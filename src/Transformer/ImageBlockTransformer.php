@@ -6,7 +6,8 @@ namespace Nowo\HtmlToWordBundle\Transformer;
 
 use DOMElement;
 use DOMNode;
-use Nowo\HtmlToWordBundle\Builder\ImageResolver;
+use Nowo\HtmlToWordBundle\Builder\ImageResolverInterface;
+use Nowo\HtmlToWordBundle\Builder\ImageStyleHelper;
 use Nowo\HtmlToWordBundle\Builder\StyleMapper;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
@@ -20,7 +21,7 @@ use PhpOffice\PhpWord\Element\AbstractContainer;
 final readonly class ImageBlockTransformer implements TransformerInterface
 {
     public function __construct(
-        private ImageResolver $imageResolver,
+        private ImageResolverInterface $imageResolver,
         private StyleMapper $styleMapper,
     ) {
     }
@@ -53,6 +54,8 @@ final readonly class ImageBlockTransformer implements TransformerInterface
         try {
             $path  = $this->imageResolver->resolveToTempPath($src, $config);
             $style = $this->imageStyle($node, $config);
+            $maxW  = (float) $config->get('images.max_width', 600);
+            $style = ImageStyleHelper::completeEmbeddingStyle($path, $style, $maxW);
             $container->addImage($path, $style);
         } catch (ImageResolveException) {
             $container->addText('[image]', $this->styleMapper->defaultFontStyle($config));

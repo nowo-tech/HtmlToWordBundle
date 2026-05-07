@@ -24,7 +24,7 @@ final readonly class InlineComposer
 {
     public function __construct(
         private StyleMapper $styleMapper,
-        private ImageResolver $imageResolver,
+        private ImageResolverInterface $imageResolver,
     ) {
     }
 
@@ -123,7 +123,8 @@ final readonly class InlineComposer
         $run  = $container instanceof TextRun ? $container : $container->addTextRun();
         $font = $this->styleMapper->defaultFontStyle($config);
         if ($href !== '') {
-            $run->addLink($href, $text, $font, [], true);
+            $internal = str_starts_with($href, '#');
+            $run->addLink($href, $text, $font, [], $internal);
         } elseif ($text !== '') {
             $run->addText($text, $font);
         }
@@ -146,6 +147,8 @@ final readonly class InlineComposer
             if ($h !== '' && is_numeric($h)) {
                 $style['height'] = (float) $h;
             }
+            $maxW  = (float) $config->get('images.max_width', 600);
+            $style = ImageStyleHelper::completeEmbeddingStyle($path, $style, $maxW);
             $container->addImage($path, $style);
         } catch (ImageResolveException) {
             $container->addText('[image]', $this->styleMapper->defaultFontStyle($config));

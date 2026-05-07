@@ -13,6 +13,8 @@ services:
 
     Nowo\HtmlToWordBundle\Builder\:
         resource: '../../Builder'
+        exclude:
+            - '../../Builder/WordDocumentBuilder.php'
 
     Nowo\HtmlToWordBundle\Config\:
         resource: '../../Config'
@@ -36,6 +38,20 @@ services:
 
     Nowo\HtmlToWordBundle\Export\:
         resource: '../../Export'
+
+    Nowo\HtmlToWordBundle\Builder\ImageResolverInterface:
+        alias: Nowo\HtmlToWordBundle\Builder\ImageResolver
+
+    Nowo\HtmlToWordBundle\Builder\WordDocumentBuilder:
+        autowire: false
+        arguments:
+            $sanitizer: '@Nowo\HtmlToWordBundle\Parser\HtmlSanitizer'
+            $remoteHttpImageInliner: '@Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner'
+            $parser: '@Nowo\HtmlToWordBundle\Parser\HtmlParser'
+            $sectionConfigurator: '@Nowo\HtmlToWordBundle\Builder\SectionConfigurator'
+            $headerFooterBuilder: '@Nowo\HtmlToWordBundle\Builder\HeaderFooterBuilder'
+            $transformerChain: '@Nowo\HtmlToWordBundle\Transformer\TransformerChain'
+            $inlineComposer: '@Nowo\HtmlToWordBundle\Builder\InlineComposer'
 
     Nowo\HtmlToWordBundle\Parser\:
         resource: '../../Parser'

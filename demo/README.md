@@ -24,7 +24,12 @@ make up
 
 Open the printed URL. The UI includes **several HTML presets** (tables, headings, code blocks, page breaks, multi-page text) and multiple **`nowo_html_to_word` profiles** (landscape, header/footer + logo + page numbers, export filenames). Pick a profile, load a preset into the textarea (or paste your own HTML), then download the `.docx`.
 
+The **`/custom-config`** route opens a form where you edit **profile JSON** merged with YAML or used inline (`convertWithInlineProfile`). It ships with a **pre-filled example** for Word **header** (`header.logo`, `header.text`) and **footer** (`footer.text`, page numbers); adjust and download.
+
 The bundle source is mounted at **`/var/html-to-word-bundle`** (see each demo’s `docker-compose.yml`).
+
+**Logo asset:** `public/demo-assets/demo-logo.png` is a raster export (PNG) of the marketing SVG from  
+`https://nowo.tech/wp-content/uploads/2022/10/nowo.tech-logo.svg` — Word/PhpWord need PNG here; the original SVG is copied beside it as `nowo.tech-logo.svg` for reference or future regeneration.
 
 See [docs/DEMO-FRANKENPHP.md](../docs/DEMO-FRANKENPHP.md) for architecture (development vs production Caddyfiles, DNS for Composer, etc.).
 

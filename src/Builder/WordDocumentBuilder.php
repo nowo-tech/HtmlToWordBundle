@@ -13,6 +13,7 @@ use Nowo\HtmlToWordBundle\Exception\UnsupportedElementException;
 use Nowo\HtmlToWordBundle\Model\WordDocument;
 use Nowo\HtmlToWordBundle\Parser\HtmlParser;
 use Nowo\HtmlToWordBundle\Parser\HtmlSanitizer;
+use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use Nowo\HtmlToWordBundle\Transformer\DocumentWalkerInterface;
 use Nowo\HtmlToWordBundle\Transformer\TransformerChain;
 use PhpOffice\PhpWord\Element\AbstractContainer;
@@ -32,6 +33,7 @@ final readonly class WordDocumentBuilder implements DocumentWalkerInterface
 {
     public function __construct(
         private HtmlSanitizer $sanitizer,
+        private RemoteHttpImageInliner $remoteHttpImageInliner,
         private HtmlParser $parser,
         private SectionConfigurator $sectionConfigurator,
         private HeaderFooterBuilder $headerFooterBuilder,
@@ -43,6 +45,7 @@ final readonly class WordDocumentBuilder implements DocumentWalkerInterface
     public function build(string $html, ResolvedConfig $config): WordDocument
     {
         $clean = $this->sanitizer->sanitize($html);
+        $clean = $this->remoteHttpImageInliner->inlineRemoteImages($clean, $config);
         $dom   = $this->parser->parse($clean);
         $this->sanitizer->sanitizeDom($dom);
         $body = $dom->getElementsByTagName('body')->item(0);
@@ -63,6 +66,9 @@ final readonly class WordDocumentBuilder implements DocumentWalkerInterface
             }
             $this->dispatch($child, $section, $config);
         }
+
+        // Temp paths from RemoteHttpImageInliner must survive until IOFactory::createWriter()->save()
+        // copies bytes into the DOCX; cleanup runs in DocxExporter after save.
 
         return new WordDocument($phpWord, $config, PhpWordEngine::NAME);
     }

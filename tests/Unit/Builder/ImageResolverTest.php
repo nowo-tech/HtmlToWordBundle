@@ -47,7 +47,7 @@ final class ImageResolverTest extends TestCase
         );
     }
 
-    public function testNonUrlNonAbsoluteThrows(): void
+    public function testNonExistentPathThrows(): void
     {
         $this->expectException(ImageResolveException::class);
         (new ImageResolver())->resolveToTempPath('not-a-url', ResolvedConfig::fromArray([]));
@@ -67,12 +67,39 @@ final class ImageResolverTest extends TestCase
         $tmp = tempnam(sys_get_temp_dir(), 'htw_img_read_');
         self::assertNotFalse($tmp);
         try {
-            file_put_contents($tmp, 'not-really-png');
+            $png = base64_decode(self::PNG_1X1, true);
+            self::assertNotFalse($png);
+            file_put_contents($tmp, $png);
             $path = (new ImageResolver())->resolveToTempPath($tmp, ResolvedConfig::fromArray([]));
             self::assertSame($tmp, $path);
         } finally {
             @unlink($tmp);
         }
+    }
+
+    public function testAbsolutePathNonRasterThrows(): void
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'htw_img_bad_');
+        self::assertNotFalse($tmp);
+        try {
+            file_put_contents($tmp, '<html>not an image</html>');
+            $this->expectException(ImageResolveException::class);
+            $this->expectExceptionMessage('not a supported raster image');
+            (new ImageResolver())->resolveToTempPath($tmp, ResolvedConfig::fromArray([]));
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
+    public function testDataUriNonRasterPayloadThrows(): void
+    {
+        $text = base64_encode('<html>error</html>');
+        $this->expectException(ImageResolveException::class);
+        $this->expectExceptionMessage('not a supported raster image');
+        (new ImageResolver())->resolveToTempPath(
+            'data:image/png;base64,' . $text,
+            ResolvedConfig::fromArray([]),
+        );
     }
 
     public function testRemoteDownloadFailureThrows(): void

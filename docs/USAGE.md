@@ -47,6 +47,20 @@ $exporter->toFlysystem($document, 'exports/out.docx'); // requires Flysystem inj
 - Scripts and dangerous markup are stripped before conversion (see sanitizer).
 - For remote images, enable `images.resolve_remote` and ensure outbound HTTP is acceptable for your environment.
 
+## Images: URLs in stored HTML (recommended)
+
+Keep `<img src="https://…">` (or `http://`) in the HTML you persist. **Immediately before** DOM parsing and PhpWord conversion, **`RemoteHttpImageInliner`** downloads each remote `src` to a **temporary file** and sets `src` to that **absolute path** (same approach as using `Html::addHtml` with local files—more reliable in PhpWord than `data:` URIs). Temp files are removed **after** `DocxExporter` finishes writing the DOCX (PhpWord reads image paths during `save()`). Your database/CMS copy stays URL-based.
+
+- Requires `images.resolve_remote: true` (default). If `false`, URLs are left unchanged and conversion falls back to `ImageResolver` at render time (same rules as before).
+- Duplicate URLs in one document are fetched once (small in-memory cache per conversion).
+- Protocol-relative URLs (`//cdn.example.com/x.png`) are normalized to `https:` before download.
+
+You can still use **data URIs** or **local file paths** in `src` directly (the bundle’s `ImageResolver` normalizes data URIs to temp files for PhpWord). **Header/footer `header.logo`** remains a **local filesystem path** only.
+
+## Images: uploads without URL
+
+After a Symfony `UploadedFile`, save the file where PHP can read it and put that **absolute path** in `src` when building the HTML string server-side (browsers cannot set OS paths). Alternatively store the file server-side and use an `https://` URL your app serves — `RemoteHttpImageInliner` will resolve it to a temp path before conversion as above.
+
 ## Extending behaviour
 
 Register additional `Nowo\HtmlToWordBundle\Transformer\TransformerInterface` implementations and tag them `html_to_word.transformer`. Higher `getPriority()` runs first when multiple transformers match the same tag.

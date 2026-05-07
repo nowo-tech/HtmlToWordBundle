@@ -10,6 +10,7 @@ use Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter;
 use Nowo\HtmlToWordBundle\Exception\ExportException;
 use Nowo\HtmlToWordBundle\Export\DocxExporter;
 use Nowo\HtmlToWordBundle\Model\WordDocument;
+use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use Nowo\HtmlToWordBundle\Tests\Fixtures\AppKernel;
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
@@ -37,7 +38,9 @@ final class DocxExporterResponsesTest extends KernelTestCase
         self::bootKernel();
         /** @var HtmlToWordConverter $converter */
         $converter = self::getContainer()->get(HtmlToWordConverter::class);
-        $exporter  = new DocxExporter();
+        /** @var RemoteHttpImageInliner $inliner */
+        $inliner  = self::getContainer()->get(RemoteHttpImageInliner::class);
+        $exporter = new DocxExporter($inliner);
 
         $doc      = $converter->convert('<p>stream</p>');
         $response = $exporter->toStreamResponse($doc);
@@ -56,7 +59,9 @@ final class DocxExporterResponsesTest extends KernelTestCase
         self::bootKernel();
         /** @var HtmlToWordConverter $converter */
         $converter = self::getContainer()->get(HtmlToWordConverter::class);
-        $exporter  = new DocxExporter();
+        /** @var RemoteHttpImageInliner $inliner */
+        $inliner  = self::getContainer()->get(RemoteHttpImageInliner::class);
+        $exporter = new DocxExporter($inliner);
 
         $doc      = $converter->convert('<p>binary</p>');
         $response = $exporter->toBinaryResponse($doc);
@@ -72,7 +77,9 @@ final class DocxExporterResponsesTest extends KernelTestCase
         self::bootKernel();
         /** @var HtmlToWordConverter $converter */
         $converter = self::getContainer()->get(HtmlToWordConverter::class);
-        $exporter  = new DocxExporter();
+        /** @var RemoteHttpImageInliner $inliner */
+        $inliner  = self::getContainer()->get(RemoteHttpImageInliner::class);
+        $exporter = new DocxExporter($inliner);
 
         $tmp = sys_get_temp_dir() . '/htw_export_' . uniqid() . '.docx';
         try {
@@ -89,7 +96,9 @@ final class DocxExporterResponsesTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $exporter = new DocxExporter();
+        /** @var RemoteHttpImageInliner $inliner */
+        $inliner  = self::getContainer()->get(RemoteHttpImageInliner::class);
+        $exporter = new DocxExporter($inliner);
 
         $bad = new WordDocument(new stdClass(), ResolvedConfig::fromArray([
             'strict_mode' => false,
@@ -118,7 +127,9 @@ final class DocxExporterResponsesTest extends KernelTestCase
             },
         );
 
-        $exporter = new DocxExporter($fs);
+        /** @var RemoteHttpImageInliner $inliner */
+        $inliner  = self::getContainer()->get(RemoteHttpImageInliner::class);
+        $exporter = new DocxExporter($inliner, $fs);
         $exporter->toFlysystem($converter->convert('<p>fly</p>'), 'remote/out.docx');
     }
 }

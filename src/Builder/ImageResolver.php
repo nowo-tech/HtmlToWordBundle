@@ -9,14 +9,14 @@ use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
 
 use function sprintf;
 
-use const FILTER_VALIDATE_URL;
-
 /**
  * Resolves <img src> to a temporary local path for PHPWord.
  *
+ * Supports data URIs, http(s) URLs, and readable local paths (Unix, Windows drive letters, project-relative when CWD allows).
+ *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
-final class ImageResolver
+final class ImageResolver implements ImageResolverInterface
 {
     /**
      * @throws ImageResolveException
@@ -29,17 +29,37 @@ final class ImageResolver
         }
 
         if (str_starts_with($src, 'data:')) {
-            return $this->fromDataUri($src);
+            $path = $this->fromDataUri($src);
+            $this->assertRasterImage($path, true);
+
+            return $path;
         }
 
-        if (str_starts_with($src, '/') && is_readable($src)) {
+        if ($this->isHttpUrl($src)) {
+            return $this->fromHttpUrl($src, $config);
+        }
+
+        if ($src !== '' && @is_readable($src)) {
+            $this->assertRasterImage($src, false);
+
             return $src;
         }
 
-        if (!filter_var($src, FILTER_VALIDATE_URL)) {
-            throw new ImageResolveException(sprintf('Unsupported image src: %s', $src));
-        }
+        throw new ImageResolveException(sprintf('Unsupported or unreadable image src: %s', $src));
+    }
 
+    private function isHttpUrl(string $src): bool
+    {
+        $lower = strtolower($src);
+
+        return str_starts_with($lower, 'http://') || str_starts_with($lower, 'https://');
+    }
+
+    /**
+     * @throws ImageResolveException
+     */
+    private function fromHttpUrl(string $src, ResolvedConfig $config): string
+    {
         if (!(bool) $config->get('images.resolve_remote', true)) {
             throw new ImageResolveException('Remote image resolution disabled by profile.');
         }
@@ -61,6 +81,7 @@ final class ImageResolver
         // @codeCoverageIgnoreEnd
 
         file_put_contents($tmp, $raw);
+        $this->assertRasterImage($tmp, true);
 
         return $tmp;
     }
@@ -86,5 +107,21 @@ final class ImageResolver
         file_put_contents($tmp, $bin);
 
         return $tmp;
+    }
+
+    /**
+     * @throws ImageResolveException
+     */
+    private function assertRasterImage(string $path, bool $unlinkTempOnFailure): void
+    {
+        if (ImageSignatureValidator::isRasterImage($path)) {
+            return;
+        }
+
+        if ($unlinkTempOnFailure && str_starts_with($path, sys_get_temp_dir())) {
+            @unlink($path);
+        }
+
+        throw new ImageResolveException('Resolved file is not a supported raster image (PNG, JPEG, GIF, WebP). Remote URLs that return HTML or JSON are rejected.');
     }
 }

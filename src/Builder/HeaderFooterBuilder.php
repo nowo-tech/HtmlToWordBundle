@@ -21,8 +21,9 @@ final class HeaderFooterBuilder
         if ((bool) $config->get('header.enabled', false)) {
             $header = $section->addHeader();
             $logo   = $config->get('header.logo');
-            if (is_string($logo) && $logo !== '' && is_readable($logo)) {
-                $header->addImage($logo, ['width' => (int) $config->get('header.logo_width', 100)]);
+            if (is_string($logo) && $logo !== '' && is_readable($logo) && ImageSignatureValidator::isRasterImage($logo)) {
+                $targetW = (int) $config->get('header.logo_width', 100);
+                $header->addImage($logo, ImageStyleHelper::headerLogoStyle($logo, $targetW > 0 ? $targetW : 100));
             }
             $ht = $config->get('header.text');
             if (is_string($ht) && $ht !== '') {

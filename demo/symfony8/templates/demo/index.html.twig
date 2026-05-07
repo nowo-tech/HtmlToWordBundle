@@ -16,8 +16,8 @@
     <code>HtmlToWordConverterInterface</code> methods:
     <code>convertWithProfile()</code>, <code>convert()</code> (YAML <code>default</code> profile) or
     <code>convertWithOptions()</code> (merge options + profile). The internal pipeline is unchanged.
-    <span class="d-block mt-2 mb-0"><a href="{{ path('demo_custom_config') }}">Full profile JSON form</a>
-      — YAML merge or inline only (<code>convertWithInlineProfile</code>), e.g. config stored in a database.</span>
+    <span class="d-block mt-2 mb-0"><a href="{{ path('demo_custom_config') }}">Formulario JSON</a>
+      — cabecera / pie de Word (<code>header</code> / <code>footer</code>), merge YAML o solo inline (<code>convertWithInlineProfile</code>).</span>
   </div>
 
   <div class="accordion mb-4" id="profiles-acc">
@@ -32,7 +32,8 @@
           <ul class="mb-0">
             <li><code>default</code>, <code>estricto</code> — <code>strict_mode</code> enabled.</li>
             <li><code>informe</code> — landscape + repeatable table header.</li>
-            <li><code>membrete</code>, <code>pie_solo</code>, <code>carta_us</code> — PhpWord header/footer and LETTER size.</li>
+            <li><code>membrete</code>, <code>pie_solo</code>, <code>carta_us</code> — cabecera/pie PhpWord y tamaño LETTER.</li>
+            <li><a href="{{ path('demo_custom_config') }}"><code>/custom-config</code></a> — mismo esquema en JSON (ejemplo precargado con cabecera + pie).</li>
             <li><code>tablas_avanzado</code> vs <code>tablas_sin_repeat</code> — <code>tables.repeat_header_row</code>.</li>
             <li><code>imagen_ancha</code> — <code>images.max_width</code> / remote images.</li>
             <li><code>densidad</code> — long text/tables + stress filename.</li>

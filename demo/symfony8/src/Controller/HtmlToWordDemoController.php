@@ -28,6 +28,7 @@ use const JSON_HEX_QUOT;
 use const JSON_HEX_TAG;
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 
 /**
@@ -72,14 +73,16 @@ final class HtmlToWordDemoController extends AbstractController
                     : ($profileKeys[0] ?? 'default');
             }
 
-            $preset = $request->request->getString('preset');
-            $html   = DemoHtmlSamples::html($preset);
+            $samplePath = $this->getParameter('kernel.project_dir').'/public/demo/sample.png';
+            $preset     = $request->request->getString('preset');
+            $html       = DemoHtmlSamples::html($preset);
             if ($html === null) {
                 $html = $request->request->getString('html');
             }
             if ($html === '') {
                 $html = '<p><em>Empty</em> — pick a preset or paste HTML.</p>';
             }
+            $html = str_replace(DemoHtmlSamples::DEMO_SAMPLE_IMAGE_PLACEHOLDER, $samplePath, $html);
 
             $api = $request->request->getString('api', self::API_PROFILE);
             if (!in_array($api, [self::API_CONVERT, self::API_PROFILE, self::API_OPTIONS], true)) {
@@ -106,7 +109,8 @@ final class HtmlToWordDemoController extends AbstractController
             return $exporter->toStreamResponse($document);
         }
 
-        $presets = DemoHtmlSamples::PRESETS;
+        $samplePath = $this->getParameter('kernel.project_dir').'/public/demo/sample.png';
+        $presets    = DemoHtmlSamples::presetsWithResolvedSampleImage($samplePath);
 
         return $this->render('demo/index.html.twig', [
             'profiles'         => $profileKeys,
@@ -132,6 +136,10 @@ final class HtmlToWordDemoController extends AbstractController
         $sampleSource = $this->htmlToWordProfiles[$this->htmlToWordDefaultProfile]
             ?? ($this->htmlToWordProfiles[$profileKeys[0] ?? ''] ?? []);
         $sampleConfigJson = json_encode($sampleSource, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $headerFooterDemoJson = json_encode(
+            DemoHtmlSamples::headerFooterDemoOverlay((string) $this->getParameter('kernel.project_dir')),
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
+        );
 
         if ($request->isMethod('POST')) {
             $rawJson = $request->request->getString('config_json');
@@ -184,6 +192,7 @@ final class HtmlToWordDemoController extends AbstractController
             'profiles'                   => $profileKeys,
             'default_profile'            => $this->htmlToWordDefaultProfile,
             'sample_config_json'         => $sampleConfigJson,
+            'header_footer_demo_json'    => $headerFooterDemoJson,
             'default_custom_config_html' => DemoHtmlSamples::CUSTOM_CONFIG_DEFAULT_HTML,
         ]);
     }

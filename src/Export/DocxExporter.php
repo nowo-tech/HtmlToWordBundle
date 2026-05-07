@@ -8,6 +8,7 @@ use League\Flysystem\FilesystemOperator;
 use Nowo\HtmlToWordBundle\Engine\PhpWordEngine;
 use Nowo\HtmlToWordBundle\Exception\ExportException;
 use Nowo\HtmlToWordBundle\Model\WordDocument;
+use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -23,6 +24,7 @@ use function sprintf;
 final readonly class DocxExporter implements ExporterInterface
 {
     public function __construct(
+        private RemoteHttpImageInliner $remoteHttpImageInliner,
         private ?FilesystemOperator $flysystem = null,
     ) {
     }
@@ -31,15 +33,18 @@ final readonly class DocxExporter implements ExporterInterface
     {
         $filename = $document->suggestedFilename();
         $writer   = IOFactory::createWriter($this->requirePhpWord($document), 'Word2007');
+        $inliner  = $this->remoteHttpImageInliner;
 
         return new StreamedResponse(
-            static function () use ($writer): void {
+            static function () use ($writer, $inliner): void {
                 try {
                     $writer->save('php://output');
                 } catch (Throwable $e) {
                     // @codeCoverageIgnoreStart
                     throw new ExportException('Failed to stream DOCX: ' . $e->getMessage(), 0, $e);
                     // @codeCoverageIgnoreEnd
+                } finally {
+                    $inliner->cleanupInlineSession();
                 }
             },
             200,
@@ -65,6 +70,8 @@ final readonly class DocxExporter implements ExporterInterface
             @unlink($tmp);
             throw new ExportException('Failed to write DOCX to temporary file: ' . $e->getMessage(), 0, $e);
             // @codeCoverageIgnoreEnd
+        } finally {
+            $this->remoteHttpImageInliner->cleanupInlineSession();
         }
 
         $response = new BinaryFileResponse($tmp);
@@ -84,6 +91,8 @@ final readonly class DocxExporter implements ExporterInterface
             // @codeCoverageIgnoreStart
             throw new ExportException(sprintf('Failed to save DOCX to "%s": %s', $path, $e->getMessage()), 0, $e);
             // @codeCoverageIgnoreEnd
+        } finally {
+            $this->remoteHttpImageInliner->cleanupInlineSession();
         }
     }
 

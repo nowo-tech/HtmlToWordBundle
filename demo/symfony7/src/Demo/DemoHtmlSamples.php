@@ -9,6 +9,38 @@ namespace App\Demo;
  */
 final class DemoHtmlSamples
 {
+    /**
+     * Replaced at runtime with {@code kernel.project_dir/public/demo/sample.png} so PhpWord receives an absolute path.
+     */
+    public const DEMO_SAMPLE_IMAGE_PLACEHOLDER = '__DEMO_SAMPLE_IMAGE_PATH__';
+
+    /**
+     * Overlay JSON for {@code /custom-config}: Word header (logo + text), footer (text + {@code {PAGE}}).
+     * Pass Symfony {@code kernel.project_dir} so {@code header.logo} is an absolute path (JSON cannot use {@code %kernel.project_dir%}).
+     *
+     * @return array<string, mixed>
+     */
+    public static function headerFooterDemoOverlay(string $projectDir): array
+    {
+        return [
+            'export' => [
+                'filename' => 'demo-cabecera-pie.docx',
+            ],
+            'header' => [
+                'enabled'          => true,
+                'text'             => 'HtmlToWordBundle — cabecera (perfil JSON)',
+                'logo'             => $projectDir . '/public/demo-assets/demo-logo.png',
+                'logo_width'       => 120,
+                'show_page_number' => false,
+            ],
+            'footer' => [
+                'enabled'          => true,
+                'text'             => 'Demo — ',
+                'show_page_number' => true,
+            ],
+        ];
+    }
+
     /** @var array<string, string> */
     public const PRESETS = [
         'minimal' => <<<'HTML'
@@ -18,6 +50,13 @@ HTML,
 <h1>Technical report</h1>
 <p class="lead">Short introduction with inline elements: <strong>strong</strong>, <em>emphasis</em>,
 <code>code</code>, and a <a href="#">link</a> (may export as plain text).</p>
+
+<h2>Sample image (local file)</h2>
+<p>Raster from <code>public/demo/sample.png</code>. At runtime the demo replaces the <code>src</code> placeholder with
+<code>kernel.project_dir</code> + <code>/public/demo/sample.png</code> (absolute path). The <code>&lt;img&gt;</code> is a
+<strong>block</strong> sibling of paragraphs so PhpWord uses the block image transformer (inline <code>&lt;p&gt;&lt;img&gt;</code>
+is less reliable in PhpWord).</p>
+<img src="__DEMO_SAMPLE_IMAGE_PATH__" alt="HtmlToWord demo sample" width="200" height="120" />
 
 <h2>Goals</h2>
 <ul>
@@ -223,7 +262,7 @@ HTML,
         ],
         'articulo' => [
             'profile' => 'default',
-            'stack'   => 'Heading/List/Blockquote/Hr transformers + PhpWord paragraph styles.',
+            'stack'   => 'Heading/List/Blockquote/Hr + local raster (public/demo/sample.png → absolute path for PhpWord).',
         ],
         'tablas' => [
             'profile' => 'tablas_avanzado',
@@ -260,6 +299,7 @@ HTML,
      */
     public const CUSTOM_CONFIG_DEFAULT_HTML = <<<'HTML'
 <h1>Reference manual — HtmlToWordBundle</h1>
+<img src="https://picsum.photos/id/237/420/280" alt="Remote HTTPS image (Picsum)" width="420" height="280" />
 <p class="lead"><strong>Demonstration document</strong> mixing blocks to exercise Word export:
 headings, lists, tables with headers, quotes, code, inline typography, and page breaks.</p>
 
@@ -396,6 +436,23 @@ HTML;
     public static function html(string $preset): ?string
     {
         return self::PRESETS[$preset] ?? null;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function presetsWithResolvedSampleImage(string $absoluteSampleImagePath): array
+    {
+        $presets = self::PRESETS;
+        if (isset($presets['articulo'])) {
+            $presets['articulo'] = str_replace(
+                self::DEMO_SAMPLE_IMAGE_PLACEHOLDER,
+                $absoluteSampleImagePath,
+                $presets['articulo'],
+            );
+        }
+
+        return $presets;
     }
 
     /** @return list<string> */
