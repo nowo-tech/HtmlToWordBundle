@@ -20,6 +20,23 @@ Symfony DI tags for transformers and engines remain **`html_to_word.transformer`
 
 The bundle’s default converter gained **`convertWithInlineProfile()`**. If you maintain a **custom implementation** of `HtmlToWordConverterInterface`, add this method and route it to your engine with `ResolvedConfig::fromArray($profileConfig)` (or equivalent), matching the profile subtree shape documented under `nowo_html_to_word.profiles` in [CONFIGURATION.md](CONFIGURATION.md).
 
+## 1.0.x → 1.1.0
+
+### `DocxExporter` constructor
+
+If you **instantiate** `Nowo\HtmlToWordBundle\Export\DocxExporter` yourself (unit tests, custom wiring), the constructor is now:
+
+```php
+public function __construct(
+    \Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner $remoteHttpImageInliner,
+    ?\League\Flysystem\FilesystemOperator $flysystem = null,
+) {}
+```
+
+Previously it was only `?FilesystemOperator $flysystem = null`. Inject `RemoteHttpImageInliner` first (or obtain both services from the Symfony container and pass them in).
+
+Applications that only use **`ExporterInterface`** from the container require **no code changes** — the bundle definition already wires the inliner.
+
 ## Version 1.x
 
 Future breaking changes will be listed here with migration steps.

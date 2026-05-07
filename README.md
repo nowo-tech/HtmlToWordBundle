@@ -16,6 +16,8 @@ Symfony bundle that converts **rich HTML** (WYSIWYG output from TipTap, CKEditor
 - **named YAML profiles** + **default profile** + **deep merge** with per-call options, or **`convertWithInlineProfile()`** for a full stored profile (no YAML merge);
 - **sanitization** and HTML5 parsing (**masterminds/html5**);
 - **tagged transformers** for block elements (`p`, headings, lists, tables, images, …);
+- **remote & inline images** — optional download of `http(s)://` `<img src>` to temp paths before PhpWord, with cleanup after DOCX `save`;
+- optional **header/footer** (logo, text, page numbers) per profile;
 - **Symfony-friendly export**: streamed/binary responses, local path, optional **Flysystem**.
 
 This bundle does **not** render Twig, generate HTML, produce PDF, or edit existing Word files.

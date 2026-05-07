@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-05-07
+
+### Added
+
+- **`RemoteHttpImageInliner`** — before PhpWord runs, resolves remote `<img src="http(s)://…">` to a **temporary absolute path** (PhpWord-friendly); optional cache per URL in one conversion. Requires `images.resolve_remote` (default `true`).
+- **`DocxExporter`** calls `RemoteHttpImageInliner::cleanupInlineSession()` **after** the Word writer `save()` completes so raster bytes are embedded in the DOCX (not before).
+- **`ImageStyleHelper::completeEmbeddingStyle()`** — when `getimagesize()` fails, width/height still converted from HTML attributes (CSS px → pt) with sensible defaults.
+- **Demo** (`demo/symfony7`, `demo/symfony8`): `DemoHtmlSamples::headerFooterDemoOverlay()`, `/custom-config` pre-filled JSON for `header` / `footer`, block-level sample images, `public/demo/sample.png`.
+
+### Changed
+
+- **`DocxExporter` constructor** — first argument `RemoteHttpImageInliner`, second `?FilesystemOperator $flysystem` (unchanged order after that). **Apps using autowiring:** no change. **Manual `new DocxExporter(...)`** (e.g. tests): pass an inliner instance first — see [UPGRADING.md](UPGRADING.md).
+- **`WordDocumentBuilder`** service definition uses explicit `autowire: false` and ordered constructor arguments so `RemoteHttpImageInliner` is injected correctly.
+
+### Fixed
+
+- Word displaying “The picture can’t be displayed…” for remote images when temp files were deleted before PhpWord read them during `save()`.
+
 ## [1.0.0] - 2026-05-07
 
 ### Added
@@ -18,5 +36,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.0.0

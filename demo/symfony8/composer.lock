@@ -267,7 +267,7 @@
             "dist": {
                 "type": "path",
                 "url": "/var/html-to-word-bundle",
-                "reference": "6af8a6e95eba51b62647c3fab1c034023d9207c6"
+                "reference": "9f0b00716169fbc9b45294904c7d4293fe13278d"
             },
             "require": {
                 "ext-dom": "*",

@@ -94,4 +94,5 @@ return (new Config())
         (new Finder())
             ->in(__DIR__)
             ->exclude(['vendor', 'var', 'coverage', '.phpunit.cache'])
+            ->notPath('#demo/symfony[78]/config/reference\\.php$#')
     );

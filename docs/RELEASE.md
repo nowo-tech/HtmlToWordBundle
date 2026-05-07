@@ -10,8 +10,8 @@ Maintainers cut releases from the default branch using **annotated Git tags** `v
 4. Create an annotated tag with release notes (same message as GitHub Release body when possible):
 
 ```bash
-git tag -a v1.0.0 -m "Release v1.0.0 — first stable; see docs/CHANGELOG.md"
-git push origin v1.0.0
+git tag -a v1.1.0 -m "Release v1.1.0 — remote image inlining + exporter cleanup; see docs/CHANGELOG.md"
+git push origin v1.1.0
 ```
 
 5. GitHub Actions **release.yml** creates or updates the GitHub Release from the tag (and can pull changelog content from `docs/CHANGELOG.md`).

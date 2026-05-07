@@ -73,7 +73,7 @@ final class HtmlToWordDemoController extends AbstractController
                     : ($profileKeys[0] ?? 'default');
             }
 
-            $samplePath = $this->getParameter('kernel.project_dir').'/public/demo/sample.png';
+            $samplePath = $this->getParameter('kernel.project_dir') . '/public/demo/sample.png';
             $preset     = $request->request->getString('preset');
             $html       = DemoHtmlSamples::html($preset);
             if ($html === null) {
@@ -109,7 +109,7 @@ final class HtmlToWordDemoController extends AbstractController
             return $exporter->toStreamResponse($document);
         }
 
-        $samplePath = $this->getParameter('kernel.project_dir').'/public/demo/sample.png';
+        $samplePath = $this->getParameter('kernel.project_dir') . '/public/demo/sample.png';
         $presets    = DemoHtmlSamples::presetsWithResolvedSampleImage($samplePath);
 
         return $this->render('demo/index.html.twig', [
@@ -135,7 +135,7 @@ final class HtmlToWordDemoController extends AbstractController
         $profileKeys  = array_keys($this->htmlToWordProfiles);
         $sampleSource = $this->htmlToWordProfiles[$this->htmlToWordDefaultProfile]
             ?? ($this->htmlToWordProfiles[$profileKeys[0] ?? ''] ?? []);
-        $sampleConfigJson = json_encode($sampleSource, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $sampleConfigJson     = json_encode($sampleSource, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         $headerFooterDemoJson = json_encode(
             DemoHtmlSamples::headerFooterDemoOverlay((string) $this->getParameter('kernel.project_dir')),
             JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,

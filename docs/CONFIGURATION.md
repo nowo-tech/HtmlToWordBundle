@@ -56,7 +56,7 @@ See `Nowo\HtmlToWordBundle\Config\ProfileResolver`.
 
 ## Flysystem wiring
 
-Override the exporter service:
+Override the exporter service (only `$flysystem` is usually needed; the first argument defaults to the bundle’s `RemoteHttpImageInliner`):
 
 ```yaml
 services:
@@ -65,4 +65,4 @@ services:
             $flysystem: '@your.filesystem.operator.service.id'
 ```
 
-If `$flysystem` is `null`, `toFlysystem()` throws `ExportException`.
+If you replace the whole service definition, wire **`$remoteHttpImageInliner`** explicitly when required by your Symfony version. If `$flysystem` is `null`, `toFlysystem()` throws `ExportException`.

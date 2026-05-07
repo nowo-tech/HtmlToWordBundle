@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Nowo\HtmlToWordBundle\Tests\Unit\Export;
 
+use Nowo\HtmlToWordBundle\Builder\ImageResolverInterface;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Engine\PhpWordEngine;
 use Nowo\HtmlToWordBundle\Exception\ExportException;
 use Nowo\HtmlToWordBundle\Export\DocxExporter;
-use Nowo\HtmlToWordBundle\Builder\ImageResolverInterface;
 use Nowo\HtmlToWordBundle\Model\WordDocument;
 use Nowo\HtmlToWordBundle\Parser\HtmlParser;
 use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
@@ -24,7 +24,7 @@ final class DocxExporterFlysystemNullTest extends TestCase
             'export'      => ['filename' => 'x.docx'],
         ]), PhpWordEngine::NAME);
 
-        $inliner = new RemoteHttpImageInliner(new HtmlParser(), $this->createMock(ImageResolverInterface::class));
+        $inliner  = new RemoteHttpImageInliner(new HtmlParser(), $this->createMock(ImageResolverInterface::class));
         $exporter = new DocxExporter($inliner);
 
         $this->expectException(ExportException::class);

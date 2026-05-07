@@ -40,4 +40,4 @@ Set `default_profile` and at least one profile under `profiles` (the `default` p
 
 ## Optional: Flysystem
 
-To export to a remote or custom filesystem, define a `League\Flysystem\FilesystemOperator` service in your app and pass it to `Nowo\HtmlToWordBundle\Export\DocxExporter` (see [CONFIGURATION.md](CONFIGURATION.md)).
+To export to a remote or custom filesystem, define a `League\Flysystem\FilesystemOperator` service in your app and pass it as the **second** constructor argument to `Nowo\HtmlToWordBundle\Export\DocxExporter` (after `RemoteHttpImageInliner`; see [CONFIGURATION.md](CONFIGURATION.md) and [UPGRADING.md](UPGRADING.md)).

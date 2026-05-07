@@ -41,6 +41,8 @@ $exporter->toFile($document, '/tmp/out.docx');
 $exporter->toFlysystem($document, 'exports/out.docx'); // requires Flysystem injection
 ```
 
+If you **bypass** `DocxExporter` and call `IOFactory::createWriter($document->phpWord(), 'Word2007')->save($path)` yourself, run **`RemoteHttpImageInliner::cleanupInlineSession()`** after a successful `save()` when the HTML contained resolved remote images (or rely on the next conversion’s cleanup). Prefer the exporter for a correct lifecycle.
+
 ## HTML expectations
 
 - Pass **final HTML** as produced by your editor or renderer (no Twig placeholders left unresolved upstream).

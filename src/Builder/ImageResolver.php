@@ -39,7 +39,7 @@ final class ImageResolver implements ImageResolverInterface
             return $this->fromHttpUrl($src, $config);
         }
 
-        if ($src !== '' && @is_readable($src)) {
+        if (@is_readable($src)) {
             $this->assertRasterImage($src, false);
 
             return $src;
