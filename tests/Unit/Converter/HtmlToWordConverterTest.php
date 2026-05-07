@@ -63,7 +63,7 @@ final class HtmlToWordConverterTest extends TestCase
         $engine->expects(self::once())->method('build')
             ->with(
                 '<p>x</p>',
-                self::callback(static fn(ResolvedConfig $c): bool => $c->get('strict_mode') === true
+                self::callback(static fn (ResolvedConfig $c): bool => $c->get('strict_mode') === true
                     && $c->get('export.filename') === 'from-inline.docx'),
             )
             ->willReturn(new WordDocument(new PhpWord(), ResolvedConfig::fromArray(['strict_mode' => true]), 'phpword'));

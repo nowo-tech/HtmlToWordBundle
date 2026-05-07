@@ -5,12 +5,12 @@ Maintainers cut releases from the default branch using **annotated Git tags** `v
 ## Steps
 
 1. Ensure `main` (or the release branch) passes CI and local `make release-check`.
-2. Update `docs/CHANGELOG.md`: move items from **Unreleased** to a new `## [x.y.z]` section with the release date.
-3. Commit changelog changes.
+2. Update `docs/CHANGELOG.md`: move items from **Unreleased** to a new `## [x.y.z]` section with the release date (YYYY-MM-DD), and add compare links at the bottom if used.
+3. Commit changelog (and any UPGRADING / USAGE updates).
 4. Create an annotated tag with release notes (same message as GitHub Release body when possible):
 
 ```bash
-git tag -a v1.0.0 -m "Release v1.0.0 — summary here"
+git tag -a v1.0.0 -m "Release v1.0.0 — first stable; see docs/CHANGELOG.md"
 git push origin v1.0.0
 ```
 

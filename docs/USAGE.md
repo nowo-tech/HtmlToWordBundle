@@ -21,6 +21,13 @@ $document = $converter->convertWithOptions($html, [
     'page' => ['orientation' => 'landscape'],
     'export' => ['filename' => 'report.docx'],
 ], null);
+
+// Full profile array only — no YAML merge (e.g. JSON decoded from a database)
+$document = $converter->convertWithInlineProfile($html, [
+    'strict_mode' => false,
+    'export' => ['filename' => 'stored-profile.docx'],
+    // …same keys as under nowo_html_to_word.profiles.<name> in YAML
+]);
 ```
 
 ## Exporting

@@ -21,7 +21,7 @@ Conversion backend identifier. Currently supported:
 |-------------|-------------------|--------|
 | `phpword` (default) | `phpoffice/phpword` (required by this bundle) | Full HTML pipeline via transformers. |
 
-Changing only this key switches the implementation used by `HtmlToWordConverter` (`convert`, `convertWithProfile`, `convertWithOptions`). At runtime, if the selected engine’s classes are missing, `EngineNotAvailableException` is thrown with the Composer package(s) to install.
+Changing only this key switches the implementation used by `HtmlToWordConverter` (`convert`, `convertWithProfile`, `convertWithOptions`, `convertWithInlineProfile`). At runtime, if the selected engine’s classes are missing, `EngineNotAvailableException` is thrown with the Composer package(s) to install.
 
 To add another engine: implement `Nowo\HtmlToWordBundle\Engine\WordEngineInterface`, register the service (the bundle tags `WordEngineInterface` with `html_to_word.engine`), add the engine name to `Nowo\HtmlToWordBundle\DependencyInjection\Configuration::SUPPORTED_ENGINES`, and wire any exporter if the output format differs from PHPWord `.docx`.
 
@@ -51,6 +51,8 @@ Configuration is merged as:
 3. Ad-hoc options passed to `convertWithOptions()` (deepest wins).
 
 See `Nowo\HtmlToWordBundle\Config\ProfileResolver`.
+
+`convertWithInlineProfile()` **does not** use this merge: it builds `ResolvedConfig` only from the associative array you pass (same keys as a single `profiles.<name>` entry). Use it when the full profile is stored outside YAML (e.g. database JSON).
 
 ## Flysystem wiring
 

@@ -16,6 +16,10 @@ If you used **`html_to_word`** as the YAML root key and **`config/packages/html_
 
 Symfony DI tags for transformers and engines remain **`html_to_word.transformer`** and **`html_to_word.engine`** (unchanged).
 
+## `HtmlToWordConverterInterface` implementors (v1.0.0+)
+
+The bundle’s default converter gained **`convertWithInlineProfile()`**. If you maintain a **custom implementation** of `HtmlToWordConverterInterface`, add this method and route it to your engine with `ResolvedConfig::fromArray($profileConfig)` (or equivalent), matching the profile subtree shape documented under `nowo_html_to_word.profiles` in [CONFIGURATION.md](CONFIGURATION.md).
+
 ## Version 1.x
 
-No prior public major version; future breaking changes will be listed here with migration steps.
+Future breaking changes will be listed here with migration steps.

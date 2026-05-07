@@ -13,7 +13,7 @@
 
 Symfony bundle that converts **rich HTML** (WYSIWYG output from TipTap, CKEditor, etc.—already rendered server-side) into a downloadable **`.docx`** using **PHPWord**, with:
 
-- **named YAML profiles** + **default profile** + **deep merge** with per-call options;
+- **named YAML profiles** + **default profile** + **deep merge** with per-call options, or **`convertWithInlineProfile()`** for a full stored profile (no YAML merge);
 - **sanitization** and HTML5 parsing (**masterminds/html5**);
 - **tagged transformers** for block elements (`p`, headings, lists, tables, images, …);
 - **Symfony-friendly export**: streamed/binary responses, local path, optional **Flysystem**.
