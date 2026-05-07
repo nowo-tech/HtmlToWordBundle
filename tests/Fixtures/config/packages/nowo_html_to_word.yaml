@@ -1,0 +1,5 @@
+nowo_html_to_word:
+    default_profile: default
+    profiles:
+        default:
+            strict_mode: false

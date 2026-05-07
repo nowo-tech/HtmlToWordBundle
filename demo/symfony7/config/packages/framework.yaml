@@ -1,0 +1,12 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    http_method_override: false
+    session: true
+    php_errors:
+        log: true
+
+# Enable profiler in dev so the Web Profiler toolbar can collect and display data
+when@dev:
+    framework:
+        profiler:
+            only_exceptions: false

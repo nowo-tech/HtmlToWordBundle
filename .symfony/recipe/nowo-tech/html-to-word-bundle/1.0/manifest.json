@@ -1,0 +1,8 @@
+{
+    "bundles": {
+        "Nowo\\HtmlToWordBundle\\HtmlToWordBundle": ["all"]
+    },
+    "copy-from-recipe": {
+        "config/packages/nowo_html_to_word.yaml": "%CONFIG_DIR%/packages/nowo_html_to_word.yaml"
+    }
+}

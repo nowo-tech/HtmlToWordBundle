@@ -1,0 +1,77 @@
+# Copy into your application as config/packages/html_to_word.yaml (adjust profiles as needed).
+#
+# Merge order: profile "default" + named profile + convertWithOptions() array (deepest wins).
+
+html_to_word:
+    default_profile: default
+
+    profiles:
+        default:
+            strict_mode: false
+            page:
+                size: A4
+                orientation: portrait
+                margins:
+                    top: 1440
+                    right: 1440
+                    bottom: 1440
+                    left: 1440
+            fonts:
+                default: Arial
+                fallback: 'Times New Roman'
+                size_unit: pt
+                default_size: 11
+            styles:
+                heading_map:
+                    h1: Heading1
+                    h2: Heading2
+                    h3: Heading3
+                    h4: Heading4
+                    h5: Heading5
+                    h6: Heading6
+                paragraph_spacing:
+                    before: 0
+                    after: 160
+                custom_class_map: []
+            header:
+                enabled: false
+                logo: ~
+                logo_width: 100
+                show_page_number: false
+                text: ~
+                different_first_page: false
+            footer:
+                enabled: false
+                show_page_number: true
+                text: ~
+                different_first_page: false
+            images:
+                max_width: 600
+                resolve_remote: true
+            export:
+                filename: document.docx
+                storage: memory
+                local_path: ~
+                flysystem_adapter: ~
+            tables:
+                repeat_header_row: true
+
+        carta_comercial:
+            page:
+                margins:
+                    top: 2000
+                    right: 1800
+                    bottom: 2000
+                    left: 2500
+            fonts:
+                default: 'Times New Roman'
+                default_size: 12
+            header:
+                enabled: true
+                logo: '/assets/logo.png'
+                logo_width: 120
+            footer:
+                enabled: true
+                show_page_number: true
+            export:
+                filename: carta.docx

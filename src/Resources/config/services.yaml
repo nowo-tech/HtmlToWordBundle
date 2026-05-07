@@ -1,0 +1,65 @@
+# HtmlToWordBundle — service wiring (public API: converter + exporter + extensible transformers)
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    _instanceof:
+        Nowo\HtmlToWordBundle\Transformer\TransformerInterface:
+            tags: ['html_to_word.transformer']
+        Nowo\HtmlToWordBundle\Engine\WordEngineInterface:
+            tags: ['html_to_word.engine']
+
+    Nowo\HtmlToWordBundle\Builder\:
+        resource: '../../Builder'
+
+    Nowo\HtmlToWordBundle\Config\:
+        resource: '../../Config'
+
+    Nowo\HtmlToWordBundle\Converter\:
+        resource: '../../Converter'
+
+    Nowo\HtmlToWordBundle\Engine\:
+        resource: '../../Engine'
+        exclude:
+            - '../../Engine/{WordEngineInterface.php,EngineRegistry.php}'
+
+    Nowo\HtmlToWordBundle\Engine\EngineRegistry:
+        arguments:
+            $engines: !tagged_iterator html_to_word.engine
+
+    Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter:
+        public: true
+        arguments:
+            $engineName: '%nowo_html_to_word.engine%'
+
+    Nowo\HtmlToWordBundle\Export\:
+        resource: '../../Export'
+
+    Nowo\HtmlToWordBundle\Parser\:
+        resource: '../../Parser'
+
+    Nowo\HtmlToWordBundle\Transformer\:
+        resource: '../../Transformer'
+        exclude:
+            - '../../Transformer/{TransformerChain.php,TransformerInterface.php,DocumentWalkerInterface.php}'
+
+    Nowo\HtmlToWordBundle\Config\ProfileResolver:
+        arguments:
+            $profiles: '%nowo_html_to_word.profiles%'
+            $defaultProfile: '%nowo_html_to_word.default_profile%'
+
+    Nowo\HtmlToWordBundle\Transformer\TransformerChain:
+        arguments:
+            $transformers: !tagged_iterator html_to_word.transformer
+
+    Nowo\HtmlToWordBundle\Export\DocxExporter:
+        arguments:
+            $flysystem: null
+
+    Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface:
+        alias: Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter
+
+    Nowo\HtmlToWordBundle\Export\ExporterInterface:
+        alias: Nowo\HtmlToWordBundle\Export\DocxExporter

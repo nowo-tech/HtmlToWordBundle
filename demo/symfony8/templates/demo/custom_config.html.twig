@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}HtmlToWord — JSON configuration (Symfony 8){% endblock %}
+
+{% block body %}
+  <h1>Full profile configuration <span class="text-secondary fs-5">(Symfony 8)</span></h1>
+  <p class="lead">
+    Same shape as one entry under <code>nowo_html_to_word.profiles</code> in YAML. Paste what you would store
+    in a database (e.g. JSON column) or use for experiments.
+  </p>
+
+  <div class="alert alert-secondary small mb-4">
+    <p class="mb-2"><strong>Merge with YAML</strong> — <code>convertWithOptions($html, $options, $profile)</code>:
+      merge order = YAML <code>default</code> profile + selected named profile + your JSON (deepest wins).</p>
+    <p class="mb-0"><strong>This config only</strong> — <code>convertWithInlineProfile($html, $options)</code>:
+      no YAML merge; use when the full profile lives in a database.</p>
+  </div>
+
+  <form method="post" action="{{ path('demo_custom_config') }}" class="mb-4">
+    <fieldset class="border rounded p-3 mb-3">
+      <legend class="float-none w-auto px-2 fs-6">Mode</legend>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="mode" id="mode-merge" value="merge" checked>
+        <label class="form-check-label" for="mode-merge">Merge JSON on top of YAML profiles (pick base profile)</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="mode" id="mode-inline" value="inline">
+        <label class="form-check-label" for="mode-inline">JSON only (inline / typical DB) — <code>convertWithInlineProfile</code></label>
+      </div>
+    </fieldset>
+
+    <div class="row g-3 mb-3" id="profile-row">
+      <div class="col-md-6">
+        <label for="profile" class="form-label">YAML profile (merge mode only)</label>
+        <select class="form-select" id="profile" name="profile">
+          {% for p in profiles %}
+            <option value="{{ p }}" {% if p == default_profile %}selected{% endif %}>{{ p }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <label for="html-field" class="form-label">HTML</label>
+    <p class="form-text small mb-1">Default content: long multi-page sample (tables, lists, quotes, <code>pre</code>, typography, <code>page-break</code>).</p>
+    <textarea class="form-control font-monospace small mb-3" id="html-field" name="html" rows="28" spellcheck="false">{{ default_custom_config_html|raw }}</textarea>
+
+    <label for="config-json" class="form-label">Configuration (profile JSON)</label>
+    <textarea class="form-control font-monospace small mb-2" id="config-json" name="config_json" rows="22" spellcheck="false" required>{{ sample_config_json }}</textarea>
+    <p class="form-text">Initial template = <code>{{ default_profile }}</code> profile from this demo. Adjust keys per bundle <code>Configuration</code>.</p>
+
+    <button type="submit" class="btn btn-primary">Download .docx</button>
+    <a href="{{ path('demo_home') }}" class="btn btn-outline-secondary ms-2">Back to main demo</a>
+  </form>
+
+  <script>
+    function syncProfileRow() {
+      const inline = document.getElementById('mode-inline').checked;
+      document.getElementById('profile-row').style.display = inline ? 'none' : '';
+      const sel = document.getElementById('profile');
+      if (sel) { sel.disabled = inline; }
+    }
+    document.getElementById('mode-merge').addEventListener('change', syncProfileRow);
+    document.getElementById('mode-inline').addEventListener('change', syncProfileRow);
+    syncProfileRow();
+  </script>
+{% endblock %}
