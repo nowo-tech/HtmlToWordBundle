@@ -34,8 +34,8 @@ final class RemoteHttpImageInliner
     private array $sessionTempFiles = [];
 
     public function __construct(
-        private HtmlParser $htmlParser,
-        private ImageResolverInterface $imageResolver,
+        private readonly HtmlParser $htmlParser,
+        private readonly ImageResolverInterface $imageResolver,
     ) {
     }
 
