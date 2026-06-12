@@ -1,5 +1,7 @@
 # ENGRAM — HtmlToWordBundle semantics
 
+Repository-local **product spec** and **`REQ-*`** traceability (Makefiles, demos) are described in [Spec-driven development](SPEC-DRIVEN-DEVELOPMENT.md).
+
 This document summarizes **meaning**, **inputs/outputs**, and **composition** for assistants and maintainers.
 
 ## Purpose
