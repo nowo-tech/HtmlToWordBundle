@@ -86,4 +86,5 @@ release-check: ensure-up update-bundle test verify-http
 	@echo "Demo release-check OK."
 
 # REQ-MAKE-008: update-deps (REQ-MAKE-008)
-include $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/../../../.scripts/Makefile.demo-update-deps.mk
+BUNDLE_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/../..)
+include $(BUNDLE_ROOT)/../.scripts/Makefile.demo-update-deps.mk
