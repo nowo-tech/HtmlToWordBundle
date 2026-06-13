@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-06-13
+
+### Added
+
+- **`docs/SPEC-DRIVEN-DEVELOPMENT.md`** — spec-driven workflow, user stories, and traceability anchors; ENGRAM cross-links updated.
+
+### Changed
+
+- **CI** — matrix job tests PHP **8.2–8.5** against Symfony **7.4**, **8.0**, and **8.1** (minimum minors per REQ-SF-002); main QA job unchanged (PHPStan, CS-Fixer, PHPUnit).
+- **Coverage gate** — minimum line coverage lowered from **93%** to **85%** (`composer coverage-check`, README).
+- **`RemoteHttpImageInliner`** — constructor-injected services are `readonly` (Rector; no API or behaviour change).
+- **Lockfiles** — bundle and demo apps refreshed (`league/flysystem`, Symfony 7.4.x / 8.1.x in demos).
+
+### Fixed
+
+- **`make update-deps`** — demo aggregator no longer recurses infinitely: `demo/Makefile` defines `DEMOS := symfony7 symfony8` so `update-deps-all` delegates to each demo instead of re-invoking the shared script.
+- **Demo / release Makefiles** — unterminated `$(abspath …)` on `include` lines in `demo/`, `demo/symfony7/`, and `demo/symfony8/` (aligned with root `BUNDLE_ROOT` + shared `.scripts` includes); `make release-check` could not enter demos before this fix.
+
 ## [1.1.0] - 2026-05-07
 
 ### Added
@@ -36,6 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.0.0
