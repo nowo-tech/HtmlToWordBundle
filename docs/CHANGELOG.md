@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [1.1.2] - 2026-07-03
 
+### Added
+
+- **CodeRabbit** — `.coderabbit.yaml` and `.github/workflows/coderabbit.yml` for automated PR reviews (maintainers; no runtime impact on the bundle).
+
 ### Changed
 
 - **Lockfiles** — bundle and `demo/symfony7` `composer.lock` refreshed (`make update-deps`; Symfony 7.4.14, PHPStan, Rector, and related dev tooling).
