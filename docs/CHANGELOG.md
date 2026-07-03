@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-07-03
+
+### Changed
+
+- **Lockfiles** — bundle and `demo/symfony7` `composer.lock` refreshed (`make update-deps`; Symfony 7.4.14, PHPStan, Rector, and related dev tooling).
+
+### Fixed
+
+- **`make update-deps` (demos)** — `demo/symfony7` and `demo/symfony8` Makefiles now define `COMPOSE` and `SERVICE_PHP` before including the shared `Makefile.demo-update-deps.mk`, so `docker-compose run` is invoked instead of failing with `/bin/sh: run: not found`.
+
 ## [1.1.1] - 2026-06-13
 
 ### Added
@@ -54,7 +64,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.2...HEAD
+[1.1.2]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.1.0
 [1.0.0]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.0.0
