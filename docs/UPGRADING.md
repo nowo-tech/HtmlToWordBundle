@@ -37,6 +37,13 @@ Previously it was only `?FilesystemOperator $flysystem = null`. Inject `RemoteHt
 
 Applications that only use **`ExporterInterface`** from the container require **no code changes** — the bundle definition already wires the inliner.
 
+## 1.1.1 → 1.1.2
+
+No application code or configuration changes are required.
+
+- **Consumers:** `composer update nowo-tech/html-to-word-bundle` and clear cache as usual.
+- **Maintainers / local dev:** if you copied demo Makefile patterns from this bundle, define **`COMPOSE`**, **`COMPOSE_FILE`**, and **`SERVICE_PHP`** before including `Makefile.demo-update-deps.mk` in each `demo/symfony*/Makefile` — see fixed demos in this release.
+
 ## 1.1.0 → 1.1.1
 
 No application code or configuration changes are required.
