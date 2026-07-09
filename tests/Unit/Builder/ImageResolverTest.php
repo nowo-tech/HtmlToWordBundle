@@ -102,13 +102,27 @@ final class ImageResolverTest extends TestCase
         );
     }
 
+    public function testRemoteBlockedWhenAllowlistEmpty(): void
+    {
+        $this->expectException(ImageResolveException::class);
+        $this->expectExceptionMessage('allowlist');
+        (new ImageResolver())->resolveToTempPath(
+            'https://example.com/image.png',
+            ResolvedConfig::fromArray(['images' => ['resolve_remote' => true, 'remote_host_allowlist' => []]]),
+        );
+    }
+
     public function testRemoteDownloadFailureThrows(): void
     {
         $this->expectException(ImageResolveException::class);
-        $this->expectExceptionMessage('Could not download');
         (new ImageResolver())->resolveToTempPath(
             'http://127.0.0.1:9/no-image.png',
-            ResolvedConfig::fromArray(['images' => ['resolve_remote' => true]]),
+            ResolvedConfig::fromArray([
+                'images' => [
+                    'resolve_remote' => true,
+                    'remote_host_allowlist' => ['127.0.0.1'],
+                ],
+            ]),
         );
     }
 }

@@ -34,7 +34,7 @@ This bundle does **not** render Twig, generate HTML, produce PDF, or edit existi
 - [Security](docs/SECURITY.md)
 - [Engram](docs/ENGRAM.md)
 - [Spec-driven development](docs/SPEC-DRIVEN-DEVELOPMENT.md)
-
+- [GitHub Spec Kit](docs/SPEC-KIT.md)
 ### Additional documentation
 
 - [FrankenPHP demos](docs/DEMO-FRANKENPHP.md) — how `demo/symfony7` runs in Docker.

@@ -64,3 +64,22 @@ Not applicable; no custom cryptography in this bundle.
 ## Reporting
 
 See the repository `.github/SECURITY.md` for coordinated disclosure contacts.
+
+## Release security checklist (12.4.1)
+
+Before tagging a release, confirm:
+
+| Item | Notes |
+|------|--------|
+| **SECURITY.md** | This document is current and linked from the README where applicable. |
+| **`.gitignore` and `.env`** | `.env` and local env files are ignored; no committed secrets. |
+| **No secrets in repo** | No API keys, passwords, or tokens in tracked files. |
+| **Recipe / Flex** | Default `images.resolve_remote: false`; allowlist documented when enabled. |
+| **Input / output** | HTML sanitized before DOM walk; Twig/output paths escaped in host app. |
+| **Dependencies** | `composer audit` run; PHPWord/Symfony advisories triaged. |
+| **Logging** | Applications avoid logging full HTML or remote image URLs with credentials. |
+| **Cryptography** | N/A — no custom cryptography in this bundle. |
+| **Permissions / exposure** | No HTTP routes; embedding app enforces authorization. |
+| **Limits / DoS** | Remote image timeouts; `images.max_width`; app-level HTML size limits. |
+
+Record confirmation in the release PR or tag notes.
