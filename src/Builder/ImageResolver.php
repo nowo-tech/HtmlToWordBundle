@@ -6,6 +6,7 @@ namespace Nowo\HtmlToWordBundle\Builder;
 
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
+use Nowo\HtmlToWordBundle\Security\RemoteImageHostPolicy;
 
 use function sprintf;
 
@@ -60,8 +61,14 @@ final class ImageResolver implements ImageResolverInterface
      */
     private function fromHttpUrl(string $src, ResolvedConfig $config): string
     {
-        if (!(bool) $config->get('images.resolve_remote', true)) {
+        if (!(bool) $config->get('images.resolve_remote', false)) {
             throw new ImageResolveException('Remote image resolution disabled by profile.');
+        }
+
+        /** @var list<string> $allowlist */
+        $allowlist = $config->get('images.remote_host_allowlist', []);
+        if (!RemoteImageHostPolicy::isAllowed($src, $allowlist)) {
+            throw new ImageResolveException('Remote image host is not in the configured allowlist.');
         }
 
         $ctx = stream_context_create([

@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "league/flysystem",
-            "version": "3.35.1",
+            "version": "3.35.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "f23af6c5aafd958a7593029a271d77baf5ed793c"
+                "reference": "b277b5dc3d56650b68904117124e79c851e12376"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/f23af6c5aafd958a7593029a271d77baf5ed793c",
-                "reference": "f23af6c5aafd958a7593029a271d77baf5ed793c",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/b277b5dc3d56650b68904117124e79c851e12376",
+                "reference": "b277b5dc3d56650b68904117124e79c851e12376",
                 "shasum": ""
             },
             "require": {
@@ -85,9 +85,9 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.35.1"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.35.2"
             },
-            "time": "2026-06-25T06:52:23+00:00"
+            "time": "2026-07-06T14:42:07+00:00"
         },
         {
             "name": "league/flysystem-local",
@@ -267,7 +267,7 @@
             "dist": {
                 "type": "path",
                 "url": "/var/html-to-word-bundle",
-                "reference": "ca1ef1cbd2949ee2147155fd645325c727b44fb2"
+                "reference": "9604073b7844748642a37f310cde285fc7eb4df4"
             },
             "require": {
                 "ext-dom": "*",
@@ -3542,16 +3542,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v3.27.1",
+            "version": "v3.28.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "ae2071bffb38f04847fc0864d730c94b9cb8ab74"
+                "reference": "597c12ed286fb9d1701a36684ce6e0cbe28ebc8b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/ae2071bffb38f04847fc0864d730c94b9cb8ab74",
-                "reference": "ae2071bffb38f04847fc0864d730c94b9cb8ab74",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/597c12ed286fb9d1701a36684ce6e0cbe28ebc8b",
+                "reference": "597c12ed286fb9d1701a36684ce6e0cbe28ebc8b",
                 "shasum": ""
             },
             "require": {
@@ -3606,7 +3606,7 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/v3.27.1"
+                "source": "https://github.com/twigphp/Twig/tree/v3.28.0"
             },
             "funding": [
                 {
@@ -3618,22 +3618,22 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-30T17:09:26+00:00"
+            "time": "2026-07-03T20:44:34+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "nowo-tech/twig-inspector-bundle",
-            "version": "v1.0.33",
+            "version": "v1.0.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/TwigInspectorBundle.git",
-                "reference": "4c681ef6f8d17e50cd1b6417b63f6a6bbbf7032b"
+                "reference": "e926c092b6df59edaded71ec011075e67190c783"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/TwigInspectorBundle/zipball/4c681ef6f8d17e50cd1b6417b63f6a6bbbf7032b",
-                "reference": "4c681ef6f8d17e50cd1b6417b63f6a6bbbf7032b",
+                "url": "https://api.github.com/repos/nowo-tech/TwigInspectorBundle/zipball/e926c092b6df59edaded71ec011075e67190c783",
+                "reference": "e926c092b6df59edaded71ec011075e67190c783",
                 "shasum": ""
             },
             "require": {
@@ -3722,7 +3722,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-30T09:51:13+00:00"
+            "time": "2026-07-07T14:45:27+00:00"
         },
         {
             "name": "symfony/debug-bundle",

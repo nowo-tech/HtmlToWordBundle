@@ -802,7 +802,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *         images?: array{
  *             max_width?: int|Param, // Default: 600
- *             resolve_remote?: bool|Param, // Default: true
+ *             resolve_remote?: bool|Param, // Download remote http(s) images. Requires remote_host_allowlist when true. // Default: false
+ *             remote_host_allowlist?: list<scalar|Param|null>,
  *         },
  *         export?: array{
  *             filename?: scalar|Param|null, // Default: "document.docx"

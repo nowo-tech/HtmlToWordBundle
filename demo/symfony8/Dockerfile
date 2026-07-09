@@ -4,7 +4,7 @@ FROM dunglas/frankenphp:1-php8.4-alpine
 
 RUN apk add --no-cache git unzip bash nodejs npm
 # gd: required by phpoffice/phpword ^1.4 (demo resolves to 1.4.x with phpoffice/math ^0.3)
-RUN install-php-extensions zip gd
+RUN install-php-extensions intl zip gd
 RUN npm install -g pnpm
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

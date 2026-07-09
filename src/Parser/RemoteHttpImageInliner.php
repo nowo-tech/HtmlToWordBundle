@@ -60,7 +60,7 @@ final class RemoteHttpImageInliner
     {
         $this->cleanupInlineSession();
 
-        if (!(bool) $config->get('images.resolve_remote', true)) {
+        if (!(bool) $config->get('images.resolve_remote', false)) {
             return $html;
         }
 

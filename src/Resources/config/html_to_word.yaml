@@ -47,7 +47,8 @@ html_to_word:
                 different_first_page: false
             images:
                 max_width: 600
-                resolve_remote: true
+                resolve_remote: false
+                remote_host_allowlist: []
             export:
                 filename: document.docx
                 storage: memory
