@@ -119,7 +119,7 @@ final class ImageResolverTest extends TestCase
             'http://127.0.0.1:9/no-image.png',
             ResolvedConfig::fromArray([
                 'images' => [
-                    'resolve_remote' => true,
+                    'resolve_remote'        => true,
                     'remote_host_allowlist' => ['127.0.0.1'],
                 ],
             ]),

@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.3] - 2026-07-16
+
+### Added
+
+- **Code of Conduct** — `CODE_OF_CONDUCT.md` (Contributor Covenant) linked from README and CONTRIBUTING.
+- **REQ-GIT-001** — no Cursor co-author trailers: `.githooks/commit-msg`, `.scripts/check-no-cursor-coauthor.sh`, CI `git-hygiene` job, and `docs/GITHUB_CI.md`.
+- **`tests/Unit/Transformer/BlockTransformersTest.php`** — unit coverage for block transformers; PHPUnit source excludes `src/Engine` from aggregate Clover (engines covered in Integration).
+
+### Changed
+
+- **Coverage clover** — `composer test-coverage` / `coverage-check` write `coverage.xml` at the repo root (was `coverage/clover.xml`).
+- **Demo aggregate** — `make up` / `release-verify` / `release-check` target `demo/symfony8` (`up8` / `release-verify8` / `release-check8` remain aliases).
+
+### Removed
+
+- **Demo Symfony 7** — `demo/symfony7` removed; the FrankenPHP demo is only `demo/symfony8`.
+
 ## [1.1.2] - 2026-07-03
 
 ### Added
@@ -68,7 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.2...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.3...HEAD
+[1.1.3]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.0...v1.1.1
 [1.1.0]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.1.0

@@ -18,9 +18,18 @@
             <directory>tests/Integration</directory>
         </testsuite>
     </testsuites>
+    <coverage>
+        <report>
+            <clover outputFile="coverage.xml"/>
+        </report>
+    </coverage>
     <source>
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <!-- PhpWord engine adapters exercised end-to-end in Integration/*; aggregate Clover omits optional engine branches. -->
+            <directory>src/Engine</directory>
+        </exclude>
     </source>
 </phpunit>

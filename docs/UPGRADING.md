@@ -37,6 +37,13 @@ Previously it was only `?FilesystemOperator $flysystem = null`. Inject `RemoteHt
 
 Applications that only use **`ExporterInterface`** from the container require **no code changes** — the bundle definition already wires the inliner.
 
+## 1.1.2 → 1.1.3
+
+No application code or configuration changes are required.
+
+- **Consumers:** `composer update nowo-tech/html-to-word-bundle` and clear cache as usual.
+- **Maintainers / local demos:** `demo/symfony7` is gone — use `demo/symfony8` (or `make -C demo up`). Aggregate `DEMOS` is now `symfony8` only; `up8` / `release-check8` remain aliases.
+
 ## 1.1.1 → 1.1.2
 
 No application code or configuration changes are required.

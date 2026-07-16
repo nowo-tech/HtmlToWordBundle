@@ -57,8 +57,8 @@ The sections below state **behavior**; this subsection states **intent** in back
 
 | ID | Where | What it marks |
 | --- | --- | --- |
-| `REQ-DEMO-005` | `demo/Makefile` | @echo "  make up               Start demo/symfony7 (REQ-DEMO-005 message)" |
-| `REQ-DEMO-007` | `demo/Makefile` | @echo "  make release-check    update-bundle + test + verify-http (REQ-DEMO-007, symfony7)" |
+| `REQ-DEMO-005` | `demo/Makefile` | @echo "  make up               Start demo/symfony8 (REQ-DEMO-005 message)" |
+| `REQ-DEMO-007` | `demo/Makefile` | @echo "  make release-check    update-bundle + test + verify-http (REQ-DEMO-007, symfony8)" |
 | `REQ-MAKE-001` | `Makefile` | # HtmlToWordBundle — Docker-driven development (REQ-MAKE-001) |
 
 When you change scripted behavior, **update the existing `REQ-*` comment** if the ID still matches the rule, or **add a new `REQ-*`** and document it here and in the PR description.

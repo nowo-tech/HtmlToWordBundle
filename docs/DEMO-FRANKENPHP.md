@@ -14,9 +14,8 @@ This mirrors the standard Nowo pattern documented for other bundles: demos live 
 
 ## Overview
 
-- **Symfony 7 demo**: `demo/symfony7` — Compose project **`html-to-word-bundle-demo-symfony-7`** (REQ-DOC-002). Default port **8020**.
-- **Symfony 8 demo**: `demo/symfony8` — Compose project **`html-to-word-bundle-demo-symfony-8`**. Same FrankenPHP layout and bundle mount; PHP **8.4**, Symfony **8**. Default port **8021** so it can run alongside the Symfony 7 stack.
-- **Bundle mount** (both demos): host `../..` → container `/var/html-to-word-bundle`.
+- **Symfony 8 demo**: `demo/symfony8` — Compose project **`html-to-word-bundle-demo-symfony-8`** (REQ-DOC-002). FrankenPHP layout with PHP **8.4**, Symfony **8**. Default port **8021**.
+- **Bundle mount**: host `../..` → container `/var/html-to-word-bundle`.
 - **Port**: configure `PORT` in `.env` / `.env.example`; `make up` prints **`Demo started at: http://localhost:<PORT>`** (REQ-DEMO-005).
 
 ---
@@ -35,7 +34,7 @@ There is a single page: choose a YAML profile, optionally load a curated HTML pr
 
 ## Volumes and Composer path repo
 
-Each demo (`demo/symfony7/composer.json`, `demo/symfony8/composer.json`) contains:
+The demo (`demo/symfony8/composer.json`) contains:
 
 ```json
 "repositories": [

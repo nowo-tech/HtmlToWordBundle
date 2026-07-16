@@ -7,6 +7,7 @@ composer.phar
 # PHPUnit / QA
 /.phpunit.cache/
 /coverage/
+coverage.xml
 coverage-php.txt
 coverage-output.txt
 .php-cs-fixer.cache
@@ -32,3 +33,6 @@ coverage-output.txt
 
 # Build / runtime
 /var/
+
+# Cursor local sandbox (machine-specific; REQ-IDE-005)
+.cursor/sandbox.json

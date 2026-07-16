@@ -9,7 +9,7 @@ cp .env.example .env
 make up
 ```
 
-Follow **`Demo started at: http://localhost:<PORT>`** (default port **8021**, next to the Symfony 7 demo on **8020**).
+Follow **`Demo started at: http://localhost:<PORT>`** (default port **8021**).
 
 ## Bundle mount
 

@@ -30,3 +30,5 @@ Before tagging a release, verify at least:
 - If cryptographic or signing features are added later, follow project crypto and permissions guidelines.
 
 See also `.github/SECURITY.md` for the repository reporting policy.
+
+After creating the release commit and tag, run `make check-no-cursor-coauthor` again **before** `git push` (REQ-GIT-001). The release commit itself is not covered by an earlier `release-check` run.

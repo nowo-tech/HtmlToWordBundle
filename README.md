@@ -24,10 +24,12 @@ This bundle does **not** render Twig, generate HTML, produce PDF, or edit existi
 
 ## Documentation
 
+- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
 - [Installation](docs/INSTALLATION.md)
 - [Configuration](docs/CONFIGURATION.md)
 - [Usage](docs/USAGE.md)
 - [Contributing](docs/CONTRIBUTING.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 - [Changelog](docs/CHANGELOG.md)
 - [Upgrading](docs/UPGRADING.md)
 - [Release](docs/RELEASE.md)
@@ -35,9 +37,10 @@ This bundle does **not** render Twig, generate HTML, produce PDF, or edit existi
 - [Engram](docs/ENGRAM.md)
 - [Spec-driven development](docs/SPEC-DRIVEN-DEVELOPMENT.md)
 - [GitHub Spec Kit](docs/SPEC-KIT.md)
+
 ### Additional documentation
 
-- [FrankenPHP demos](docs/DEMO-FRANKENPHP.md) — how `demo/symfony7` runs in Docker.
+- [FrankenPHP demos](docs/DEMO-FRANKENPHP.md) — how `demo/symfony8` runs in Docker.
 - Example YAML profiles are shipped as `src/Resources/config/nowo_html_to_word.yaml` (copy into your app’s `config/packages/`).
 
 ## Requirements
