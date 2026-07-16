@@ -26,9 +26,11 @@ use const LIBXML_HTML_NOIMPLIED;
 
 final class BlockTransformersTest extends TestCase
 {
+    private const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
+
     public function testListTransformerSupportsAndPriorities(): void
     {
-        $transformer = new ListTransformer($this->createMock(InlineComposer::class));
+        $transformer = new ListTransformer($this->createInlineComposer());
 
         self::assertTrue($transformer->supports('ul'));
         self::assertTrue($transformer->supports('ol'));
@@ -49,9 +51,8 @@ final class BlockTransformersTest extends TestCase
         $section = $this->createSection();
         $walker  = $this->createWalker();
         $config  = ResolvedConfig::fromArray([]);
-        $inline  = new InlineComposer(new StyleMapper(), $this->createMock(ImageResolverInterface::class));
 
-        (new ListTransformer($inline))->transform($ul, $section, $config, $walker);
+        (new ListTransformer($this->createInlineComposer()))->transform($ul, $section, $config, $walker);
 
         self::assertNotEmpty($section->getElements());
     }
@@ -62,7 +63,7 @@ final class BlockTransformersTest extends TestCase
         $text    = $doc->createTextNode('plain');
         $section = $this->createSection();
 
-        (new ListTransformer(new InlineComposer(new StyleMapper(), $this->createMock(ImageResolverInterface::class))))->transform(
+        (new ListTransformer($this->createInlineComposer()))->transform(
             $text,
             $section,
             ResolvedConfig::fromArray([]),
@@ -106,21 +107,25 @@ final class BlockTransformersTest extends TestCase
 
         $temp = tempnam(sys_get_temp_dir(), 'img');
         self::assertIsString($temp);
-        file_put_contents($temp, 'png');
+        $png = base64_decode(self::PNG_1X1, true);
+        self::assertNotFalse($png);
+        file_put_contents($temp, $png);
 
         $resolver = $this->createMock(ImageResolverInterface::class);
         $resolver->method('resolveToTempPath')->willReturn($temp);
 
         $section = $this->createSection();
-        (new ImageBlockTransformer($resolver, new StyleMapper()))->transform(
-            $img,
-            $section,
-            ResolvedConfig::fromArray(['images' => ['max_width' => 100]]),
-            $this->createWalker(),
-        );
-
-        @unlink($temp);
-        self::assertNotEmpty($section->getElements());
+        try {
+            (new ImageBlockTransformer($resolver, new StyleMapper()))->transform(
+                $img,
+                $section,
+                ResolvedConfig::fromArray(['images' => ['max_width' => 100]]),
+                $this->createWalker(),
+            );
+            self::assertNotEmpty($section->getElements());
+        } finally {
+            @unlink($temp);
+        }
     }
 
     public function testParagraphTransformerAddsTextRun(): void
@@ -170,6 +175,11 @@ final class BlockTransformersTest extends TestCase
         $phpWord = new PhpWord();
 
         return $phpWord->addSection();
+    }
+
+    private function createInlineComposer(): InlineComposer
+    {
+        return new InlineComposer(new StyleMapper(), $this->createMock(ImageResolverInterface::class));
     }
 
     private function createWalker(): DocumentWalkerInterface

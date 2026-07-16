@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.1.4] - 2026-07-16
+
+### Fixed
+
+- **`BlockTransformersTest`** — do not double `final` `InlineComposer`; embed a real 1×1 PNG so PhpWord accepts the resolved image path (CI PHPUnit errors).
+
 ## [1.1.3] - 2026-07-16
 
 ### Added
@@ -85,7 +91,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.4...HEAD
+[1.1.4]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.1...v1.1.2
 [1.1.1]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.0...v1.1.1
