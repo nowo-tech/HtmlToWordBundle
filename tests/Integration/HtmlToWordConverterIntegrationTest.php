@@ -7,6 +7,7 @@ namespace Nowo\HtmlToWordBundle\Tests\Integration;
 use Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter;
 use Nowo\HtmlToWordBundle\Exception\InvalidProfileException;
 use Nowo\HtmlToWordBundle\Tests\Fixtures\AppKernel;
+use PhpOffice\PhpWord\IOFactory;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -36,7 +37,7 @@ final class HtmlToWordConverterIntegrationTest extends KernelTestCase
         $tmp = sys_get_temp_dir() . '/htw_integration_' . uniqid() . '.docx';
 
         try {
-            $writer = \PhpOffice\PhpWord\IOFactory::createWriter($doc->phpWord(), 'Word2007');
+            $writer = IOFactory::createWriter($doc->phpWord(), 'Word2007');
             $writer->save($tmp);
             self::assertFileExists($tmp);
             self::assertGreaterThan(2000, filesize($tmp) ?: 0);

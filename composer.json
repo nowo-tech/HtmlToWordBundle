@@ -14,6 +14,11 @@
         "wysiwyg"
     ],
     "homepage": "https://github.com/nowo-tech/HtmlToWordBundle",
+    "support": {
+        "issues": "https://github.com/nowo-tech/HtmlToWordBundle/issues",
+        "source": "https://github.com/nowo-tech/HtmlToWordBundle",
+        "docs": "https://github.com/nowo-tech/HtmlToWordBundle/blob/main/README.md"
+    },
     "authors": [
         {
             "name": "Héctor Franco Aceituno",
@@ -39,6 +44,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "nowo-tech/phpstan-frankenphp": "^1.0",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
@@ -75,7 +81,7 @@
     "scripts": {
         "test": "@php vendor/bin/phpunit --colors=always",
         "test-coverage": "@php -d pcov.enabled=1 vendor/bin/phpunit --colors=always --coverage-text --coverage-clover=coverage.xml | tee coverage-php.txt && sh .scripts/php-coverage-percent.sh coverage-php.txt",
-        "coverage-check": "@php -d pcov.enabled=1 vendor/bin/phpunit --colors=always --coverage-text=coverage-output.txt --coverage-clover=coverage.xml && sh .scripts/coverage-fail-under.sh coverage-output.txt 85",
+        "coverage-check": "@php -d pcov.enabled=1 vendor/bin/phpunit --colors=always --coverage-text=coverage-output.txt --coverage-clover=coverage.xml && sh .scripts/coverage-fail-under.sh coverage-output.txt 100",
         "cs-check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff",
         "cs-fix": "@php vendor/bin/php-cs-fixer fix",
         "phpstan": "@php vendor/bin/phpstan analyse --memory-limit=512M",

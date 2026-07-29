@@ -140,16 +140,16 @@
         },
         {
             "name": "league/mime-type-detection",
-            "version": "1.16.0",
+            "version": "1.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/mime-type-detection.git",
-                "reference": "2d6702ff215bf922936ccc1ad31007edc76451b9"
+                "reference": "f5f47eff7c48ed1003069a2ca67f316fb4021c76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/2d6702ff215bf922936ccc1ad31007edc76451b9",
-                "reference": "2d6702ff215bf922936ccc1ad31007edc76451b9",
+                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/f5f47eff7c48ed1003069a2ca67f316fb4021c76",
+                "reference": "f5f47eff7c48ed1003069a2ca67f316fb4021c76",
                 "shasum": ""
             },
             "require": {
@@ -159,7 +159,7 @@
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.2",
                 "phpstan/phpstan": "^0.12.68",
-                "phpunit/phpunit": "^8.5.8 || ^9.3 || ^10.0"
+                "phpunit/phpunit": "^8.5.8 || ^9.3 || ^10.0 || ^11.0 || ^12.0"
             },
             "type": "library",
             "autoload": {
@@ -180,7 +180,7 @@
             "description": "Mime-type detection for Flysystem",
             "support": {
                 "issues": "https://github.com/thephpleague/mime-type-detection/issues",
-                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.16.0"
+                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.17.0"
             },
             "funding": [
                 {
@@ -192,7 +192,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-21T08:32:55+00:00"
+            "time": "2026-07-09T11:49:27+00:00"
         },
         {
             "name": "masterminds/html5",
@@ -267,7 +267,7 @@
             "dist": {
                 "type": "path",
                 "url": "/var/html-to-word-bundle",
-                "reference": "9604073b7844748642a37f310cde285fc7eb4df4"
+                "reference": "d08bda3563e7f3d68b0ba9edb73a33b7c56cd8e6"
             },
             "require": {
                 "ext-dom": "*",
@@ -315,10 +315,10 @@
                     "@php vendor/bin/phpunit --colors=always"
                 ],
                 "test-coverage": [
-                    "@php -d pcov.enabled=1 vendor/bin/phpunit --colors=always --coverage-text --coverage-clover=coverage/clover.xml | tee coverage-php.txt && sh .scripts/php-coverage-percent.sh coverage-php.txt"
+                    "@php -d pcov.enabled=1 vendor/bin/phpunit --colors=always --coverage-text --coverage-clover=coverage.xml | tee coverage-php.txt && sh .scripts/php-coverage-percent.sh coverage-php.txt"
                 ],
                 "coverage-check": [
-                    "@php -d pcov.enabled=1 vendor/bin/phpunit --colors=always --coverage-text=coverage-output.txt --coverage-clover=coverage/clover.xml && sh .scripts/coverage-fail-under.sh coverage-output.txt 85"
+                    "@php -d pcov.enabled=1 vendor/bin/phpunit --colors=always --coverage-text=coverage-output.txt --coverage-clover=coverage.xml && sh .scripts/coverage-fail-under.sh coverage-output.txt 85"
                 ],
                 "cs-check": [
                     "@php vendor/bin/php-cs-fixer fix --dry-run --diff"
@@ -3624,16 +3624,16 @@
     "packages-dev": [
         {
             "name": "nowo-tech/twig-inspector-bundle",
-            "version": "v1.0.34",
+            "version": "v1.0.40",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/TwigInspectorBundle.git",
-                "reference": "e926c092b6df59edaded71ec011075e67190c783"
+                "reference": "38b44a33602670c6f4f44786dd529472be1aee3b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/TwigInspectorBundle/zipball/e926c092b6df59edaded71ec011075e67190c783",
-                "reference": "e926c092b6df59edaded71ec011075e67190c783",
+                "url": "https://api.github.com/repos/nowo-tech/TwigInspectorBundle/zipball/38b44a33602670c6f4f44786dd529472be1aee3b",
+                "reference": "38b44a33602670c6f4f44786dd529472be1aee3b",
                 "shasum": ""
             },
             "require": {
@@ -3651,6 +3651,7 @@
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.0",
+                "nowo-tech/phpstan-frankenphp": "^1.0",
                 "phpstan/extension-installer": "^1.4",
                 "phpstan/phpstan": "^2.0",
                 "phpstan/phpstan-symfony": "^2.0",
@@ -3661,7 +3662,7 @@
                 "symfony/yaml": "^6.0 || ^7.0 || ^8.0"
             },
             "suggest": {
-                "symfony/flex": "For automatic recipe installation (config and routes)"
+                "symfony/flex": "For automatic recipe installation (config and routes; registers this bundle for dev/test only — always install with composer require --dev)"
             },
             "type": "symfony-bundle",
             "autoload": {
@@ -3722,7 +3723,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-07-07T14:45:27+00:00"
+            "time": "2026-07-22T16:18:15+00:00"
         },
         {
             "name": "symfony/debug-bundle",

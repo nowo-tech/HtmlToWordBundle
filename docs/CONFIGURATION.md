@@ -38,7 +38,7 @@ Each profile can define:
 - `fonts` — `default`, `fallback`, `size_unit`, `default_size`.
 - `styles` — `heading_map` (h1–h6 to Word style names), `paragraph_spacing` (before/after in twips), `custom_class_map` (CSS class → Word style name).
 - `header` / `footer` — enablement, `logo` path, `logo_width` (**CSS px**, converted to typographic points for PHPWord), `text`, `show_page_number`, `different_first_page`.
-- `images` — `max_width` (**CSS px** for HTML `width`/intrinsic size), `resolve_remote` (download remote `<img src>` URLs). With `resolve_remote` enabled, **before** PhpWord runs the bundle resolves each `http(s)://` `src` to a **temporary absolute path** in memory only (stored HTML can keep URLs); temps are deleted after the DOCX is written (`DocxExporter` / `IOFactory` `save`, when you use the bundle exporter). Values are converted to **points** (`pt = px × 72/96`) before embedding—PhpWord’s image style uses points, not pixels.
+- `images` — `max_width` (**CSS px** for HTML `width`/intrinsic size), `resolve_remote` (download remote `<img src>` URLs), `remote_host_allowlist`, and `remote_timeout` (seconds, default **10**; HTTP(S) stream timeout for remote downloads — keep below PHP `max_execution_time` / FrankenPHP write timeout). With `resolve_remote` enabled, **before** PhpWord runs the bundle resolves each `http(s)://` `src` to a **temporary absolute path** in memory only (stored HTML can keep URLs); temps are deleted after the DOCX is written (`DocxExporter` / `IOFactory` `save`, when you use the bundle exporter). Values are converted to **points** (`pt = px × 72/96`) before embedding—PhpWord’s image style uses points, not pixels.
 - `export` — `filename`, `storage`, `local_path`, `flysystem_adapter`.
 - `tables` — `repeat_header_row`.
 

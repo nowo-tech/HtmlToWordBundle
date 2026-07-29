@@ -8,6 +8,11 @@ use Nowo\HtmlToWordBundle\Builder\ImageResolver;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
+
+use function is_string;
+
+use const PHP_BINARY;
 
 final class ImageResolverTest extends TestCase
 {
@@ -124,5 +129,64 @@ final class ImageResolverTest extends TestCase
                 ],
             ]),
         );
+    }
+
+    public function testRemoteDownloadSuccessWithClampedTimeout(): void
+    {
+        $png = base64_decode(self::PNG_1X1, true);
+        self::assertNotFalse($png);
+
+        $docRoot = sys_get_temp_dir() . '/htw_http_' . uniqid('', true);
+        self::assertTrue(mkdir($docRoot));
+        $imgPath = $docRoot . '/pixel.png';
+        file_put_contents($imgPath, $png);
+
+        $port = random_int(28000, 28999);
+        $cmd  = [
+            PHP_BINARY,
+            '-S',
+            '127.0.0.1:' . $port,
+            '-t',
+            $docRoot,
+        ];
+        $process = new Process($cmd);
+        $process->setTimeout(30);
+        $process->setIdleTimeout(30);
+        $process->start();
+
+        $url    = 'http://127.0.0.1:' . $port . '/pixel.png';
+        $tmpOut = null;
+        try {
+            $ready = false;
+            for ($i = 0; $i < 50; ++$i) {
+                usleep(50_000);
+                $probe = @file_get_contents($url);
+                if ($probe !== false) {
+                    $ready = true;
+                    break;
+                }
+            }
+            self::assertTrue($ready, 'Built-in PHP server did not become ready');
+
+            $tmpOut = (new ImageResolver())->resolveToTempPath(
+                $url,
+                ResolvedConfig::fromArray([
+                    'images' => [
+                        'resolve_remote'        => true,
+                        'remote_host_allowlist' => ['127.0.0.1'],
+                        'remote_timeout'        => 0.01,
+                    ],
+                ]),
+            );
+            self::assertFileExists($tmpOut);
+            self::assertGreaterThan(10, filesize($tmpOut) ?: 0);
+        } finally {
+            if (is_string($tmpOut)) {
+                @unlink($tmpOut);
+            }
+            $process->stop(1);
+            @unlink($imgPath);
+            @rmdir($docRoot);
+        }
     }
 }

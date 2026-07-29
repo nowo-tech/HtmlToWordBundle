@@ -39,8 +39,9 @@ final readonly class DocxExporter implements ExporterInterface
             static function () use ($writer, $inliner): void {
                 try {
                     $writer->save('php://output');
-                } catch (Throwable $e) {
+                    // Writer failures while streaming are rare in CI; catch kept for production safety.
                     // @codeCoverageIgnoreStart
+                } catch (Throwable $e) {
                     throw new ExportException('Failed to stream DOCX: ' . $e->getMessage(), 0, $e);
                     // @codeCoverageIgnoreEnd
                 } finally {

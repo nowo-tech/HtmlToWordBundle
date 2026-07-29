@@ -1,5 +1,19 @@
 # Upgrading
 
+## Table of contents
+
+- [General](#general)
+- [Configuration root key rename](#configuration-root-key-rename)
+- [`HtmlToWordConverterInterface` implementors (v1.0.0+)](#htmltowordconverterinterface-implementors-v100)
+- [1.0.x → 1.1.0](#10x--110)
+  - [`DocxExporter` constructor](#docxexporter-constructor)
+- [1.1.4 → 1.2.0](#114--120)
+- [1.1.3 → 1.1.4](#113--114)
+- [1.1.2 → 1.1.3](#112--113)
+- [1.1.1 → 1.1.2](#111--112)
+- [1.1.0 → 1.1.1](#110--111)
+- [Version 1.x](#version-1x)
+
 ## General
 
 - Always read the release notes on GitHub for the tag you are upgrading to.
@@ -36,6 +50,15 @@ public function __construct(
 Previously it was only `?FilesystemOperator $flysystem = null`. Inject `RemoteHttpImageInliner` first (or obtain both services from the Symfony container and pass them in).
 
 Applications that only use **`ExporterInterface`** from the container require **no code changes** — the bundle definition already wires the inliner.
+
+## 1.1.4 → 1.2.0
+
+No breaking application code changes are required.
+
+- **Consumers:** `composer update nowo-tech/html-to-word-bundle` and clear cache as usual.
+- **Optional:** set `images.remote_timeout` (seconds, default `10`) under a profile’s `images` section if you need a different remote download timeout — see [CONFIGURATION.md](CONFIGURATION.md).
+- **Security:** when `images.resolve_remote` is enabled, keep a tight `remote_host_allowlist` (empty allowlist remains permissive) — see [SECURITY.md](SECURITY.md).
+- **Maintainers:** coverage gate is now **100%** lines; demo FrankenPHP image uses PHP **8.5** with optional `FRANKENPHP_MODE`.
 
 ## 1.1.3 → 1.1.4
 

@@ -1,5 +1,15 @@
 # Usage
 
+## Table of contents
+
+- [Injecting services](#injecting-services)
+- [Converting HTML](#converting-html)
+- [Exporting](#exporting)
+- [HTML expectations](#html-expectations)
+- [Images: URLs in stored HTML (recommended)](#images-urls-in-stored-html-recommended)
+- [Images: uploads without URL](#images-uploads-without-url)
+- [Extending behaviour](#extending-behaviour)
+
 ## Injecting services
 
 - `Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface` — converts HTML strings to `WordDocument`.

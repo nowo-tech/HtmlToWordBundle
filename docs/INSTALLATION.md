@@ -1,5 +1,14 @@
 # Installation
 
+## Table of contents
+
+- [Requirements](#requirements)
+- [Install with Composer](#install-with-composer)
+- [Symfony Flex recipe](#symfony-flex-recipe)
+- [Register the bundle](#register-the-bundle)
+- [Configuration file](#configuration-file)
+- [Optional: Flysystem](#optional-flysystem)
+
 ## Requirements
 
 - PHP 8.2 or newer with extensions: `dom`, `json`, `libxml`

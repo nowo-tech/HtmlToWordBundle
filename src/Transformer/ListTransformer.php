@@ -9,12 +9,13 @@ use DOMNode;
 use Nowo\HtmlToWordBundle\Builder\InlineComposer;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use PhpOffice\PhpWord\Element\AbstractContainer;
+use PhpOffice\PhpWord\Element\ListItemRun;
 use PhpOffice\PhpWord\Style\ListItem as ListItemStyle;
 
 use function count;
 
 /**
- * Multilevel {@code ul}/{@code ol} lists using {@see \PhpOffice\PhpWord\Element\ListItemRun}.
+ * Multilevel {@code ul}/{@code ol} lists using {@see ListItemRun}.
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
@@ -126,9 +127,12 @@ final readonly class ListTransformer implements TransformerInterface
                 ++$i;
             }
 
+            // Unreachable with current control flow (ul/ol handled above); kept as a safety net.
+            // @codeCoverageIgnoreStart
             if ($buffer === []) {
                 continue;
             }
+            // @codeCoverageIgnoreEnd
 
             $run = $container->addListItemRun($depth, $listStyle);
             foreach ($buffer as $fragment) {

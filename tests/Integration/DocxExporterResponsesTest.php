@@ -111,6 +111,25 @@ final class DocxExporterResponsesTest extends KernelTestCase
 
     #[RunInSeparateProcess]
     #[PreserveGlobalState(false)]
+    public function testWrongEngineThrowsOnBinaryResponse(): void
+    {
+        self::bootKernel();
+
+        /** @var RemoteHttpImageInliner $inliner */
+        $inliner  = self::getContainer()->get(RemoteHttpImageInliner::class);
+        $exporter = new DocxExporter($inliner);
+
+        $bad = new WordDocument(new stdClass(), ResolvedConfig::fromArray([
+            'strict_mode' => false,
+            'export'      => ['filename' => 'x.docx'],
+        ]), 'not-phpword');
+
+        $this->expectException(ExportException::class);
+        $exporter->toBinaryResponse($bad);
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
     public function testToFlysystemWritesThroughOperator(): void
     {
         self::bootKernel();

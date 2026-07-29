@@ -7,7 +7,11 @@
 [![PHP](https://img.shields.io/badge/PHP-8.2%2B-777BB4?logo=php)](https://php.net)
 [![Symfony](https://img.shields.io/badge/Symfony-6.4%20%7C%207.4%2B%20%7C%208.0%20%7C%208.1%2B-000000?logo=symfony)](https://symfony.com)
 [![GitHub stars](https://img.shields.io/github/stars/nowo-tech/html-to-word-bundle.svg?style=social&label=Star)](https://github.com/nowo-tech/HtmlToWordBundle)
-[![Coverage](https://img.shields.io/badge/Coverage-~89%25-green)](#tests-and-coverage)
+[![Coverage](https://img.shields.io/badge/Coverage-100%25-brightgreen)](#tests-and-coverage)
+
+![FrankenPHP Friendly Worker Mode](docs/images/frankenphp-friendly.png)
+
+FrankenPHP worker mode: supported (PHPStan FrankenPHP rules + Symfony 8 demo with `FRANKENPHP_MODE=worker`).
 
 > ⭐ **Found this useful?** Install from Packagist (`composer require nowo-tech/html-to-word-bundle`) and consider starring [HtmlToWordBundle on GitHub](https://github.com/nowo-tech/HtmlToWordBundle).
 
@@ -70,7 +74,7 @@ return $exporter->toStreamResponse($doc);
 | Scope | Detail |
 |-------|--------|
 | **PHPUnit** | `composer test` — unit tests under `tests/Unit`, integration tests under `tests/Integration` (minimal Symfony kernel in `tests/Fixtures/AppKernel.php`). |
-| **PHP lines** | Run `composer test-coverage` for the console summary, or `composer coverage-check` (same report written to `coverage-output.txt`, **fails below 85%** global lines). Latest reported global line coverage: **~89%** (PCOV; a few defensive branches in exporters / image temp paths are marked `@codeCoverageIgnore` where impractical to hit in CI). |
+| **PHP lines** | Run `composer test-coverage` for the console summary, or `composer coverage-check` (same report written to `coverage-output.txt`, **fails below 100%** global lines). Latest reported global line coverage: **100%** (PCOV; `src/Engine` excluded in `phpunit.xml.dist`; a few defensive branches are marked `@codeCoverageIgnore` where impractical to hit in CI). |
 
 CI runs tests, PHPStan, and PHP-CS-Fixer on push/PR (see `.github/workflows/ci.yml`).
 

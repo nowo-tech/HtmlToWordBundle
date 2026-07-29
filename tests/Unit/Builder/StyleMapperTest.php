@@ -95,4 +95,31 @@ final class StyleMapperTest extends TestCase
         $c = ResolvedConfig::fromArray(['fonts' => ['default' => 'Arial', 'default_size' => 11]]);
         self::assertSame($m->defaultFontStyle($c), $m->fontStyleFromInlineStyle('', $c));
     }
+
+    public function testTableCellBackgroundHexRejectsInvalidColor(): void
+    {
+        $m = new StyleMapper();
+        self::assertNull($m->tableCellBackgroundHex('background-color: transparent'));
+        self::assertNull($m->tableCellBackgroundHex('background-color: '));
+    }
+
+    public function testFontStyleSkipsEmptyCssChunksAndEmptyFamilies(): void
+    {
+        $m = new StyleMapper();
+        $c = ResolvedConfig::fromArray(['fonts' => ['default' => 'Arial', 'default_size' => 11]]);
+
+        $fs = $m->fontStyleFromInlineStyle('color: #112233;; font-family: , , ; font-size:   ', $c);
+        self::assertSame('#112233', $fs['color']);
+        self::assertSame('Arial', $fs['name']);
+        self::assertSame(11.0, $fs['size']);
+    }
+
+    public function testNormalizeColorRejectsEmptyAndUnknown(): void
+    {
+        $m  = new StyleMapper();
+        $c  = ResolvedConfig::fromArray([]);
+        $fs = $m->fontStyleFromInlineStyle('color: ; background-color: orange', $c);
+        self::assertArrayNotHasKey('color', $fs);
+        self::assertArrayNotHasKey('bgColor', $fs);
+    }
 }

@@ -42,3 +42,6 @@ coverage.xml
 *.tgz
 *.rar
 *.7z
+
+# pnpm store (REQ-GITIGNORE-003)
+.pnpm-store/

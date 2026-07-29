@@ -9,9 +9,10 @@ use DOMNode;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\Element\TextRun;
+use PhpOffice\PhpWord\Element\Title;
 
 /**
- * Maps {@code h1}–{@code h6} to PHPWord {@see \PhpOffice\PhpWord\Element\Title} (rich TextRun when needed).
+ * Maps {@code h1}–{@code h6} to PHPWord {@see Title} (rich TextRun when needed).
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */

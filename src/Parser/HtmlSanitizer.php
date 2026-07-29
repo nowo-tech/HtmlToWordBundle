@@ -30,9 +30,12 @@ final class HtmlSanitizer
     {
         $xpath = new DOMXPath($dom);
         foreach ($xpath->query('//@*') ?: [] as $attr) {
+            // XPath //@* always yields DOMAttr in practice; guard kept for static analysis.
+            // @codeCoverageIgnoreStart
             if (!$attr instanceof DOMAttr) {
                 continue;
             }
+            // @codeCoverageIgnoreEnd
             $n = $attr->name;
             if (str_starts_with(strtolower($n), 'on')) {
                 $attr->ownerElement?->removeAttribute($n);

@@ -23,9 +23,12 @@ final class ImageSignatureValidator
         }
 
         $handle = fopen($path, 'r');
+        // is_readable() already passed; fopen false only under races / exotic FS.
+        // @codeCoverageIgnoreStart
         if ($handle === false) {
             return false;
         }
+        // @codeCoverageIgnoreEnd
 
         $head = fread($handle, 16);
         fclose($handle);

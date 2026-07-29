@@ -4,6 +4,14 @@ Repository-local **product spec** and **`REQ-*`** traceability (Makefiles, demos
 
 This document summarizes **meaning**, **inputs/outputs**, and **composition** for assistants and maintainers.
 
+## Table of contents
+
+- [Purpose](#purpose)
+- [Configuration cascade](#configuration-cascade)
+- [Pipeline](#pipeline)
+- [Extension points](#extension-points)
+- [Non-goals](#non-goals)
+
 ## Purpose
 
 - **In**: HTML string produced by a WYSIWYG or upstream renderer (already expanded; **no Twig** responsibility here).

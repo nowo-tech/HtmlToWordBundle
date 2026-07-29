@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Nowo\HtmlToWordBundle\Tests\Unit\Exception;
 
+use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Engine\WordEngineInterface;
 use Nowo\HtmlToWordBundle\Exception\EngineNotAvailableException;
 use Nowo\HtmlToWordBundle\Exception\UnknownEngineException;
+use Nowo\HtmlToWordBundle\Model\WordDocument;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -43,7 +45,7 @@ final class ExceptionFactoriesTest extends TestCase
                 return false;
             }
 
-            public function build(string $html, \Nowo\HtmlToWordBundle\Config\ResolvedConfig $config): \Nowo\HtmlToWordBundle\Model\WordDocument
+            public function build(string $html, ResolvedConfig $config): WordDocument
             {
                 throw new RuntimeException('unused');
             }
@@ -72,7 +74,7 @@ final class ExceptionFactoriesTest extends TestCase
                 return false;
             }
 
-            public function build(string $html, \Nowo\HtmlToWordBundle\Config\ResolvedConfig $config): \Nowo\HtmlToWordBundle\Model\WordDocument
+            public function build(string $html, ResolvedConfig $config): WordDocument
             {
                 throw new RuntimeException('unused');
             }

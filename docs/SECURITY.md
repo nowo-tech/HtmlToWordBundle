@@ -2,6 +2,23 @@
 
 This document describes the **attack surface**, **threats**, and **controls** for `nowo-tech/html-to-word-bundle`. It is written in English per project standards.
 
+## Table of contents
+
+- [Scope](#scope)
+- [Attack surface](#attack-surface)
+- [Threats and mitigations](#threats-and-mitigations)
+  - [HTML / script injection](#html--script-injection)
+  - [SSRF via remote images](#ssrf-via-remote-images)
+  - [Path traversal / local file read via `<img src>`](#path-traversal--local-file-read-via-img-src)
+  - [Resource exhaustion](#resource-exhaustion)
+  - [Unsafe temporary files](#unsafe-temporary-files)
+  - [Dependency vulnerabilities](#dependency-vulnerabilities)
+- [Logging and secrets](#logging-and-secrets)
+- [Cryptography](#cryptography)
+- [Reporting](#reporting)
+- [Release security checklist (12.4.1)](#release-security-checklist-1241)
+- [AI security audit](#ai-security-audit)
+
 ## Scope
 
 The bundle converts **HTML strings** into **WordprocessingML (.docx)** files using PHPWord. It may:
@@ -81,5 +98,16 @@ Before tagging a release, confirm:
 | **Cryptography** | N/A — no custom cryptography in this bundle. |
 | **Permissions / exposure** | No HTTP routes; embedding app enforces authorization. |
 | **Limits / DoS** | Remote image timeouts; `images.max_width`; app-level HTML size limits. |
+| **AI security audit (REQ-SEC-004)** | Grade **Pass (conditional)** / risk **Medium** (2026-07-29). Recorded in the Nowo monorepo `BUNDLES_SECURITY_ANALYSIS.md`. |
 
 Record confirmation in the release PR or tag notes.
+
+## AI security audit
+
+| Field | Value |
+| ----- | ----- |
+| Date | 2026-07-29 |
+| Grade | Pass (conditional) |
+| Risk | Medium |
+| Method | Cursor security-review / campaign static pass (`src/`, Flex recipe, demo, SECURITY docs) |
+| Open residuals | No Critical/High. **Accepted Medium:** SSRF surface if `images.resolve_remote: true` without a tight `remote_host_allowlist` and network egress controls; empty allowlist is permissive when remote is enabled. Prefer default `resolve_remote: false`. App-owned: HTML size limits, path validation for local `<img src>`, avoid logging full HTML or credentialed remote URLs. |

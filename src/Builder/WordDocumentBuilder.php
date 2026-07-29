@@ -16,6 +16,7 @@ use Nowo\HtmlToWordBundle\Parser\HtmlSanitizer;
 use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use Nowo\HtmlToWordBundle\Transformer\DocumentWalkerInterface;
 use Nowo\HtmlToWordBundle\Transformer\TransformerChain;
+use Nowo\HtmlToWordBundle\Transformer\TransformerInterface;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\PhpWord;
 
@@ -90,7 +91,7 @@ final readonly class WordDocumentBuilder implements DocumentWalkerInterface
 
         $tag = strtolower($node->nodeName);
         $t   = $this->transformerChain->firstSupporting($tag);
-        if ($t instanceof \Nowo\HtmlToWordBundle\Transformer\TransformerInterface) {
+        if ($t instanceof TransformerInterface) {
             $t->transform($node, $container, $config, $this);
 
             return;

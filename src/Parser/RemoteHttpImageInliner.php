@@ -75,9 +75,12 @@ final class RemoteHttpImageInliner
         $cache = [];
 
         foreach ($xpath->query('//img') ?: [] as $node) {
+            // //img always resolves to elements; instanceof guard is defensive.
+            // @codeCoverageIgnoreStart
             if (!$node instanceof DOMElement) {
                 continue;
             }
+            // @codeCoverageIgnoreEnd
 
             $src = trim($node->getAttribute('src'));
             if ($src === '') {

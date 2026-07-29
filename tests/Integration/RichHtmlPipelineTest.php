@@ -6,6 +6,8 @@ namespace Nowo\HtmlToWordBundle\Tests\Integration;
 
 use Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter;
 use Nowo\HtmlToWordBundle\Tests\Fixtures\AppKernel;
+use PhpOffice\PhpWord\IOFactory;
+use PhpOffice\PhpWord\PhpWord;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -84,7 +86,7 @@ HTML;
         $tmp = sys_get_temp_dir() . '/htw_rich_' . uniqid() . '.docx';
 
         try {
-            $writer = \PhpOffice\PhpWord\IOFactory::createWriter($doc->phpWord(), 'Word2007');
+            $writer = IOFactory::createWriter($doc->phpWord(), 'Word2007');
             $writer->save($tmp);
             self::assertFileExists($tmp);
             self::assertGreaterThan(4000, filesize($tmp) ?: 0);
@@ -114,7 +116,7 @@ HTML;
 
         $tmp = sys_get_temp_dir() . '/htw_opts_' . uniqid() . '.docx';
         try {
-            $writer = \PhpOffice\PhpWord\IOFactory::createWriter($doc->phpWord(), 'Word2007');
+            $writer = IOFactory::createWriter($doc->phpWord(), 'Word2007');
             $writer->save($tmp);
             self::assertGreaterThan(2000, filesize($tmp) ?: 0);
         } finally {
@@ -142,7 +144,7 @@ HTML;
         );
 
         self::assertSame('phpword', $doc->engine());
-        self::assertInstanceOf(\PhpOffice\PhpWord\PhpWord::class, $doc->native());
+        self::assertInstanceOf(PhpWord::class, $doc->native());
     }
 
     #[RunInSeparateProcess]
@@ -160,7 +162,7 @@ HTML;
 
         $tmp = sys_get_temp_dir() . '/htw_tbl_' . uniqid() . '.docx';
         try {
-            $writer = \PhpOffice\PhpWord\IOFactory::createWriter($doc->phpWord(), 'Word2007');
+            $writer = IOFactory::createWriter($doc->phpWord(), 'Word2007');
             $writer->save($tmp);
             self::assertGreaterThan(2000, filesize($tmp) ?: 0);
         } finally {

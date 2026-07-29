@@ -4,7 +4,52 @@ All notable changes to this project are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Table of contents
+
+- [[Unreleased]](#unreleased)
+- [[1.2.0] - 2026-07-29](#120---2026-07-29)
+  - [Added](#added)
+  - [Changed](#changed)
+- [[1.1.4] - 2026-07-16](#114---2026-07-16)
+  - [Fixed](#fixed)
+- [[1.1.3] - 2026-07-16](#113---2026-07-16)
+  - [Added](#added-1)
+  - [Changed](#changed-1)
+  - [Removed](#removed)
+- [[1.1.2] - 2026-07-03](#112---2026-07-03)
+  - [Added](#added-2)
+  - [Changed](#changed-2)
+  - [Fixed](#fixed-1)
+- [[1.1.1] - 2026-06-13](#111---2026-06-13)
+  - [Added](#added-3)
+  - [Changed](#changed-3)
+  - [Fixed](#fixed-2)
+- [[1.1.0] - 2026-05-07](#110---2026-05-07)
+  - [Added](#added-4)
+  - [Changed](#changed-4)
+  - [Fixed](#fixed-3)
+- [[1.0.0] - 2026-05-07](#100---2026-05-07)
+  - [Added](#added-5)
+  - [Changed](#changed-5)
+
 ## [Unreleased]
+
+## [1.2.0] - 2026-07-29
+
+### Added
+
+- **`images.remote_timeout`** — configurable HTTP(S) download timeout in seconds for remote images (default **10**, minimum **0.1**); documented in [CONFIGURATION.md](CONFIGURATION.md) (REQ-RUNTIME-001).
+- **Makefile** — `down-dev`, `demo-smoke`, `test-coverage-100`, `release-check-demos`; Compose V2 preference with V1 fallback; optional monorepo `update-deps` include (REQ-MAKE-007/009/010).
+- **FrankenPHP Friendly** — README banner + worker-mode note; demo Symfony 8 supports `FRANKENPHP_MODE` via `.env` / `docker/entrypoint.sh` on PHP **8.5** (REQ-DEMO-010, REQ-DOCS-017/018).
+- **`composer.json` `support`** — issues / source / docs URLs (REQ-PKG-004).
+- **Docs** — TOC on long docs; SECURITY AI audit record (REQ-SEC-004 Pass conditional / Medium residual for remote images); PHPUnit `SYMFONY_DEPRECATIONS_HELPER=max[direct]=0` (REQ-DOCS-005, REQ-SF-005).
+- **Tests** — expanded unit/integration coverage toward a **100%** line gate (`src/Engine` excluded).
+
+### Changed
+
+- **Coverage gate** — minimum line coverage raised from **85%** to **100%** (`composer coverage-check`, README).
+- **PHPStan** — `nowo-tech/phpstan-frankenphp` + `ignoreErrors: []` (REQ-CS-005/006).
+- **Lockfiles** — bundle and `demo/symfony8` refreshed.
 
 ## [1.1.4] - 2026-07-16
 
@@ -91,7 +136,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.4...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.4...v1.2.0
 [1.1.4]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.2...v1.1.3
 [1.1.2]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.1...v1.1.2

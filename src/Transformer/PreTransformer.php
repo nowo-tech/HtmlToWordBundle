@@ -6,11 +6,12 @@ namespace Nowo\HtmlToWordBundle\Transformer;
 
 use DOMElement;
 use DOMNode;
+use Nowo\HtmlToWordBundle\Builder\InlineComposer;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 
 /**
- * Monospace block for {@code <pre>} (inline {@code <code>} is handled by {@see \Nowo\HtmlToWordBundle\Builder\InlineComposer}).
+ * Monospace block for {@code <pre>} (inline {@code <code>} is handled by {@see InlineComposer}).
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */

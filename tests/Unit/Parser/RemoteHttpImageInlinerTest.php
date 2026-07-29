@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Nowo\HtmlToWordBundle\Tests\Unit\Parser;
 
+use DOMDocument;
 use Nowo\HtmlToWordBundle\Builder\ImageResolverInterface;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
+use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
 use Nowo\HtmlToWordBundle\Parser\HtmlParser;
 use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 
 final class RemoteHttpImageInlinerTest extends TestCase
 {
@@ -80,6 +83,86 @@ final class RemoteHttpImageInlinerTest extends TestCase
         } finally {
             @unlink($tmp);
         }
+    }
+
+    public function testEmptyHtmlOrNoHttpImgReturnsUnchanged(): void
+    {
+        $resolver = $this->createMock(ImageResolverInterface::class);
+        $resolver->expects(self::never())->method('resolveToTempPath');
+        $inliner = new RemoteHttpImageInliner(new HtmlParser(), $resolver);
+        $cfg     = ResolvedConfig::fromArray(['images' => ['resolve_remote' => true]]);
+
+        self::assertSame('', $inliner->inlineRemoteImages('', $cfg));
+        self::assertSame('<p>no images</p>', $inliner->inlineRemoteImages('<p>no images</p>', $cfg));
+        self::assertSame(
+            '<img src="data:image/png;base64,xx"/>',
+            $inliner->inlineRemoteImages('<img src="data:image/png;base64,xx"/>', $cfg),
+        );
+    }
+
+    public function testSkipsEmptySrcProtocolRelativeNonHttpAndUnreadable(): void
+    {
+        $tmp = $this->createTempPng();
+        try {
+            $resolver = $this->createMock(ImageResolverInterface::class);
+            $resolver->method('resolveToTempPath')->willReturnCallback(
+                static function (string $src) use ($tmp): string {
+                    if (str_contains($src, 'cdn.example.com')) {
+                        return $tmp;
+                    }
+                    if (str_contains($src, 'missing')) {
+                        return sys_get_temp_dir() . '/htw-missing-' . uniqid('', true) . '.png';
+                    }
+
+                    return $tmp;
+                },
+            );
+
+            $inliner = new RemoteHttpImageInliner(new HtmlParser(), $resolver);
+            $html    = <<<'HTML'
+<img src="https://example.com/a.png"/>
+<img src=""/>
+<img src="//cdn.example.com/b.png"/>
+<img src="data:image/png;base64,abc"/>
+<img src="https://example.com/missing.png"/>
+HTML;
+            $out = $inliner->inlineRemoteImages($html, ResolvedConfig::fromArray([
+                'images' => ['resolve_remote' => true],
+            ]));
+
+            self::assertStringContainsString((string) (realpath($tmp) ?: $tmp), $out);
+            self::assertStringContainsString('data:image/png;base64,abc', $out);
+            self::assertStringNotContainsString('cdn.example.com', $out);
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
+    public function testResolveExceptionLeavesSrcUnchanged(): void
+    {
+        $resolver = $this->createMock(ImageResolverInterface::class);
+        $resolver->method('resolveToTempPath')->willThrowException(new ImageResolveException('nope'));
+
+        $inliner = new RemoteHttpImageInliner(new HtmlParser(), $resolver);
+        $html    = '<img src="https://example.com/a.png"/>';
+        $out     = $inliner->inlineRemoteImages($html, ResolvedConfig::fromArray([
+            'images' => ['resolve_remote' => true],
+        ]));
+
+        self::assertStringContainsString('https://example.com/a.png', $out);
+    }
+
+    public function testSerializeBodyInnerHtmlWithoutBodyReturnsEmpty(): void
+    {
+        $inliner = new RemoteHttpImageInliner(
+            new HtmlParser(),
+            $this->createMock(ImageResolverInterface::class),
+        );
+        $dom = new DOMDocument();
+        $dom->loadXML('<root/>');
+
+        $method = new ReflectionMethod(RemoteHttpImageInliner::class, 'serializeBodyInnerHtml');
+        self::assertSame('', $method->invoke($inliner, $dom));
     }
 
     private function createTempPng(): string

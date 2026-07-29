@@ -2,19 +2,20 @@
 
 This mirrors the standard Nowo pattern documented for other bundles: demos live only in the **Git repository** (not in the Composer artifact) and use **FrankenPHP** (Caddy + PHP) with Docker Compose.
 
-## Contents
+## Table of contents
 
 - [Overview](#overview)
 - [What this demo includes](#what-this-demo-includes)
 - [Volumes and Composer path repo](#volumes-and-composer-path-repo)
 - [DNS (Composer / Packagist)](#dns-composer--packagist)
 - [Development vs production Caddyfiles](#development-vs-production-caddyfiles)
+- [Switching classic vs worker (`FRANKENPHP_MODE`)](#switching-classic-vs-worker-frankenphp_mode)
 
 ---
 
 ## Overview
 
-- **Symfony 8 demo**: `demo/symfony8` — Compose project **`html-to-word-bundle-demo-symfony-8`** (REQ-DOC-002). FrankenPHP layout with PHP **8.4**, Symfony **8**. Default port **8021**.
+- **Symfony 8 demo**: `demo/symfony8` — Compose project **`html-to-word-bundle-demo-symfony-8`** (REQ-DOC-002). FrankenPHP layout with PHP **8.5**, Symfony **8**. Default port **8021**.
 - **Bundle mount**: host `../..` → container `/var/html-to-word-bundle`.
 - **Port**: configure `PORT` in `.env` / `.env.example`; `make up` prints **`Demo started at: http://localhost:<PORT>`** (REQ-DEMO-005).
 
@@ -60,3 +61,15 @@ Editing bundle sources on the host updates what Composer installs inside the con
 The FrankenPHP image ships two Caddyfiles (`docker/frankenphp/Caddyfile` and `Caddyfile.dev`). The Dockerfile entrypoint copies **`Caddyfile.dev`** when `APP_ENV=dev` so you get fast iteration without worker mode; production uses workers and stricter caching (same pattern as other Nowo bundle demos).
 
 For full narrative tables (worker mode, cache headers, troubleshooting), see the canonical write-up in sibling bundles (e.g. Icon Selector’s `docs/DEMO-FRANKENPHP.md`) — behaviour is identical; only paths and bundle names differ.
+
+
+## Switching classic vs worker (`FRANKENPHP_MODE`)
+
+Demos select the FrankenPHP runtime via **`FRANKENPHP_MODE`** in `.env` / `.env.example` (not a Dockerfile `ENV`):
+
+| Value | Behaviour |
+| --- | --- |
+| **`worker`** (default) | Keep the worker Caddyfile (`php_server { worker ... }`) |
+| **`classic`** | Entrypoint copies `Caddyfile.dev` (plain `php_server`, hot-reload friendly) |
+
+Compose passes `FRANKENPHP_MODE=${FRANKENPHP_MODE:-worker}` into the PHP service. After changing `.env`, run `docker compose up -d` (or `make up`) so the container is **recreated** — a plain `restart` does not reload env. No image rebuild is required.

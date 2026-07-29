@@ -2,6 +2,13 @@
 
 Thank you for improving HtmlToWordBundle.
 
+## Table of contents
+
+- [Code of Conduct](#code-of-conduct)
+- [Workflow](#workflow)
+- [Tests](#tests)
+- [Security](#security)
+- [Git hooks (REQ-GIT-001)](#git-hooks-req-git-001)
 
 ## Code of Conduct
 

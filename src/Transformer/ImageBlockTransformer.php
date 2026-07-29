@@ -8,13 +8,14 @@ use DOMElement;
 use DOMNode;
 use Nowo\HtmlToWordBundle\Builder\ImageResolverInterface;
 use Nowo\HtmlToWordBundle\Builder\ImageStyleHelper;
+use Nowo\HtmlToWordBundle\Builder\InlineComposer;
 use Nowo\HtmlToWordBundle\Builder\StyleMapper;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 
 /**
- * Block-level {@code <img>} (images inside paragraphs are handled by {@see \Nowo\HtmlToWordBundle\Builder\InlineComposer}).
+ * Block-level {@code <img>} (images inside paragraphs are handled by {@see InlineComposer}).
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */

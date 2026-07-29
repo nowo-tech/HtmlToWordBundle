@@ -71,9 +71,13 @@ final class ImageResolver implements ImageResolverInterface
             throw new ImageResolveException('Remote image host is not in the configured allowlist.');
         }
 
+        $timeout = (float) $config->get('images.remote_timeout', 10.0);
+        if ($timeout < 0.1) {
+            $timeout = 0.1;
+        }
         $ctx = stream_context_create([
-            'http'  => ['timeout' => 10],
-            'https' => ['timeout' => 10],
+            'http'  => ['timeout' => $timeout],
+            'https' => ['timeout' => $timeout],
         ]);
         $raw = @file_get_contents($src, false, $ctx);
         if ($raw === false) {

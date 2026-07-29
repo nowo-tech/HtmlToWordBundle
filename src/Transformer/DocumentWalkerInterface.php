@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Nowo\HtmlToWordBundle\Transformer;
 
 use DOMNode;
+use Nowo\HtmlToWordBundle\Builder\WordDocumentBuilder;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 
 /**
- * Callback into {@see \Nowo\HtmlToWordBundle\Builder\WordDocumentBuilder} for nested DOM walks.
+ * Callback into {@see WordDocumentBuilder} for nested DOM walks.
  */
 interface DocumentWalkerInterface
 {
