@@ -3,3 +3,15 @@ nowo_html_to_word:
     profiles:
         default:
             strict_mode: false
+            images:
+                # Keep remote HTTP(S) image fetching off by default (SSRF surface).
+                resolve_remote: false
+                # When enabling resolve_remote, set a tight remote_host_allowlist (empty deny-all).
+                # remote_host_allowlist: ['cdn.example.com']
+
+when@prod:
+    nowo_html_to_word:
+        profiles:
+            default:
+                images:
+                    resolve_remote: false

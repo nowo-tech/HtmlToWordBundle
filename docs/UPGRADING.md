@@ -57,7 +57,7 @@ No breaking application code changes are required.
 
 - **Consumers:** `composer update nowo-tech/html-to-word-bundle` and clear cache as usual.
 - **Optional:** set `images.remote_timeout` (seconds, default `10`) under a profile’s `images` section if you need a different remote download timeout — see [CONFIGURATION.md](CONFIGURATION.md).
-- **Security:** when `images.resolve_remote` is enabled, keep a tight `remote_host_allowlist` (empty allowlist remains permissive) — see [SECURITY.md](SECURITY.md).
+- **Security:** when `images.resolve_remote` is enabled, set an explicit `remote_host_allowlist` (empty allowlist is deny-all via `RemoteImageHostPolicy`) — see [SECURITY.md](SECURITY.md).
 - **Maintainers:** coverage gate is now **100%** lines; demo FrankenPHP image uses PHP **8.5** with optional `FRANKENPHP_MODE`.
 
 ## 1.1.3 → 1.1.4

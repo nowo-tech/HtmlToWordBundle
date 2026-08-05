@@ -49,7 +49,7 @@ It does **not** expose HTTP routes by itself; embedding apps choose authorizatio
 ### SSRF via remote images
 
 - **Risk**: When `images.resolve_remote` is true, `file_get_contents()` may fetch attacker-controlled URLs from the server network.
-- **Mitigation**: Keep remote resolution **disabled** in sensitive deployments; terminate outbound traffic at the network layer; prefer base64 or controlled CDN URLs at the application layer. HTTP timeouts are limited (10s) in `ImageResolver`.
+- **Mitigation**: Keep remote resolution **disabled** (recipe default and `when@prod: resolve_remote: false`). `RemoteImageHostPolicy` **denies** remote hosts when `remote_host_allowlist` is empty — configure an explicit allowlist before enabling remote. Terminate outbound traffic at the network layer; prefer base64 or controlled CDN URLs at the application layer. HTTP timeouts are limited (10s) in `ImageResolver`.
 
 ### Path traversal / local file read via `<img src>`
 
@@ -110,4 +110,4 @@ Record confirmation in the release PR or tag notes.
 | Grade | Pass (conditional) |
 | Risk | Medium |
 | Method | Cursor security-review / campaign static pass (`src/`, Flex recipe, demo, SECURITY docs) |
-| Open residuals | No Critical/High. **Accepted Medium:** SSRF surface if `images.resolve_remote: true` without a tight `remote_host_allowlist` and network egress controls; empty allowlist is permissive when remote is enabled. Prefer default `resolve_remote: false`. App-owned: HTML size limits, path validation for local `<img src>`, avoid logging full HTML or credentialed remote URLs. |
+| Open residuals | No Critical/High. **Accepted Medium:** SSRF surface if `images.resolve_remote: true` without a tight `remote_host_allowlist` and network egress controls. An **empty** `remote_host_allowlist` is **deny-all** (`RemoteImageHostPolicy`); configure an explicit allowlist when enabling remote. Flex recipe keeps `resolve_remote: false` (including `when@prod`). App-owned: HTML size limits, path validation for local `<img src>`, avoid logging full HTML or credentialed remote URLs. |
