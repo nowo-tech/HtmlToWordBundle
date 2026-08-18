@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [General](#general)
+- [1.2.0 → 1.2.1](#120--121)
 - [Configuration root key rename](#configuration-root-key-rename)
 - [`HtmlToWordConverterInterface` implementors (v1.0.0+)](#htmltowordconverterinterface-implementors-v100)
 - [1.0.x → 1.1.0](#10x--110)
@@ -23,6 +24,10 @@
 ```bash
 php bin/console cache:clear
 ```
+
+## 1.2.0 → 1.2.1
+
+No application upgrade steps. Demos only: Hot Reload Bundle `^1.4` (FrankenPHP Mercure/`hot_reload`, `dev`/`test`).
 
 ## Configuration root key rename
 
