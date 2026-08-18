@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.2.1] - 2026-08-18](#121---2026-08-18)
 - [[1.2.0] - 2026-07-29](#120---2026-07-29)
   - [Added](#added)
   - [Changed](#changed)
@@ -33,6 +34,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - [Changed](#changed-5)
 
 ## [Unreleased]
+
+## [1.2.1] - 2026-08-18
+
+### Changed
+
+- **Demos:** pin `nowo-tech/hot-reload-bundle` to `^1.4` with FrankenPHP Mercure/`hot_reload` (`dev`/`test` only).
+
+[1.2.1]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.2.1
 
 ## [1.2.0] - 2026-07-29
 
@@ -136,7 +145,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.1...HEAD
 [1.2.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.4...v1.2.0
 [1.1.4]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.2...v1.1.3
