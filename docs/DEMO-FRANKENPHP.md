@@ -1,5 +1,7 @@
 # Demo applications with FrankenPHP (HtmlToWordBundle)
 
+**REQ-DEMO-001:** FrankenPHP demos must install **Nowo Twig Inspector** and **Nowo Hot Reload** together (`nowo-tech/twig-inspector-bundle` + `nowo-tech/hot-reload-bundle` in `require-dev`). Caddyfile: Mercure + `hot_reload` (and `worker { file …; watch }` in worker mode). Do not enable Hot Reload in production.
+
 This mirrors the standard Nowo pattern documented for other bundles: demos live only in the **Git repository** (not in the Composer artifact) and use **FrankenPHP** (Caddy + PHP) with Docker Compose.
 
 ## Table of contents

@@ -35,6 +35,9 @@ release-verify release-verify8: demo-smoke
 release-check release-check8:
 	@$(MAKE) -C symfony8 release-check
 
+update-bundle:
+	@$(MAKE) -C symfony8 update-bundle
+
 DEMOS := symfony8
 BUNDLE_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/..)
 # Optional: monorepo helper absent on standalone GitHub Actions checkout (REQ-MAKE-009).
