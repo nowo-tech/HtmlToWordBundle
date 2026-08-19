@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [General](#general)
+- [1.2.1 → 1.2.2](#121--122)
 - [1.2.0 → 1.2.1](#120--121)
 - [Configuration root key rename](#configuration-root-key-rename)
 - [`HtmlToWordConverterInterface` implementors (v1.0.0+)](#htmltowordconverterinterface-implementors-v100)
@@ -23,6 +24,14 @@
 
 ```bash
 php bin/console cache:clear
+```
+
+## 1.2.1 → 1.2.2
+
+No application upgrade steps.
+
+```bash
+composer update nowo-tech/html-to-word-bundle
 ```
 
 ## 1.2.0 → 1.2.1
