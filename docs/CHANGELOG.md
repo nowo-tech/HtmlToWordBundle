@@ -7,33 +7,49 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.2.3] - 2026-09-24](#123---2026-09-24)
+  - [Fixed](#fixed)
+  - [Added](#added)
+- [[1.2.2] - 2026-08-19](#122---2026-08-19)
 - [[1.2.1] - 2026-08-18](#121---2026-08-18)
 - [[1.2.0] - 2026-07-29](#120---2026-07-29)
-  - [Added](#added)
+  - [Added](#added-1)
   - [Changed](#changed)
 - [[1.1.4] - 2026-07-16](#114---2026-07-16)
-  - [Fixed](#fixed)
+  - [Fixed](#fixed-1)
 - [[1.1.3] - 2026-07-16](#113---2026-07-16)
-  - [Added](#added-1)
+  - [Added](#added-2)
   - [Changed](#changed-1)
   - [Removed](#removed)
 - [[1.1.2] - 2026-07-03](#112---2026-07-03)
-  - [Added](#added-2)
-  - [Changed](#changed-2)
-  - [Fixed](#fixed-1)
-- [[1.1.1] - 2026-06-13](#111---2026-06-13)
   - [Added](#added-3)
-  - [Changed](#changed-3)
+  - [Changed](#changed-2)
   - [Fixed](#fixed-2)
-- [[1.1.0] - 2026-05-07](#110---2026-05-07)
+- [[1.1.1] - 2026-06-13](#111---2026-06-13)
   - [Added](#added-4)
-  - [Changed](#changed-4)
+  - [Changed](#changed-3)
   - [Fixed](#fixed-3)
-- [[1.0.0] - 2026-05-07](#100---2026-05-07)
+- [[1.1.0] - 2026-05-07](#110---2026-05-07)
   - [Added](#added-5)
+  - [Changed](#changed-4)
+  - [Fixed](#fixed-4)
+- [[1.0.0] - 2026-05-07](#100---2026-05-07)
+  - [Added](#added-6)
   - [Changed](#changed-5)
 
 ## [Unreleased]
+
+## [1.2.3] - 2026-09-24
+
+### Fixed
+
+- **Worker mode / temp files (REQ-WORKER-001):** `htw_b64_*` (data URI) and `htw_img_*` (remote) temp images are tracked per document by `Builder\TemporaryImageFiles`. `DocxExporter` deletes the images of the exported document after save; images never exported (or from a failed conversion) are deleted on `kernel.terminate` and on `kernel.reset`, so FrankenPHP workers without kernel reset no longer accumulate files in the temp dir. See [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md).
+- **Two documents in one request:** building a second document no longer deletes the remote-image temp files of the first one before it is exported (`inlineRemoteImages()` no longer wipes the previous session).
+
+### Added
+
+- `WordDocument::temporaryFiles()` (optional 4th constructor argument); `RemoteHttpImageInliner::beginDocument()` / `endDocument()` / `abortDocument()` / `releaseTemporaryFiles()`; optional `TemporaryImageFiles` on `ImageResolver` and `RemoteHttpImageInliner`.
+- Integration tests simulating consecutive requests on the same container without `services_resetter` reset (`WorkerModeTemporaryFilesTest`).
 
 ## [1.2.2] - 2026-08-19
 
@@ -151,7 +167,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.3...HEAD
+[1.2.3]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.2...v1.2.3
+[1.2.2]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.1...v1.2.2
+[1.2.1]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.2.1
 [1.2.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.4...v1.2.0
 [1.1.4]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.3...v1.1.4
 [1.1.3]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.1.2...v1.1.3

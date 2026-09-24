@@ -64,6 +64,7 @@ The FrankenPHP image ships two Caddyfiles (`docker/frankenphp/Caddyfile` and `Ca
 
 For full narrative tables (worker mode, cache headers, troubleshooting), see the canonical write-up in sibling bundles (e.g. Icon Selector’s `docs/DEMO-FRANKENPHP.md`) — behaviour is identical; only paths and bundle names differ.
 
+**Worker mode without kernel reset:** HtmlToWordBundle is audited for FrankenPHP workers that keep the same container across requests (scenario B). Temp images are cleaned after export or on `kernel.terminate` / `kernel.reset` — see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md) (REQ-WORKER-001).
 
 ## Switching classic vs worker (`FRANKENPHP_MODE`)
 

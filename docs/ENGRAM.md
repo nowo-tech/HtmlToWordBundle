@@ -30,10 +30,14 @@ The result is an immutable value object: `Nowo\HtmlToWordBundle\Config\ResolvedC
 ## Pipeline
 
 1. **HtmlSanitizer** — strip scripts/styles/iframes; strip `on*` attributes on DOM.
-2. **HtmlParser** — HTML5 parse into `DOMDocument` with a `<body>` wrapper.
-3. **WordDocumentBuilder** — one section: section layout + optional header/footer, then depth-first dispatch on `body` children.
-4. **TransformerChain** — first transformer matching the element name (priority order) runs; unknown tags respect `strict_mode`.
-5. **InlineComposer** — maps inline tags (`strong`, `a`, `img`, …) inside `TextRun` / cells / list runs.
+2. **RemoteHttpImageInliner** — optional `http(s)` → temp path; tracked in `TemporaryImageFiles` per document.
+3. **HtmlParser** — HTML5 parse into `DOMDocument` with a `<body>` wrapper.
+4. **WordDocumentBuilder** — one section: section layout + optional header/footer, then depth-first dispatch on `body` children; attaches `temporaryFiles()` for the exporter.
+5. **TransformerChain** — first transformer matching the element name (priority order) runs; unknown tags respect `strict_mode`.
+6. **InlineComposer** — maps inline tags (`strong`, `a`, `img`, …) inside `TextRun` / cells / list runs.
+7. **DocxExporter** — writes DOCX then `releaseTemporaryFiles()` (worker-safe leftovers on `kernel.terminate` / `reset`).
+
+FrankenPHP worker mode without kernel reset: [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md) (`REQ-WORKER-001`).
 
 ## Extension points
 

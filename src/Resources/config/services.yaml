@@ -42,6 +42,9 @@ services:
     Nowo\HtmlToWordBundle\Builder\ImageResolverInterface:
         alias: Nowo\HtmlToWordBundle\Builder\ImageResolver
 
+    # Shared across ImageResolver + RemoteHttpImageInliner; ResetInterface + kernel.terminate (worker mode).
+    Nowo\HtmlToWordBundle\Builder\TemporaryImageFiles: ~
+
     Nowo\HtmlToWordBundle\Builder\WordDocumentBuilder:
         autowire: false
         arguments:

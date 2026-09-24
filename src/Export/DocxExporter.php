@@ -36,7 +36,7 @@ final readonly class DocxExporter implements ExporterInterface
         $inliner  = $this->remoteHttpImageInliner;
 
         return new StreamedResponse(
-            static function () use ($writer, $inliner): void {
+            static function () use ($writer, $inliner, $document): void {
                 try {
                     $writer->save('php://output');
                     // Writer failures while streaming are rare in CI; catch kept for production safety.
@@ -45,7 +45,7 @@ final readonly class DocxExporter implements ExporterInterface
                     throw new ExportException('Failed to stream DOCX: ' . $e->getMessage(), 0, $e);
                     // @codeCoverageIgnoreEnd
                 } finally {
-                    $inliner->cleanupInlineSession();
+                    $inliner->releaseTemporaryFiles($document);
                 }
             },
             200,
@@ -72,7 +72,7 @@ final readonly class DocxExporter implements ExporterInterface
             throw new ExportException('Failed to write DOCX to temporary file: ' . $e->getMessage(), 0, $e);
             // @codeCoverageIgnoreEnd
         } finally {
-            $this->remoteHttpImageInliner->cleanupInlineSession();
+            $this->remoteHttpImageInliner->releaseTemporaryFiles($document);
         }
 
         $response = new BinaryFileResponse($tmp);
@@ -93,7 +93,7 @@ final readonly class DocxExporter implements ExporterInterface
             throw new ExportException(sprintf('Failed to save DOCX to "%s": %s', $path, $e->getMessage()), 0, $e);
             // @codeCoverageIgnoreEnd
         } finally {
-            $this->remoteHttpImageInliner->cleanupInlineSession();
+            $this->remoteHttpImageInliner->releaseTemporaryFiles($document);
         }
     }
 

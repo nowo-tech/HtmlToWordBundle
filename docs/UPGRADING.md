@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [General](#general)
+- [1.2.2 → 1.2.3](#122--123)
 - [1.2.1 → 1.2.2](#121--122)
 - [1.2.0 → 1.2.1](#120--121)
 - [Configuration root key rename](#configuration-root-key-rename)
@@ -23,6 +24,21 @@
 - Run `composer update nowo-tech/html-to-word-bundle` and clear Symfony cache in your application:
 
 ```bash
+php bin/console cache:clear
+```
+
+## 1.2.2 → 1.2.3
+
+No configuration change. Constructor changes are additive (new optional last arguments):
+
+- `ImageResolver(?TemporaryImageFiles $temporaryFiles = null)`, `RemoteHttpImageInliner(HtmlParser, ImageResolverInterface, ?TemporaryImageFiles $temporaryFiles = null)`, `WordDocument(object, ResolvedConfig, string, array $temporaryFiles = [])`.
+- `RemoteHttpImageInliner::cleanupInlineSession()` still exists and now deletes every tracked temp image not released yet. `DocxExporter` calls the new `releaseTemporaryFiles($document)` instead, so exporting one document does not delete the images of another document built in the same request.
+- If you build `WordDocumentBuilder` / `ImageResolver` by hand (outside the container), pass the same `TemporaryImageFiles` instance to `ImageResolver` and `RemoteHttpImageInliner` so data URI temp files are cleaned too.
+- The cron / tmpfs workaround for `htw_*` files from the worker-mode audit is no longer needed.
+- FrankenPHP workers without kernel reset are supported for temp-image lifecycle — see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md).
+
+```bash
+composer update nowo-tech/html-to-word-bundle
 php bin/console cache:clear
 ```
 

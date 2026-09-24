@@ -15,7 +15,7 @@ This bundle does **not** render Twig, generate HTML, produce PDF, or edit existi
 
 ![FrankenPHP Friendly Worker Mode](docs/images/frankenphp-friendly.png)
 
-This bundle is **FrankenPHP worker mode friendly**.
+This bundle is **FrankenPHP worker mode friendly** (including when the kernel is **not** reset between requests). See [docs/FRANKENPHP-WORKER-AUDIT.md](docs/FRANKENPHP-WORKER-AUDIT.md).
 
 ## Version information
 
@@ -79,6 +79,7 @@ The PHP Docker image installs extensions required by PHPWord (including **GD**).
 ### Additional documentation
 
 - [FrankenPHP demos](docs/DEMO-FRANKENPHP.md) — how `demo/symfony8` runs in Docker.
+- [FrankenPHP worker audit](docs/FRANKENPHP-WORKER-AUDIT.md) — scenario B (no kernel reset) findings and remediations.
 - Example YAML profiles are shipped as `src/Resources/config/nowo_html_to_word.yaml` (copy into your app’s `config/packages/`).
 
 ## Tests and coverage

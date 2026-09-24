@@ -19,6 +19,7 @@ use Nowo\HtmlToWordBundle\Transformer\TransformerChain;
 use Nowo\HtmlToWordBundle\Transformer\TransformerInterface;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\PhpWord;
+use Throwable;
 
 use function sprintf;
 
@@ -45,6 +46,23 @@ final readonly class WordDocumentBuilder implements DocumentWalkerInterface
 
     public function build(string $html, ResolvedConfig $config): WordDocument
     {
+        $this->remoteHttpImageInliner->beginDocument();
+
+        try {
+            $phpWord = $this->buildPhpWord($html, $config);
+        } catch (Throwable $e) {
+            $this->remoteHttpImageInliner->abortDocument();
+
+            throw $e;
+        }
+
+        // Temp images must survive until IOFactory::createWriter()->save() copies bytes into the DOCX;
+        // DocxExporter releases them after save.
+        return new WordDocument($phpWord, $config, PhpWordEngine::NAME, $this->remoteHttpImageInliner->endDocument());
+    }
+
+    private function buildPhpWord(string $html, ResolvedConfig $config): PhpWord
+    {
         $clean = $this->sanitizer->sanitize($html);
         $clean = $this->remoteHttpImageInliner->inlineRemoteImages($clean, $config);
         $dom   = $this->parser->parse($clean);
@@ -68,10 +86,7 @@ final readonly class WordDocumentBuilder implements DocumentWalkerInterface
             $this->dispatch($child, $section, $config);
         }
 
-        // Temp paths from RemoteHttpImageInliner must survive until IOFactory::createWriter()->save()
-        // copies bytes into the DOCX; cleanup runs in DocxExporter after save.
-
-        return new WordDocument($phpWord, $config, PhpWordEngine::NAME);
+        return $phpWord;
     }
 
     public function dispatch(DOMNode $node, AbstractContainer $container, ResolvedConfig $config): void

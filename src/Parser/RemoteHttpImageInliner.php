@@ -8,10 +8,11 @@ use DOMDocument;
 use DOMElement;
 use DOMXPath;
 use Nowo\HtmlToWordBundle\Builder\ImageResolverInterface;
+use Nowo\HtmlToWordBundle\Builder\TemporaryImageFiles;
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
+use Nowo\HtmlToWordBundle\Model\WordDocument;
 
-use function is_file;
 use function is_readable;
 use function preg_match;
 use function realpath;
@@ -23,34 +24,61 @@ use function trim;
  * Before PhpWord runs: replaces {@code <img src="http(s)://...">} with an absolute local filesystem path
  * (temp file from {@see ImageResolverInterface::resolveToTempPath}). PhpWord’s HTML reader is most reliable
  * with paths, not {@code data:} URIs. Stored HTML can keep URLs; only the in-memory HTML passed to the
- * builder uses temp paths. {@see cleanupInlineSession()} runs after {@code DocxExporter} finishes
- * {@code IOFactory::createWriter()->save(...)} so PhpWord can copy image bytes into the DOCX first.
+ * builder uses temp paths.
+ *
+ * Temp files are tracked per document in {@see TemporaryImageFiles}: the builder wraps each conversion in
+ * {@see beginDocument()} / {@see endDocument()} and {@code DocxExporter} calls {@see releaseTemporaryFiles()}
+ * after {@code IOFactory::createWriter()->save(...)} so PhpWord can copy image bytes into the DOCX first.
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
 final class RemoteHttpImageInliner
 {
-    /** @var array<string, true> path => true */
-    private array $sessionTempFiles = [];
+    private readonly TemporaryImageFiles $temporaryFiles;
 
     public function __construct(
         private readonly HtmlParser $htmlParser,
         private readonly ImageResolverInterface $imageResolver,
+        ?TemporaryImageFiles $temporaryFiles = null,
     ) {
+        $this->temporaryFiles = $temporaryFiles ?? new TemporaryImageFiles();
+    }
+
+    public function beginDocument(): void
+    {
+        $this->temporaryFiles->beginCollection();
     }
 
     /**
-     * Deletes temp files registered during the last {@see inlineRemoteImages} pass (idempotent).
+     * @return list<string> temp files created since {@see beginDocument()}
+     */
+    public function endDocument(): array
+    {
+        return $this->temporaryFiles->endCollection();
+    }
+
+    /**
+     * Ends the current collection and deletes its files (conversion failed).
+     */
+    public function abortDocument(): void
+    {
+        $this->temporaryFiles->release($this->temporaryFiles->endCollection());
+    }
+
+    /**
+     * Deletes the temp images of one document once it has been written.
+     */
+    public function releaseTemporaryFiles(WordDocument $document): void
+    {
+        $this->temporaryFiles->release($document->temporaryFiles());
+    }
+
+    /**
+     * Deletes every tracked temp image that was not released yet (idempotent).
      */
     public function cleanupInlineSession(): void
     {
-        foreach (array_keys($this->sessionTempFiles) as $path) {
-            if ($path !== '' && is_file($path)) {
-                @unlink($path);
-            }
-        }
-
-        $this->sessionTempFiles = [];
+        $this->temporaryFiles->releaseAll();
     }
 
     /**
@@ -58,8 +86,6 @@ final class RemoteHttpImageInliner
      */
     public function inlineRemoteImages(string $html, ResolvedConfig $config): string
     {
-        $this->cleanupInlineSession();
-
         if (!(bool) $config->get('images.resolve_remote', false)) {
             return $html;
         }
@@ -107,9 +133,9 @@ final class RemoteHttpImageInliner
                     continue;
                 }
 
-                $absolute                          = realpath($path) ?: $path;
-                $cache[$src]                       = $absolute;
-                $this->sessionTempFiles[$absolute] = true;
+                $absolute    = realpath($path) ?: $path;
+                $cache[$src] = $absolute;
+                $this->temporaryFiles->register($absolute);
                 $node->setAttribute('src', $absolute);
             } catch (ImageResolveException) {
                 continue;

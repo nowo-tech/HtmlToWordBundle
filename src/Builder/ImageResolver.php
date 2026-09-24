@@ -19,6 +19,11 @@ use function sprintf;
  */
 final class ImageResolver implements ImageResolverInterface
 {
+    public function __construct(
+        private readonly ?TemporaryImageFiles $temporaryFiles = null,
+    ) {
+    }
+
     /**
      * @throws ImageResolveException
      */
@@ -32,6 +37,7 @@ final class ImageResolver implements ImageResolverInterface
         if (str_starts_with($src, 'data:')) {
             $path = $this->fromDataUri($src);
             $this->assertRasterImage($path, true);
+            $this->temporaryFiles?->register($path);
 
             return $path;
         }
@@ -93,6 +99,7 @@ final class ImageResolver implements ImageResolverInterface
 
         file_put_contents($tmp, $raw);
         $this->assertRasterImage($tmp, true);
+        $this->temporaryFiles?->register($tmp);
 
         return $tmp;
     }

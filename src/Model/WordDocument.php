@@ -17,10 +17,14 @@ use function sprintf;
  */
 final readonly class WordDocument
 {
+    /**
+     * @param list<string> $temporaryFiles temp images the exporter deletes after writing the DOCX
+     */
     public function __construct(
         private object $nativeDocument,
         private ResolvedConfig $config,
         private string $engineName,
+        private array $temporaryFiles = [],
     ) {
     }
 
@@ -49,6 +53,14 @@ final readonly class WordDocument
     public function resolvedConfig(): ResolvedConfig
     {
         return $this->config;
+    }
+
+    /**
+     * @return list<string>
+     */
+    public function temporaryFiles(): array
+    {
+        return $this->temporaryFiles;
     }
 
     public function suggestedFilename(): string

@@ -51,7 +51,7 @@ $exporter->toFile($document, '/tmp/out.docx');
 $exporter->toFlysystem($document, 'exports/out.docx'); // requires Flysystem injection
 ```
 
-If you **bypass** `DocxExporter` and call `IOFactory::createWriter($document->phpWord(), 'Word2007')->save($path)` yourself, run **`RemoteHttpImageInliner::cleanupInlineSession()`** after a successful `save()` when the HTML contained resolved remote images (or rely on the next conversion’s cleanup). Prefer the exporter for a correct lifecycle.
+If you **bypass** `DocxExporter` and call `IOFactory::createWriter($document->phpWord(), 'Word2007')->save($path)` yourself, delete the document’s temp images afterwards with **`RemoteHttpImageInliner::releaseTemporaryFiles($document)`** (or `cleanupInlineSession()` to wipe every pending temp image). Prefer the exporter for a correct lifecycle — it also works under FrankenPHP worker mode without kernel reset (see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md)).
 
 ## HTML expectations
 
@@ -63,9 +63,10 @@ If you **bypass** `DocxExporter` and call `IOFactory::createWriter($document->ph
 
 Keep `<img src="https://…">` (or `http://`) in the HTML you persist. **Immediately before** DOM parsing and PhpWord conversion, **`RemoteHttpImageInliner`** downloads each remote `src` to a **temporary file** and sets `src` to that **absolute path** (same approach as using `Html::addHtml` with local files—more reliable in PhpWord than `data:` URIs). Temp files are removed **after** `DocxExporter` finishes writing the DOCX (PhpWord reads image paths during `save()`). Your database/CMS copy stays URL-based.
 
-- Requires `images.resolve_remote: true` (default). If `false`, URLs are left unchanged and conversion falls back to `ImageResolver` at render time (same rules as before).
+- Requires `images.resolve_remote: true` (default **false**). If `false`, URLs are left unchanged and conversion falls back to `ImageResolver` at render time (same rules as before).
 - Duplicate URLs in one document are fetched once (small in-memory cache per conversion).
 - Protocol-relative URLs (`//cdn.example.com/x.png`) are normalized to `https:` before download.
+- Temp files (`htw_img_*`, `htw_b64_*`) are tracked per document and deleted after export, or on `kernel.terminate` / `kernel.reset` if the document was never exported (worker-safe).
 
 You can still use **data URIs** or **local file paths** in `src` directly (the bundle’s `ImageResolver` normalizes data URIs to temp files for PhpWord). **Header/footer `header.logo`** remains a **local filesystem path** only.
 

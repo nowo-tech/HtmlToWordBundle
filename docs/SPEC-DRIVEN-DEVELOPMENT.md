@@ -32,6 +32,7 @@ The sections below state **behavior**; this subsection states **intent** in back
 | US-03 | **As an** integrator, **I want** PHPWord-backed rendering **so that** I avoid maintaining low-level OOXML code. |
 | US-04 | **As a** maintainer, **I want** PHPUnit on converters **so that** profile and transformer regressions are caught in CI. |
 | US-05 | **As a** contributor, **I want** `REQ-*` anchors on scripted flows **so that** PRs cite the same identifiers as this document. |
+| US-06 | **As an** integrator on FrankenPHP worker mode, **I want** conversion without cross-request leaks **so that** the kernel can stay warm without reset (`REQ-WORKER-001`). |
 
 **Out of scope for these stories:** guarantees outside the stated public API and outside dependency limits (PHP, Symfony, third-party libraries).
 
@@ -71,6 +72,7 @@ The sections below state **behavior**; this subsection states **intent** in back
 | `REQ-DEMO-005` | `demo/Makefile` | @echo "  make up               Start demo/symfony8 (REQ-DEMO-005 message)" |
 | `REQ-DEMO-007` | `demo/Makefile` | @echo "  make release-check    update-bundle + test + verify-http (REQ-DEMO-007, symfony8)" |
 | `REQ-MAKE-001` | `Makefile` | # HtmlToWordBundle — Docker-driven development (REQ-MAKE-001) |
+| `REQ-WORKER-001` | `docs/FRANKENPHP-WORKER-AUDIT.md`, `Builder\TemporaryImageFiles` | FrankenPHP worker / no kernel reset: per-document temp images deleted after export, on `kernel.terminate`, and on `kernel.reset` |
 
 When you change scripted behavior, **update the existing `REQ-*` comment** if the ID still matches the rule, or **add a new `REQ-*`** and document it here and in the PR description.
 
