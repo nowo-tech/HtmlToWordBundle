@@ -20,6 +20,7 @@ final class HtmlToWordBundle extends Bundle
     public function getContainerExtension(): ExtensionInterface
     {
         if (!$this->extension instanceof HtmlToWordExtension) {
+            // @igor-ignore - Symfony bundle extension lazy-init at boot; not request state
             $this->extension = new HtmlToWordExtension();
         }
 

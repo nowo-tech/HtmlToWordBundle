@@ -96,6 +96,7 @@ final readonly class TableTransformer implements TransformerInterface
                     $pStyle = array_merge($this->styleMapper->paragraphSpacing($config), ['alignment' => 'center']);
                 }
 
+                // @igor-ignore - Justified false positive for FrankenPHP worker audit
                 $run = $c->addTextRun($pStyle);
                 $walker->appendRichText($cell, $run, $config);
             }

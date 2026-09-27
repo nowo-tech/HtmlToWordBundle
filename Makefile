@@ -1,5 +1,5 @@
 # HtmlToWordBundle — Docker-driven development (REQ-MAKE-001)
-.PHONY: help up down down-dev build shell install test test-coverage coverage-check test-coverage-100 cs-check cs-fix qa clean assets release-check release-check-demos demo-smoke composer-sync ensure-up phpstan rector rector-dry update validate setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history update-deps
+.PHONY: help up down down-dev build shell install test test-coverage coverage-check test-coverage-100 cs-check cs-fix qa clean assets release-check release-check-demos demo-smoke composer-sync ensure-up phpstan igor rector rector-dry update validate setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history update-deps
 
 COMPOSE_FILE ?= docker-compose.yml
 # Prefer Compose V2 plugin (GitHub Actions / modern Docker Desktop); fall back to docker-compose V1 (REQ-MAKE-010).
@@ -87,6 +87,10 @@ composer-sync: ensure-up
 	$(COMPOSE) exec -T $(SERVICE_PHP) composer validate --strict
 	$(COMPOSE) exec -T $(SERVICE_PHP) composer update --no-install
 
+
+# Run Igor worker-state audit (REQ-CS-008)
+igor: ensure-up
+	$(COMPOSE) exec -T php composer igor
 release-check: check-no-cursor-coauthor
 	@$(MAKE) ensure-up
 	@$(MAKE) composer-sync

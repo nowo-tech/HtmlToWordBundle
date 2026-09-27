@@ -1,6 +1,6 @@
 {
     "name": "nowo-tech/html-to-word-bundle",
-    "description": "Symfony bundle: HTML (WYSIWYG output) → DOCX with named YAML profiles, PHPWord, sanitization and tagged transformers.",
+    "description": "Symfony bundle: HTML (WYSIWYG output) \u2192 DOCX with named YAML profiles, PHPWord, sanitization and tagged transformers.",
     "type": "symfony-bundle",
     "license": "MIT",
     "keywords": [
@@ -21,7 +21,7 @@
     },
     "authors": [
         {
-            "name": "Héctor Franco Aceituno",
+            "name": "H\u00e9ctor Franco Aceituno",
             "email": "hectorfranco@nowo.tech"
         },
         {
@@ -44,6 +44,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
+        "igor-php/igor-php": "^0.9.7",
         "nowo-tech/phpstan-frankenphp": "^1.0",
         "phpstan/extension-installer": "^1.0",
         "phpstan/phpstan": "^2.0",
@@ -91,6 +92,10 @@
             "@test"
         ],
         "rector": "@php vendor/bin/rector --no-progress-bar",
-        "rector-dry": "@php vendor/bin/rector --dry-run --no-progress-bar"
+        "rector-dry": "@php vendor/bin/rector --dry-run --no-progress-bar",
+        "igor": "igor-php --no-agent ."
+    },
+    "scripts-descriptions": {
+        "igor": "Run Igor FrankenPHP worker-state audit (REQ-CS-008)"
     }
 }

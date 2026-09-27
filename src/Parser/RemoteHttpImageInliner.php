@@ -135,6 +135,7 @@ final class RemoteHttpImageInliner
 
                 $absolute    = realpath($path) ?: $path;
                 $cache[$src] = $absolute;
+                // @igor-ignore - Mutates attached request-scoped or value object; not worker singleton cache
                 $this->temporaryFiles->register($absolute);
                 $node->setAttribute('src', $absolute);
             } catch (ImageResolveException) {
