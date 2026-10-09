@@ -3,6 +3,16 @@
 
 ## Unreleased
 
+## To 1.2.6
+
+From **1.2.4** / **1.2.5** — dependency refresh.
+
+```bash
+composer update nowo-tech/html-to-word-bundle
+```
+
+- No breaking changes. No application upgrade steps.
+
 ## To 1.2.4
 
 From **1.2.3** — REQ-CS-008 Igor FrankenPHP worker audit (igor-php require-dev, igor.json, make igor).
@@ -17,6 +27,7 @@ php bin/console cache:clear
 ## Table of contents
 
 - [General](#general)
+- [To 1.2.6](#to-126)
 - [1.2.2 → 1.2.3](#122--123)
 - [1.2.1 → 1.2.2](#121--122)
 - [1.2.0 → 1.2.1](#120--121)

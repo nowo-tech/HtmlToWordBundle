@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.2.6] - 2026-10-09](#126---2026-10-09)
+- [[1.2.5] - 2026-10-09](#125---2026-10-09)
 - [[1.2.4] - 2026-09-27](#124---2026-09-27)
 - [[1.2.3] - 2026-09-24](#123---2026-09-24)
   - [Fixed](#fixed)
@@ -39,6 +41,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - [Changed](#changed-5)
 
 ## [Unreleased]
+
+## [1.2.6] - 2026-10-09
+
+### Dependencies
+
+- Dev lock refreshed: Symfony 7.4.20, PHPStan 2.3.1, `phpstan/phpstan-phpunit` 2.1.1, Rector 2.7.0, PHPUnit 11.5.57, `nowo-tech/phpstan-frankenphp` 1.2.3.
+- Demo `symfony8`: Symfony 8.1.8, Twig 3.30.0; regenerated `config/reference.php`.
+
+## [1.2.5] - 2026-10-09
+
+### Dependencies
+
+- `igor-php/igor-php` require-dev constraint bumped to `^0.10.1`; PHPStan group and `nowo-tech/phpstan-frankenphp` Dependabot bumps (tag cut on the Dependabot commits only).
 
 ## [1.2.4] - 2026-09-27
 
@@ -180,7 +195,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.3...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.6...HEAD
+[1.2.6]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.5...v1.2.6
+[1.2.5]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.4...v1.2.5
+[1.2.4]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/nowo-tech/HtmlToWordBundle/releases/tag/v1.2.1
