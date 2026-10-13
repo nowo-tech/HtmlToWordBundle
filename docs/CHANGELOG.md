@@ -25,6 +25,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Symfony 7 floor raised from `^7.0` to `^7.4` for every `symfony/*` requirement (`^6.4 || ^7.4 || ^8.0`), matching the CI matrix (6.4, 7.4, 8.0, 8.1). Symfony 7.0–7.3 are no longer installable; README and INSTALLATION aligned.
+
 ## [1.4.0] - 2026-10-13
 
 ### Fixed

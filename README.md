@@ -44,7 +44,7 @@ return $exporter->toStreamResponse($doc);
 ## Requirements
 
 - PHP **8.2+**
-- Symfony **6.4 / 7.x / 8.x** (components declared in `composer.json`)
+- Symfony **6.4 / 7.4+ / 8.x** (components declared in `composer.json`; Symfony 7.0–7.3 are not supported)
 - Extensions: `dom`, `json`, `libxml`
 
 ## Development

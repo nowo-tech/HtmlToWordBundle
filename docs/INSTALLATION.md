@@ -12,7 +12,7 @@
 ## Requirements
 
 - PHP 8.2 or newer with extensions: `dom`, `json`, `libxml`
-- Symfony 6.4, 7.x, or 8.x (for the components used by this bundle)
+- Symfony 6.4, 7.4+, or 8.x (for the components used by this bundle; 7.0–7.3 are not supported)
 - [PHPWord](https://github.com/PHPOffice/PHPWord) (pulled in by Composer)
 - [League Flysystem](https://github.com/thephpleague/flysystem) 3.x (optional, not installed by the bundle; needed for `DocxExporter::toFlysystem()`)
 

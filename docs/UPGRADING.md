@@ -24,6 +24,8 @@
 
 ## Unreleased
 
+- **Symfony 7.0–7.3 are no longer supported.** `symfony/*` requirements are now `^6.4 || ^7.4 || ^8.0` (the versions tested in CI). Apps on Symfony 7.0–7.3 must upgrade to 7.4 (LTS) before updating this bundle; Symfony 6.4 and 8.x are unaffected.
+
 ## To 1.4.0
 
 From **1.3.0** — header/footer and heading_map options implemented, flysystem adapter wired and optional, dead keys deprecated.
