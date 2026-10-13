@@ -1,7 +1,14 @@
 # Upgrading
 
-
 ## Unreleased
+
+## To 1.3.0
+
+From **1.2.6** — security: host-exact image allowlist, pinned/limited remote downloads, local paths confined, safe Content-Disposition.
+
+```bash
+composer update nowo-tech/html-to-word-bundle
+```
 
 - **Local `<img src>` paths** (e.g. `/var/www/public/logo.png`) are no longer read unless you set `images.local_base_dir` to the directory that contains them; other schemes (`file://`, `ftp://`…) are always rejected. Header/footer `logo` paths from configuration are unaffected.
 - **`remote_host_allowlist`**: substring matches are gone — list the host (`cdn.example.com`, or `example.com` for all subdomains). Regex entries (`#…#`) now match the **host** (e.g. `#^cdn\d\.example\.com$#`), not the full URL.
@@ -31,6 +38,7 @@ php bin/console cache:clear
 ## Table of contents
 
 - [General](#general)
+- [To 1.3.0](#to-130)
 - [To 1.2.6](#to-126)
 - [1.2.2 → 1.2.3](#122--123)
 - [1.2.1 → 1.2.2](#121--122)
