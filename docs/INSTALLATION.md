@@ -14,7 +14,7 @@
 - PHP 8.2 or newer with extensions: `dom`, `json`, `libxml`
 - Symfony 6.4, 7.x, or 8.x (for the components used by this bundle)
 - [PHPWord](https://github.com/PHPOffice/PHPWord) (pulled in by Composer)
-- [League Flysystem](https://github.com/thephpleague/flysystem) 3.x (optional, for `DocxExporter::toFlysystem()` when you inject an adapter)
+- [League Flysystem](https://github.com/thephpleague/flysystem) 3.x (optional, not installed by the bundle; needed for `DocxExporter::toFlysystem()`)
 
 ## Install with Composer
 
@@ -49,4 +49,4 @@ Set `default_profile` and at least one profile under `profiles` (the `default` p
 
 ## Optional: Flysystem
 
-To export to a remote or custom filesystem, define a `League\Flysystem\FilesystemOperator` service in your app and pass it as the **second** constructor argument to `Nowo\HtmlToWordBundle\Export\DocxExporter` (after `RemoteHttpImageInliner`; see [CONFIGURATION.md](CONFIGURATION.md) and [UPGRADING.md](UPGRADING.md)).
+`league/flysystem` is not installed with the bundle. To export to a remote or custom filesystem, run `composer require league/flysystem`, define a `League\Flysystem\FilesystemOperator` service in your app and either reference it from a profile (`export.flysystem_adapter: 'your.storage.id'`) or pass it as the `$flysystem` argument of `Nowo\HtmlToWordBundle\Export\DocxExporter` (see [CONFIGURATION.md](CONFIGURATION.md#flysystem-wiring)).

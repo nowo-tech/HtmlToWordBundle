@@ -11,17 +11,23 @@ use Nowo\HtmlToWordBundle\Model\WordDocument;
 use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
+use function is_string;
 use function preg_replace;
 use function sprintf;
 use function trim;
 
 /**
+ * {@code league/flysystem} is optional: {@see toFlysystem()} only works when it is installed and either a
+ * profile sets {@code export.flysystem_adapter} (resolved through {@code $flysystemAdapters}) or a
+ * {@code $flysystem} operator is injected.
+ *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
 final readonly class DocxExporter implements ExporterInterface
@@ -29,6 +35,7 @@ final readonly class DocxExporter implements ExporterInterface
     public function __construct(
         private RemoteHttpImageInliner $remoteHttpImageInliner,
         private ?FilesystemOperator $flysystem = null,
+        private ?ContainerInterface $flysystemAdapters = null,
     ) {
     }
 
@@ -102,9 +109,7 @@ final readonly class DocxExporter implements ExporterInterface
 
     public function toFlysystem(WordDocument $document, string $remotePath): void
     {
-        if (!$this->flysystem instanceof FilesystemOperator) {
-            throw new ExportException('Flysystem adapter is not configured for HtmlToWordBundle exporter.');
-        }
+        $filesystem = $this->resolveFilesystem($document);
 
         $tmp = tempnam(sys_get_temp_dir(), 'html_to_word_fs_');
         // @codeCoverageIgnoreStart
@@ -122,13 +127,37 @@ final readonly class DocxExporter implements ExporterInterface
             }
             // @codeCoverageIgnoreEnd
             try {
-                $this->flysystem->writeStream($remotePath, $stream);
+                $filesystem->writeStream($remotePath, $stream);
             } finally {
                 fclose($stream);
             }
         } finally {
             @unlink($tmp);
         }
+    }
+
+    private function resolveFilesystem(WordDocument $document): FilesystemOperator
+    {
+        $id = $document->resolvedConfig()->get('export.flysystem_adapter');
+        if (!is_string($id) || trim($id) === '') {
+            if (!$this->flysystem instanceof FilesystemOperator) {
+                throw new ExportException('Flysystem adapter is not configured for HtmlToWordBundle exporter: install league/flysystem and set export.flysystem_adapter (or inject $flysystem).');
+            }
+
+            return $this->flysystem;
+        }
+
+        $id = trim($id);
+        if (!$this->flysystemAdapters instanceof ContainerInterface || !$this->flysystemAdapters->has($id)) {
+            throw new ExportException(sprintf('Flysystem adapter "%s" is not available: declare it as export.flysystem_adapter in a nowo_html_to_word profile.', $id));
+        }
+
+        $filesystem = $this->flysystemAdapters->get($id);
+        if (!$filesystem instanceof FilesystemOperator) {
+            throw new ExportException(sprintf('Flysystem adapter "%s" must implement League\\Flysystem\\FilesystemOperator (is league/flysystem installed?).', $id));
+        }
+
+        return $filesystem;
     }
 
     private function requirePhpWord(WordDocument $document): PhpWord

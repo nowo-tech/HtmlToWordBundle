@@ -48,7 +48,7 @@ use Nowo\HtmlToWordBundle\Export\ExporterInterface;
 $response = $exporter->toStreamResponse($document);
 $response = $exporter->toBinaryResponse($document);
 $exporter->toFile($document, '/tmp/out.docx');
-$exporter->toFlysystem($document, 'exports/out.docx'); // requires Flysystem injection
+$exporter->toFlysystem($document, 'exports/out.docx'); // requires league/flysystem + export.flysystem_adapter (or $flysystem)
 ```
 
 If you **bypass** `DocxExporter` and call `IOFactory::createWriter($document->phpWord(), 'Word2007')->save($path)` yourself, delete the document’s temp images afterwards with **`RemoteHttpImageInliner::releaseTemporaryFiles($document)`** (or `cleanupInlineSession()` to wipe every pending temp image). Prefer the exporter for a correct lifecycle — it also works under FrankenPHP worker mode without kernel reset (see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md)).

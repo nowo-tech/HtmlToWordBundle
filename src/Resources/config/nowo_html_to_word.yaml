@@ -18,8 +18,6 @@ nowo_html_to_word:
                     left: 1440
             fonts:
                 default: Arial
-                fallback: 'Times New Roman'
-                size_unit: pt
                 default_size: 11
             styles:
                 heading_map:
@@ -32,7 +30,6 @@ nowo_html_to_word:
                 paragraph_spacing:
                     before: 0
                     after: 160
-                custom_class_map: []
             header:
                 enabled: false
                 logo: ~
@@ -51,8 +48,7 @@ nowo_html_to_word:
                 remote_host_allowlist: []
             export:
                 filename: document.docx
-                storage: memory
-                local_path: ~
+                # Service id of a League\Flysystem\FilesystemOperator used by DocxExporter::toFlysystem().
                 flysystem_adapter: ~
             tables:
                 repeat_header_row: true

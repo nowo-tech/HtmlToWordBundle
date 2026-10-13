@@ -23,6 +23,8 @@ use Nowo\HtmlToWordBundle\Transformer\PreTransformer;
 use Nowo\HtmlToWordBundle\Transformer\TableTransformer;
 use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\Element\Section;
+use PhpOffice\PhpWord\Element\TextRun;
+use PhpOffice\PhpWord\Element\Title;
 use PhpOffice\PhpWord\PhpWord;
 use PHPUnit\Framework\TestCase;
 
@@ -274,6 +276,50 @@ final class BlockTransformersTest extends TestCase
         $t->transform($doc->createTextNode('x'), $section, $cfg, $walker);
         $t->transform($doc->createElement('h0'), $section, $cfg, $walker);
         self::assertSame([], $section->getElements());
+    }
+
+    public function testHeadingTransformerUsesDefaultDepthWithoutHeadingMap(): void
+    {
+        $section = $this->transformHeading('h3', ResolvedConfig::fromArray([]));
+
+        $el = $section->getElements()[0];
+        self::assertInstanceOf(Title::class, $el);
+        self::assertSame(3, $el->getDepth());
+    }
+
+    public function testHeadingTransformerRelevelsBuiltInHeadingStyle(): void
+    {
+        $section = $this->transformHeading('h1', ResolvedConfig::fromArray([
+            'styles' => ['heading_map' => ['h1' => ' Heading2 ']],
+        ]));
+
+        $el = $section->getElements()[0];
+        self::assertInstanceOf(Title::class, $el);
+        self::assertSame(2, $el->getDepth());
+    }
+
+    public function testHeadingTransformerAppliesCustomParagraphStyle(): void
+    {
+        $section = $this->transformHeading('h2', ResolvedConfig::fromArray([
+            'styles' => ['heading_map' => ['h2' => 'CorporateSubtitle']],
+        ]));
+
+        $el = $section->getElements()[0];
+        self::assertInstanceOf(TextRun::class, $el);
+        self::assertSame('CorporateSubtitle', $el->getParagraphStyle());
+    }
+
+    private function transformHeading(string $tag, ResolvedConfig $config): Section
+    {
+        $doc     = new DOMDocument();
+        $section = $this->createSection();
+        $walker  = $this->createMock(DocumentWalkerInterface::class);
+        $walker->expects(self::once())->method('appendRichText');
+
+        (new HeadingTransformer())->transform($doc->createElement($tag, 'Title'), $section, $config, $walker);
+        self::assertCount(1, $section->getElements());
+
+        return $section;
     }
 
     public function testBlockquoteTransformerIgnoresNonElement(): void

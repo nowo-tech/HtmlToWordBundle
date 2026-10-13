@@ -50,7 +50,7 @@ Converts **rich HTML** (WYSIWYG output) into downloadable **DOCX** via **PHPWord
 
 ### DI
 
-- **FR-DI-001**: `services.yaml`, `html_to_word.yaml`, shipped `nowo_html_to_word.yaml` example profiles.
+- **FR-DI-001**: `services.yaml`, shipped `nowo_html_to_word.yaml` example profiles.
 
 ### Conversion
 

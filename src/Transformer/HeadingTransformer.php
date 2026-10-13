@@ -11,8 +11,12 @@ use PhpOffice\PhpWord\Element\AbstractContainer;
 use PhpOffice\PhpWord\Element\TextRun;
 use PhpOffice\PhpWord\Element\Title;
 
+use function is_string;
+use function trim;
+
 /**
- * Maps {@code h1}–{@code h6} to PHPWord {@see Title} (rich TextRun when needed).
+ * Maps {@code h1}–{@code h6} via {@code styles.heading_map}: {@code HeadingN} values become PHPWord
+ * {@see Title} elements of depth N; any other value is applied as a Word paragraph style name.
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
@@ -43,9 +47,21 @@ final class HeadingTransformer implements TransformerInterface
             return;
         }
 
-        $depth = (int) $m[1];
-        $run   = new TextRun();
-        $walker->appendRichText($node, $run, $config);
-        $container->addTitle($run, $depth);
+        $depth  = (int) $m[1];
+        $mapped = $config->get('styles.heading_map.' . $tag);
+        $style  = is_string($mapped) ? trim($mapped) : '';
+        $hm     = [];
+
+        // Built-in heading styles keep PHPWord titles (outline level / TOC); h2: Heading1 re-levels the heading.
+        if ($style === '' || preg_match('/^Heading([1-9])$/', $style, $hm)) {
+            $run = new TextRun();
+            $walker->appendRichText($node, $run, $config);
+            $container->addTitle($run, isset($hm[1]) ? (int) $hm[1] : $depth);
+
+            return;
+        }
+
+        // Any other value is a Word paragraph style name (must exist in the document/template).
+        $walker->appendRichText($node, $container->addTextRun($style), $config);
     }
 }

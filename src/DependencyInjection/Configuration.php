@@ -21,6 +21,8 @@ final class Configuration implements ConfigurationInterface
 {
     public const ALIAS = 'nowo_html_to_word';
 
+    public const PACKAGE = 'nowo-tech/html-to-word-bundle';
+
     /** @var list<string> */
     public const SUPPORTED_ENGINES = [
         'phpword',
@@ -67,8 +69,14 @@ final class Configuration implements ConfigurationInterface
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->scalarNode('default')->defaultValue('Arial')->end()
-                                    ->scalarNode('fallback')->defaultValue('Times New Roman')->end()
-                                    ->scalarNode('size_unit')->defaultValue('pt')->end()
+                                    ->scalarNode('fallback')
+                                        ->defaultValue('Times New Roman')
+                                        ->setDeprecated(self::PACKAGE, '1.4', 'The "%path%.%node%" option is deprecated and has no effect: Word has no font fallback chain; set "fonts.default" only.')
+                                    ->end()
+                                    ->scalarNode('size_unit')
+                                        ->defaultValue('pt')
+                                        ->setDeprecated(self::PACKAGE, '1.4', 'The "%path%.%node%" option is deprecated and has no effect: "fonts.default_size" is always in points.')
+                                    ->end()
                                     ->floatNode('default_size')->defaultValue(11.0)->end()
                                 ->end()
                             ->end()
@@ -96,6 +104,7 @@ final class Configuration implements ConfigurationInterface
                                     ->arrayNode('custom_class_map')
                                         ->scalarPrototype()->end()
                                         ->defaultValue([])
+                                        ->setDeprecated(self::PACKAGE, '1.4', 'The "%path%.%node%" option is deprecated and has no effect: CSS classes are not mapped to Word styles; use a custom transformer instead.')
                                     ->end()
                                 ->end()
                             ->end()
@@ -156,9 +165,18 @@ final class Configuration implements ConfigurationInterface
                                 ->addDefaultsIfNotSet()
                                 ->children()
                                     ->scalarNode('filename')->defaultValue('document.docx')->end()
-                                    ->scalarNode('storage')->defaultValue('memory')->end()
-                                    ->scalarNode('local_path')->defaultNull()->end()
-                                    ->scalarNode('flysystem_adapter')->defaultNull()->end()
+                                    ->scalarNode('storage')
+                                        ->defaultValue('memory')
+                                        ->setDeprecated(self::PACKAGE, '1.4', 'The "%path%.%node%" option is deprecated and has no effect: choose the target by calling the exporter (toStreamResponse/toBinaryResponse/toFile/toFlysystem).')
+                                    ->end()
+                                    ->scalarNode('local_path')
+                                        ->defaultNull()
+                                        ->setDeprecated(self::PACKAGE, '1.4', 'The "%path%.%node%" option is deprecated and has no effect: pass the path to DocxExporter::toFile().')
+                                    ->end()
+                                    ->scalarNode('flysystem_adapter')
+                                        ->info('Service id of a League\Flysystem\FilesystemOperator used by DocxExporter::toFlysystem() for documents of this profile (requires league/flysystem). Null = the exporter\'s injected $flysystem.')
+                                        ->defaultNull()
+                                    ->end()
                                 ->end()
                             ->end()
                             ->arrayNode('tables')

@@ -73,9 +73,12 @@ services:
         arguments:
             $transformers: !tagged_iterator html_to_word.transformer
 
+    # $flysystem: optional default FilesystemOperator (override in the app); $flysystemAdapters: service locator
+    # built by HtmlToWordExtension from profiles.*.export.flysystem_adapter (null when no profile sets one).
     Nowo\HtmlToWordBundle\Export\DocxExporter:
         arguments:
             $flysystem: null
+            $flysystemAdapters: null
 
     Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface:
         alias: Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter

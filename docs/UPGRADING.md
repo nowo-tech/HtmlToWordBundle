@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- **`league/flysystem` is no longer installed by the bundle.** If you call `DocxExporter::toFlysystem()`, run `composer require league/flysystem` (3.x).
+- **Header/footer output may change** if your profiles already set keys that used to be ignored: `header.show_page_number: true` now prints a page number in the header, `*.different_first_page: true` now leaves the first page's header/footer empty, and non-default `styles.heading_map` values are now applied (`HeadingN` = title level N; other values = Word paragraph style name, which must exist in the document).
+- **`export.flysystem_adapter`** is now used: when set, `toFlysystem()` writes to that service (it must exist and implement `League\Flysystem\FilesystemOperator`, otherwise the container fails to compile or `ExportException` is thrown) instead of the injected `$flysystem`.
+- **Deprecated keys** (no effect, now trigger deprecations): `fonts.fallback`, `fonts.size_unit`, `styles.custom_class_map`, `export.storage`, `export.local_path` — remove them from your YAML.
+
 ## To 1.3.0
 
 From **1.2.6** — security: host-exact image allowlist, pinned/limited remote downloads, local paths confined, safe Content-Disposition.

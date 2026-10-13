@@ -9,7 +9,6 @@
 | Source file | Spec section | Requirement IDs |
 | --- | --- | --- |
 | `Resources/config/services.yaml` | Core DI | FR-DI-001 |
-| `Resources/config/html_to_word.yaml` | Default profile schema | FR-DI-001 |
 | `Resources/config/nowo_html_to_word.yaml` | Shipped example profiles | FR-DI-001 |
 
 ## Bundle & DI

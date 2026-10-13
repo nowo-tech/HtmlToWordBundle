@@ -45,6 +45,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- `header.show_page_number` now adds a centered `{PAGE}` field to the header (the key was accepted but ignored).
+- `header.different_first_page` / `footer.different_first_page` now give the first page an empty header/footer (Word `titlePg`); the other side is repeated on the first page so it stays unchanged.
+- `styles.heading_map` is now applied: `HeadingN` values set the PHPWord title level (e.g. `h1: Heading2`), any other value is used as the Word paragraph style name.
+- `export.flysystem_adapter` is now wired: every service id set in `profiles` is exposed to `DocxExporter` through a service locator and used by `toFlysystem()` for documents of that profile (the injected `$flysystem` stays the fallback).
+
+### Changed
+
+- `league/flysystem` moved from `require` to `suggest` (+ `require-dev`); install it explicitly if you use `toFlysystem()`.
+- `symfony/yaml` moved from `require-dev` to `require` (the extension loads `services.yaml` with `YamlFileLoader`).
+- CI matrix now includes Symfony 6.4 (the composer floor).
+- `.githooks/pre-commit` runs `composer cs-check` inside the Docker `php` service first and only falls back to the host when PHP is installed there.
+- Removed the stale sample `src/Resources/config/html_to_word.yaml` (pre-rename `html_to_word` root key; use `src/Resources/config/nowo_html_to_word.yaml`).
+
+### Deprecated
+
+- `fonts.fallback`, `fonts.size_unit`, `styles.custom_class_map`, `export.storage` and `export.local_path`: they never had any effect; setting them now triggers a deprecation (see docs/CONFIGURATION.md#deprecated-keys).
+
 ## [1.3.0] - 2026-10-13
 
 ### Security
