@@ -768,8 +768,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         },
  *         fonts?: array{
  *             default?: scalar|Param|null, // Default: "Arial"
- *             fallback?: scalar|Param|null, // Default: "Times New Roman"
- *             size_unit?: scalar|Param|null, // Default: "pt"
+ *             fallback?: scalar|Param|null, // Deprecated: The "nowo_html_to_word.profiles..fonts.fallback.fallback" option is deprecated and has no effect: Word has no font fallback chain; set "fonts.default" only. // Default: "Times New Roman"
+ *             size_unit?: scalar|Param|null, // Deprecated: The "nowo_html_to_word.profiles..fonts.size_unit.size_unit" option is deprecated and has no effect: "fonts.default_size" is always in points. // Default: "pt"
  *             default_size?: float|Param, // Default: 11.0
  *         },
  *         styles?: array{
@@ -805,13 +805,16 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             max_width?: int|Param, // Default: 600
  *             resolve_remote?: bool|Param, // Download remote http(s) images. Requires remote_host_allowlist when true. // Default: false
  *             remote_host_allowlist?: list<scalar|Param|null>,
+ *             remote_max_bytes?: int|Param, // Maximum size in bytes of a downloaded remote image; the download is aborted when exceeded. // Default: 10485760
+ *             remote_allow_private_network?: bool|Param, // Allow remote images on private/loopback/link-local/reserved addresses (intranet only). Default false: hosts must resolve only to public IPs. // Default: false
+ *             local_base_dir?: scalar|Param|null, // Directory from which local <img src> paths may be read (absolute or relative to it). Null (default) = local paths in HTML are rejected. // Default: null
  *             remote_timeout?: float|Param, // HTTP(S) download timeout in seconds for remote images (stream_context). Keep below PHP max_execution_time / FrankenPHP write timeout. // Default: 10.0
  *         },
  *         export?: array{
  *             filename?: scalar|Param|null, // Default: "document.docx"
- *             storage?: scalar|Param|null, // Default: "memory"
- *             local_path?: scalar|Param|null, // Default: null
- *             flysystem_adapter?: scalar|Param|null, // Default: null
+ *             storage?: scalar|Param|null, // Deprecated: The "nowo_html_to_word.profiles..export.storage.storage" option is deprecated and has no effect: choose the target by calling the exporter (toStreamResponse/toBinaryResponse/toFile/toFlysystem). // Default: "memory"
+ *             local_path?: scalar|Param|null, // Deprecated: The "nowo_html_to_word.profiles..export.local_path.local_path" option is deprecated and has no effect: pass the path to DocxExporter::toFile(). // Default: null
+ *             flysystem_adapter?: scalar|Param|null, // Service id of a League\Flysystem\FilesystemOperator used by DocxExporter::toFlysystem() for documents of this profile (requires league/flysystem). Null = the exporter's injected $flysystem. // Default: null
  *         },
  *         tables?: array{
  *             repeat_header_row?: bool|Param, // Default: true
