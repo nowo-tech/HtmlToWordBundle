@@ -1,5 +1,27 @@
 # Upgrading
 
+## Table of contents
+
+- [Unreleased](#unreleased)
+- [To 1.4.0](#to-140)
+- [To 1.3.0](#to-130)
+- [To 1.2.6](#to-126)
+- [To 1.2.4](#to-124)
+- [General](#general)
+- [1.2.2 → 1.2.3](#122--123)
+- [1.2.1 → 1.2.2](#121--122)
+- [1.2.0 → 1.2.1](#120--121)
+- [Configuration root key rename](#configuration-root-key-rename)
+- [`HtmlToWordConverterInterface` implementors (v1.0.0+)](#htmltowordconverterinterface-implementors-v100)
+- [1.0.x → 1.1.0](#10x--110)
+  - [`DocxExporter` constructor](#docxexporter-constructor)
+- [1.1.4 → 1.2.0](#114--120)
+- [1.1.3 → 1.1.4](#113--114)
+- [1.1.2 → 1.1.3](#112--113)
+- [1.1.1 → 1.1.2](#111--112)
+- [1.1.0 → 1.1.1](#110--111)
+- [Version 1.x](#version-1x)
+
 ## Unreleased
 
 ## To 1.4.0
@@ -47,26 +69,6 @@ php bin/console cache:clear
 ```
 
 - No application upgrade steps for require-dev Igor tooling (REQ-CS-008). Consumers do not pull `igor-php/igor-php` transitively.
-
-## Table of contents
-
-- [General](#general)
-- [To 1.4.0](#to-140)
-- [To 1.3.0](#to-130)
-- [To 1.2.6](#to-126)
-- [1.2.2 → 1.2.3](#122--123)
-- [1.2.1 → 1.2.2](#121--122)
-- [1.2.0 → 1.2.1](#120--121)
-- [Configuration root key rename](#configuration-root-key-rename)
-- [`HtmlToWordConverterInterface` implementors (v1.0.0+)](#htmltowordconverterinterface-implementors-v100)
-- [1.0.x → 1.1.0](#10x--110)
-  - [`DocxExporter` constructor](#docxexporter-constructor)
-- [1.1.4 → 1.2.0](#114--120)
-- [1.1.3 → 1.1.4](#113--114)
-- [1.1.2 → 1.1.3](#112--113)
-- [1.1.1 → 1.1.2](#111--112)
-- [1.1.0 → 1.1.1](#110--111)
-- [Version 1.x](#version-1x)
 
 ## General
 
