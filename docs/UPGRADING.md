@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.5.0](#to-150)
 - [To 1.4.0](#to-140)
 - [To 1.3.0](#to-130)
 - [To 1.2.6](#to-126)
@@ -23,6 +24,14 @@
 - [Version 1.x](#version-1x)
 
 ## Unreleased
+
+## To 1.5.0
+
+From **1.4.0** — Symfony 7 floor raised to 7.4 (6.4 and 8.x unchanged).
+
+```bash
+composer update nowo-tech/html-to-word-bundle
+```
 
 - **Symfony 7.0–7.3 are no longer supported.** `symfony/*` requirements are now `^6.4 || ^7.4 || ^8.0` (the versions tested in CI). Apps on Symfony 7.0–7.3 must upgrade to 7.4 (LTS) before updating this bundle; Symfony 6.4 and 8.x are unaffected.
 
