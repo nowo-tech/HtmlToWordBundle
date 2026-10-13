@@ -6,17 +6,23 @@ nowo_html_to_word:
 
     profiles:
         default:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             strict_mode: false
             export:
                 filename: demo-default.docx
 
         # strict_mode: rejects tags without a transformer (useful with the "minimal" preset).
         estricto:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             strict_mode: true
             export:
                 filename: demo-estricto.docx
 
         informe:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             page:
                 orientation: landscape
                 margins:
@@ -33,6 +39,8 @@ nowo_html_to_word:
                 filename: demo-informe-landscape.docx
 
         membrete:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             page:
                 margins:
                     top: 1800
@@ -59,6 +67,8 @@ nowo_html_to_word:
 
         # Footer only + page number (PhpWord preserves footer text).
         pie_solo:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             header:
                 enabled: false
             footer:
@@ -70,6 +80,8 @@ nowo_html_to_word:
 
         # US Letter paper (SectionConfigurator size LETTER).
         carta_us:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             page:
                 size: LETTER
                 margins:
@@ -81,6 +93,8 @@ nowo_html_to_word:
                 filename: demo-letter.docx
 
         tablas_avanzado:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             fonts:
                 default_size: 10
             tables:
@@ -90,6 +104,8 @@ nowo_html_to_word:
 
         # Compare PHPWord tblHeader vs table without header repeat.
         tablas_sin_repeat:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             fonts:
                 default_size: 10
             tables:
@@ -100,12 +116,15 @@ nowo_html_to_word:
         # Remote images + max width (ImageResolver + GD in PHP runtime).
         imagen_ancha:
             images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
                 max_width: 720
                 resolve_remote: true
             export:
                 filename: demo-imagen.docx
 
         densidad:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             fonts:
                 default_size: 11
             tables:
@@ -115,6 +134,8 @@ nowo_html_to_word:
 
         # Whole document: default font / size (fonts.default / fonts.default_size → PhpWord).
         fuente_arial_16:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             fonts:
                 default: Arial
                 default_size: 16
@@ -122,6 +143,8 @@ nowo_html_to_word:
                 filename: demo-fuente-arial-16.docx
 
         fuente_times_13:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             fonts:
                 default: 'Times New Roman'
                 default_size: 13
@@ -129,6 +152,8 @@ nowo_html_to_word:
                 filename: demo-fuente-times-13.docx
 
         fuente_verdana_10:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             fonts:
                 default: Verdana
                 default_size: 10
@@ -136,6 +161,8 @@ nowo_html_to_word:
                 filename: demo-fuente-verdana-10.docx
 
         fuente_courier_11:
+            images:
+                local_base_dir: '%kernel.project_dir%/public/demo' # local <img src> paths only read here
             fonts:
                 default: 'Courier New'
                 default_size: 11

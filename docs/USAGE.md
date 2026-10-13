@@ -66,6 +66,8 @@ Keep `<img src="https://…">` (or `http://`) in the HTML you persist. **Immedia
 - Requires `images.resolve_remote: true` (default **false**). If `false`, URLs are left unchanged and conversion falls back to `ImageResolver` at render time (same rules as before).
 - Duplicate URLs in one document are fetched once (small in-memory cache per conversion).
 - Protocol-relative URLs (`//cdn.example.com/x.png`) are normalized to `https:` before download.
+- Downloads do not follow redirects, only reach hosts whose IPs are all public (unless `images.remote_allow_private_network: true`) and are capped by `images.remote_max_bytes`.
+- Local paths in `<img src>` are only read inside `images.local_base_dir` (unset by default = rejected).
 - Temp files (`htw_img_*`, `htw_b64_*`) are tracked per document and deleted after export, or on `kernel.terminate` / `kernel.reset` if the document was never exported (worker-safe).
 
 You can still use **data URIs** or **local file paths** in `src` directly (the bundle’s `ImageResolver` normalizes data URIs to temp files for PhpWord). **Header/footer `header.logo`** remains a **local filesystem path** only.

@@ -6,22 +6,52 @@ namespace Nowo\HtmlToWordBundle\Builder;
 
 use Nowo\HtmlToWordBundle\Config\ResolvedConfig;
 use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
+use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
+use Nowo\HtmlToWordBundle\Security\RemoteAddressGuard;
 use Nowo\HtmlToWordBundle\Security\RemoteImageHostPolicy;
 
+use function fclose;
+use function feof;
+use function fopen;
+use function fread;
+use function in_array;
+use function is_string;
+use function parse_url;
+use function preg_match;
+use function realpath;
+use function rtrim;
 use function sprintf;
+use function str_contains;
+use function str_starts_with;
+use function stream_context_create;
+use function stream_get_meta_data;
+use function strlen;
+use function strtolower;
+use function trim;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Resolves <img src> to a temporary local path for PHPWord.
  *
- * Supports data URIs, http(s) URLs, and readable local paths (Unix, Windows drive letters, project-relative when CWD allows).
+ * Supports data URIs, http(s) URLs (allowlisted public hosts, no redirects, size-capped) and local paths only when they
+ * are temp files created by this bundle for the current conversion or live inside {@code images.local_base_dir}.
+ * Any other scheme or stream wrapper ({@code file://}, {@code ftp://}, {@code php://}, {@code phar://}…) is rejected.
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
 final class ImageResolver implements ImageResolverInterface
 {
+    /** Default cap for remote image downloads (bytes). */
+    public const DEFAULT_REMOTE_MAX_BYTES = 10485760;
+
+    private readonly RemoteAddressGuard $addressGuard;
+
     public function __construct(
         private readonly ?TemporaryImageFiles $temporaryFiles = null,
+        ?RemoteAddressGuard $addressGuard = null,
     ) {
+        $this->addressGuard = $addressGuard ?? new RemoteAddressGuard();
     }
 
     /**
@@ -46,13 +76,52 @@ final class ImageResolver implements ImageResolverInterface
             return $this->fromHttpUrl($src, $config);
         }
 
-        if (@is_readable($src)) {
-            $this->assertRasterImage($src, false);
+        // Any other scheme / stream wrapper (file://, ftp://, php://, phar://, glob://…) is never read from user HTML.
+        // Windows drive letters (C:\\, C:/) are paths, not schemes.
+        if (preg_match('#^[a-z][a-z0-9+.\-]*:#i', $src) === 1 && preg_match('#^[a-z]:[\\\\/]#i', $src) !== 1) {
+            throw new ImageResolveException(sprintf('Unsupported image src scheme: %s', $src));
+        }
 
-            return $src;
+        $local = $this->resolveLocalPath($src, $config);
+        if ($local !== null) {
+            $this->assertRasterImage($local, false);
+
+            return $local;
         }
 
         throw new ImageResolveException(sprintf('Unsupported or unreadable image src: %s', $src));
+    }
+
+    /**
+     * Local paths are accepted only when they are temp files tracked for the current conversion (remote images
+     * inlined by {@see RemoteHttpImageInliner}) or real files inside images.local_base_dir.
+     */
+    private function resolveLocalPath(string $src, ResolvedConfig $config): ?string
+    {
+        if ($this->temporaryFiles instanceof TemporaryImageFiles && @is_readable($src)) {
+            $real    = realpath($src);
+            $pending = $this->temporaryFiles->pending();
+            if (in_array($src, $pending, true) || ($real !== false && in_array($real, $pending, true))) {
+                return $src;
+            }
+        }
+
+        $baseDir = $config->get('images.local_base_dir');
+        if (!is_string($baseDir) || $baseDir === '') {
+            return null;
+        }
+        $baseReal = realpath($baseDir);
+        if ($baseReal === false) {
+            return null;
+        }
+        $isAbsolute = str_starts_with($src, '/') || str_starts_with($src, '\\') || preg_match('#^[a-z]:[\\\\/]#i', $src) === 1;
+        $real       = realpath($isAbsolute ? $src : $baseReal . DIRECTORY_SEPARATOR . $src);
+        $prefix     = rtrim($baseReal, '/\\') . DIRECTORY_SEPARATOR;
+        if ($real === false || !str_starts_with($real, $prefix) || !@is_readable($real)) {
+            return null;
+        }
+
+        return $real;
     }
 
     private function isHttpUrl(string $src): bool
@@ -81,14 +150,11 @@ final class ImageResolver implements ImageResolverInterface
         if ($timeout < 0.1) {
             $timeout = 0.1;
         }
-        $ctx = stream_context_create([
-            'http'  => ['timeout' => $timeout],
-            'https' => ['timeout' => $timeout],
-        ]);
-        $raw = @file_get_contents($src, false, $ctx);
-        if ($raw === false) {
-            throw new ImageResolveException(sprintf('Could not download image: %s', $src));
+        $maxBytes = (int) $config->get('images.remote_max_bytes', self::DEFAULT_REMOTE_MAX_BYTES);
+        if ($maxBytes < 1) {
+            $maxBytes = self::DEFAULT_REMOTE_MAX_BYTES;
         }
+        $raw = $this->download($src, $timeout, $maxBytes, (bool) $config->get('images.remote_allow_private_network', false));
 
         $tmp = tempnam(sys_get_temp_dir(), 'htw_img_');
         // @codeCoverageIgnoreStart
@@ -102,6 +168,72 @@ final class ImageResolver implements ImageResolverInterface
         $this->temporaryFiles?->register($tmp);
 
         return $tmp;
+    }
+
+    /**
+     * Downloads a remote image without following redirects, pinned to a validated public IP, aborting above $maxBytes.
+     *
+     * @throws ImageResolveException
+     */
+    private function download(string $src, float $timeout, int $maxBytes, bool $allowPrivateNetwork): string
+    {
+        // The host allowlist already rejected URLs without a host; an empty host fails the address check below.
+        $parts  = (array) parse_url($src);
+        $host   = (string) ($parts['host'] ?? '');
+        $scheme = strtolower((string) ($parts['scheme'] ?? 'http'));
+
+        $connectUrl = $src;
+        $http       = ['timeout' => $timeout, 'follow_location' => 0, 'max_redirects' => 1, 'ignore_errors' => true];
+        $ssl        = [];
+        if (!$allowPrivateNetwork) {
+            $ip = $this->addressGuard->resolvePublicIp($host);
+            if ($ip === null) {
+                throw new ImageResolveException(sprintf('Remote image host resolves to a non-public or unknown address: %s', $host));
+            }
+            // Pin the connection to the validated IP (no second DNS lookup → no rebinding); keep Host / TLS name.
+            $ipHost         = str_contains($ip, ':') ? '[' . $ip . ']' : $ip;
+            $port           = isset($parts['port']) ? ':' . $parts['port'] : '';
+            $connectUrl     = $scheme . '://' . $ipHost . $port . ($parts['path'] ?? '/') . (isset($parts['query']) ? '?' . $parts['query'] : '');
+            $http['header'] = 'Host: ' . $host . $port;
+            $ssl            = ['peer_name' => trim($host, '[]'), 'SNI_enabled' => true, 'verify_peer' => true, 'verify_peer_name' => true];
+        }
+
+        $ctx = stream_context_create(['http' => $http, 'ssl' => $ssl]);
+        $fh  = @fopen($connectUrl, 'r', false, $ctx);
+        if ($fh === false) {
+            throw new ImageResolveException(sprintf('Could not download image: %s', $src));
+        }
+
+        try {
+            $meta   = stream_get_meta_data($fh);
+            $status = 0;
+            foreach ((array) ($meta['wrapper_data'] ?? []) as $line) {
+                if (is_string($line) && preg_match('#^HTTP/\S+\s+(\d{3})#', $line, $m) === 1) {
+                    $status = (int) $m[1];
+                }
+            }
+            if ($status < 200 || $status >= 300) {
+                throw new ImageResolveException(sprintf('Could not download image (HTTP %d, redirects are not followed): %s', $status, $src));
+            }
+
+            $raw = '';
+            while (!feof($fh)) {
+                $chunk = fread($fh, 8192);
+                if ($chunk === false) {
+                    // @codeCoverageIgnoreStart
+                    throw new ImageResolveException(sprintf('Could not download image: %s', $src));
+                    // @codeCoverageIgnoreEnd
+                }
+                $raw .= $chunk;
+                if (strlen($raw) > $maxBytes) {
+                    throw new ImageResolveException(sprintf('Remote image exceeds images.remote_max_bytes (%d bytes): %s', $maxBytes, $src));
+                }
+            }
+        } finally {
+            fclose($fh);
+        }
+
+        return $raw;
     }
 
     /**

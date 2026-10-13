@@ -31,7 +31,7 @@ A bundle that is safe under **B** is safe under **A** and under classic mode / P
 | Output, headers, `exit`, shutdown functions | ✅ | Output only through Symfony `StreamedResponse` (`php://output` inside the callback) and `BinaryFileResponse` |
 | Resources (files, sockets, cURL) held open | ✅ | No handle is kept open; temp images are deleted after export or at request end (W-01, resolved) |
 | Memory growth across requests | ✅ | No caches or accumulating arrays; PHPWord static registries are reset by each `new PhpWord()` (W-04) |
-| Blocking I/O and timeouts | ⚠️ Low | Remote images use `file_get_contents()` with a configurable read timeout (default 10 s) but no total duration or size cap (W-03, accepted) |
+| Blocking I/O and timeouts | ⚠️ Low | Remote images use a stream with a configurable read timeout (default 10 s) and a size cap (`images.remote_max_bytes`), but no total duration cap (W-03, accepted) |
 | Third-party static state | ⚠️ Info | PHPWord `Media::$elements`, `Style::$styles`, `Settings::*` are process-global; the bundle never writes `Settings` (W-04) |
 | PHPStan FrankenPHP rulesets | ✅ | `ruleset-classic.neon` + `ruleset-worker.neon` included in `phpstan.neon.dist` |
 

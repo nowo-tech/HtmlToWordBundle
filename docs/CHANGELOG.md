@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+  - [Security](#security)
+  - [Fixed](#fixed)
 - [[1.2.6] - 2026-10-09](#126---2026-10-09)
 - [[1.2.5] - 2026-10-09](#125---2026-10-09)
 - [[1.2.4] - 2026-09-27](#124---2026-09-27)
@@ -41,6 +43,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - [Changed](#changed-5)
 
 ## [Unreleased]
+
+### Security
+
+- `remote_host_allowlist`: entries are matched against the URL host only (exact host or subdomain; `.example.com` = subdomains only); `example.com.evil.net` and `http://169.254.169.254/?x=example.com` no longer pass. `#` regex entries are now applied to the host, not the full URL.
+- Remote image downloads no longer follow redirects, are pinned to a validated IP whose A/AAAA records are all public (private, loopback, link-local/metadata, CGNAT, ULA, IPv4-mapped… are rejected; unresolvable hosts fail closed) and are capped by the new `images.remote_max_bytes` (default 10 MiB). New `images.remote_allow_private_network` (default `false`) for intranet use.
+- `<img src>` with any non-http(s)/`data:` scheme (`file://`, `ftp://`, `php://`, `phar://`…) is rejected. Local filesystem paths are only read inside the new `images.local_base_dir` (default `null` = rejected), besides the bundle's own temp files for inlined remote images.
+
+### Fixed
+
+- `Content-Disposition` for DOCX downloads is built with `HeaderUtils::makeDisposition()` (ASCII fallback + `filename*`); quotes, CR/LF and path separators in `export.filename` can no longer break the header.
 
 ## [1.2.6] - 2026-10-09
 

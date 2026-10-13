@@ -3,6 +3,10 @@
 
 ## Unreleased
 
+- **Local `<img src>` paths** (e.g. `/var/www/public/logo.png`) are no longer read unless you set `images.local_base_dir` to the directory that contains them; other schemes (`file://`, `ftp://`…) are always rejected. Header/footer `logo` paths from configuration are unaffected.
+- **`remote_host_allowlist`**: substring matches are gone — list the host (`cdn.example.com`, or `example.com` for all subdomains). Regex entries (`#…#`) now match the **host** (e.g. `#^cdn\d\.example\.com$#`), not the full URL.
+- **Remote images**: redirects are not followed (use the final URL), hosts must resolve to public IPs only (set `images.remote_allow_private_network: true` for intranet hosts), and downloads above `images.remote_max_bytes` (10 MiB) fail.
+
 ## To 1.2.6
 
 From **1.2.4** / **1.2.5** — dependency refresh.

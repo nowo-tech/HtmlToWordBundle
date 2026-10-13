@@ -12,11 +12,14 @@ use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
+use function preg_replace;
 use function sprintf;
+use function trim;
 
 /**
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
@@ -77,7 +80,7 @@ final readonly class DocxExporter implements ExporterInterface
 
         $response = new BinaryFileResponse($tmp);
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename);
+        $response->headers->set('Content-Disposition', self::contentDisposition($filename));
         $response->deleteFileAfterSend(true);
 
         return $response;
@@ -144,7 +147,23 @@ final readonly class DocxExporter implements ExporterInterface
     {
         return [
             'Content-Type'        => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'Content-Disposition' => ResponseHeaderBag::DISPOSITION_ATTACHMENT . '; filename="' . $filename . '"',
+            'Content-Disposition' => self::contentDisposition($filename),
         ];
+    }
+
+    /**
+     * Builds an RFC 6266 attachment header (quoted ASCII fallback + filename* UTF-8) via {@see HeaderUtils::makeDisposition()},
+     * so quotes, CR/LF, path separators or non-ASCII characters in export.filename cannot break or inject headers.
+     */
+    private static function contentDisposition(string $filename): string
+    {
+        // Control characters (incl. CR/LF) and path separators are never part of a download name.
+        $filename = trim((string) preg_replace('/[\x00-\x1F\x7F\/\\\\]+/u', '_', $filename));
+        if (trim($filename, ' _.') === '') {
+            $filename = 'document.docx';
+        }
+        $fallback = (string) preg_replace('/[^\x20-\x7E]|[%"]/u', '_', $filename);
+
+        return HeaderUtils::makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename, $fallback);
     }
 }
