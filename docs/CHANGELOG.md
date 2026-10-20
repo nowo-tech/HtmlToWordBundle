@@ -26,6 +26,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation: wave-1 REQ compliance — README section order (Quick start before Version information), canonical FrankenPHP claim and documentation list order, canonical pull request template, CONTRIBUTING Cursor Agent settings (REQ-IDE-006), tables of contents, DEMO-FRANKENPHP rewritten for `FRANKENPHP_MODE` with development/production start, timeout hierarchy (REQ-RUNTIME-001) and troubleshooting, commented demo `.env.example`, Spec Kit inventory refresh (50/50).
+
 ## [1.5.0] - 2026-10-13
 
 ### Changed

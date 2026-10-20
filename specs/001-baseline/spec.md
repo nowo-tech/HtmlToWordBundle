@@ -80,7 +80,7 @@ Converts **rich HTML** (WYSIWYG output) into downloadable **DOCX** via **PHPWord
 
 ## Success Criteria
 
-- **SC-001**: **49/49** files mapped in inventory.
+- **SC-001**: **50/50** production files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (audited 2026-10-20; `git ls-files src | wc -l`).
 - **SC-002**: Config keys match [`docs/CONFIGURATION.md`](../../docs/CONFIGURATION.md).
 - **SC-003**: `composer qa` / coverage-check (≥85%) green in CI.
 

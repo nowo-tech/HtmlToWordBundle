@@ -9,6 +9,19 @@
 | Remediation (2026-09-23/24) | W-01 and W-02 fixed: temp images are tracked per document (`Builder\TemporaryImageFiles`), deleted after export, and leftovers are deleted on `kernel.terminate` and `kernel.reset`; regression tests run consecutive requests on the same container without `reset()` |
 | **Verdict** | ✅ **Viable under scenario B** — no cross-request state; temp images never outlive the request. Remaining items are accepted (W-03 remote download limits, W-04 PHPWord `Settings` owned by the application) |
 
+## Table of contents
+
+- [Execution model assumed](#execution-model-assumed)
+- [Summary](#summary)
+- [Services reviewed](#services-reviewed)
+- [Findings](#findings)
+  - [W-01 — Temp files for `data:` URI images are never deleted (Medium)](#w-01--temp-files-for-data-uri-images-are-never-deleted-medium)
+  - [W-02 — `RemoteHttpImageInliner` keeps a temp-file list across requests without `ResetInterface` (Low)](#w-02--remotehttpimageinliner-keeps-a-temp-file-list-across-requests-without-resetinterface-low)
+  - [W-03 — Remote image download has a read timeout but no total duration or size cap (Low)](#w-03--remote-image-download-has-a-read-timeout-but-no-total-duration-or-size-cap-low)
+  - [W-04 — PHPWord process-global static state (Info)](#w-04--phpword-process-global-static-state-info)
+- [Usage recommendations in worker mode](#usage-recommendations-in-worker-mode)
+- [Re-audit triggers](#re-audit-triggers)
+
 ## Execution model assumed
 
 FrankenPHP worker mode boots the Symfony kernel once per worker and serves many requests with the same container. This audit assumes the **strict** variant: the kernel is **not** rebooted between requests, so every shared service, static property and PHP global survives from one request to the next. Two scenarios are evaluated:

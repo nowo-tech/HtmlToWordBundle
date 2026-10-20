@@ -2,7 +2,7 @@
 
 **Baseline spec**: [`spec.md`](spec.md)  
 **Package**: `nowo-tech/html-to-word-bundle`  
-**Last audited**: 2026-07-07
+**Last audited**: 2026-10-20
 
 ## Symfony config
 
@@ -36,6 +36,7 @@
 | `Parser/HtmlSanitizer.php` | HTML sanitization | FR-PARSE-001 |
 | `Parser/RemoteHttpImageInliner.php` | Remote image fetch | FR-PARSE-002 |
 | `Security/RemoteImageHostPolicy.php` | Allowed image hosts | FR-PARSE-002 |
+| `Security/RemoteAddressGuard.php` | SSRF guard: resolves the host, accepts it only when every A/AAAA record is public, returns the IP to pin | FR-PARSE-002 |
 
 ## Engine & document model
 
@@ -54,6 +55,7 @@
 | `Builder/ImageResolverInterface.php` | Resolver contract | FR-BUILD-003 |
 | `Builder/ImageSignatureValidator.php` | Image signature check | FR-BUILD-003 |
 | `Builder/ImageStyleHelper.php` | Image dimension/style | FR-BUILD-003 |
+| `Builder/TemporaryImageFiles.php` | Tracks temp image files per conversion (data URIs, remote downloads) for cleanup after export / on reset | FR-BUILD-003 |
 
 ## Transformers
 
@@ -96,12 +98,14 @@
 
 | Category | Files | Mapped |
 | --- | ---: | ---: |
-| Symfony config | 3 | 3 |
+| Symfony config | 2 | 2 |
 | Bundle & DI | 3 | 3 |
 | Config resolution | 2 | 2 |
-| Conversion pipeline | 6 | 6 |
-| Engine & document model | 13 | 13 |
+| Conversion pipeline | 7 | 7 |
+| Engine & document model | 14 | 14 |
 | Transformers | 12 | 12 |
 | Export | 2 | 2 |
 | Exceptions | 8 | 8 |
-| **Total production sources** | **49** | **49** |
+| **Total production sources** | **50** | **50** |
+
+Audit command (production count): `git ls-files src | wc -l` → **50** (2026-10-20).

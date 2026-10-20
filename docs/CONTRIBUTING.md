@@ -9,6 +9,8 @@ Thank you for improving HtmlToWordBundle.
 - [Tests](#tests)
 - [Security](#security)
 - [Git hooks (REQ-GIT-001)](#git-hooks-req-git-001)
+- [Igor worker audit (REQ-CS-008)](#igor-worker-audit-req-cs-008)
+- [Cursor Agent (REQ-IDE-006)](#cursor-agent-req-ide-006)
 
 ## Code of Conduct
 
@@ -53,3 +55,18 @@ If CI fails because trailers are already on the remote, see [GITHUB_CI.md](GITHU
 ## Igor worker audit (REQ-CS-008)
 
 Run `make igor` (or `composer igor`) before release. Igor audits package `src/` for FrankenPHP worker-state issues. It is require-dev only.
+
+## Cursor Agent (REQ-IDE-006)
+
+Contributors using Cursor Agent on this repository should:
+
+1. **Submit with Ctrl+Enter** (macOS: **⌘+Enter**). **Enter** inserts a newline; **Ctrl+Enter** / **⌘+Enter** submits the prompt. UI: **Cursor Settings → Agents / Chat → Submit with Ctrl + Enter**.
+2. **Queue follow-ups** while the agent is running. In user `settings.json` (not a repo file):
+
+```json
+{
+  "cursor.composer.queueMessageDefaultBehavior": "queue"
+}
+```
+
+Do **not** use `"steer"` as the org default: steer interrupts the running agent as soon as a follow-up is sent.

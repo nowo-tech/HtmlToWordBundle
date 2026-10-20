@@ -15,15 +15,7 @@ This bundle does **not** render Twig, generate HTML, produce PDF, or edit existi
 
 ![FrankenPHP Friendly Worker Mode](docs/images/frankenphp-friendly.png)
 
-This bundle is **FrankenPHP worker mode friendly** (including when the kernel is **not** reset between requests). See [docs/FRANKENPHP-WORKER-AUDIT.md](docs/FRANKENPHP-WORKER-AUDIT.md).
-
-## Version information
-
-Stable releases are tagged on GitHub; upgrade notes are in [docs/UPGRADING.md](docs/UPGRADING.md) and [docs/CHANGELOG.md](docs/CHANGELOG.md).
-
-## Versioning
-
-This library follows [Semantic Versioning](https://semver.org/).
+This bundle is **FrankenPHP worker mode friendly**.
 
 ## Quick start
 
@@ -47,6 +39,14 @@ return $exporter->toStreamResponse($doc);
 - Symfony **6.4 / 7.4+ / 8.x** (components declared in `composer.json`; Symfony 7.0–7.3 are not supported)
 - Extensions: `dom`, `json`, `libxml`
 
+## Version information
+
+Stable releases are tagged on GitHub; upgrade notes are in [docs/UPGRADING.md](docs/UPGRADING.md) and [docs/CHANGELOG.md](docs/CHANGELOG.md).
+
+## Versioning
+
+This library follows [Semantic Versioning](https://semver.org/).
+
 ## Development
 
 Use the root `Makefile` and `docker-compose.yml`:
@@ -57,14 +57,12 @@ make qa
 make release-check
 ```
 
-The PHP Docker image installs extensions required by PHPWord (including **GD**). Demo apps live under `demo/` (see [docs/DEMO-FRANKENPHP.md](docs/DEMO-FRANKENPHP.md)).
+The PHP Docker image installs extensions required by PHPWord (including **GD**). Demo apps live under `demo/` (see [docs/DEMO-FRANKENPHP.md](docs/DEMO-FRANKENPHP.md)). FrankenPHP worker mode is supported also when the kernel is **not** reset between requests; see the [worker audit](docs/FRANKENPHP-WORKER-AUDIT.md).
 
 ## Documentation
 
-- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
 - [Installation](docs/INSTALLATION.md)
 - [Configuration](docs/CONFIGURATION.md)
-- [PSR evaluation (REQ-CS-007)](docs/PSR.md)
 - [Usage](docs/USAGE.md)
 - [Contributing](docs/CONTRIBUTING.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
@@ -78,6 +76,8 @@ The PHP Docker image installs extensions required by PHPWord (including **GD**).
 
 ### Additional documentation
 
+- [GitHub Actions CI requirements](docs/GITHUB_CI.md)
+- [PSR evaluation (REQ-CS-007)](docs/PSR.md)
 - [FrankenPHP demos](docs/DEMO-FRANKENPHP.md) — how `demo/symfony8` runs in Docker.
 - [FrankenPHP worker audit](docs/FRANKENPHP-WORKER-AUDIT.md) — scenario B (no kernel reset) findings and remediations.
 - Example YAML profiles are shipped as `src/Resources/config/nowo_html_to_word.yaml` (copy into your app’s `config/packages/`).
