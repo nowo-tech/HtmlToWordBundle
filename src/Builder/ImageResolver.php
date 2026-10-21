@@ -9,6 +9,7 @@ use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
 use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use Nowo\HtmlToWordBundle\Security\RemoteAddressGuard;
 use Nowo\HtmlToWordBundle\Security\RemoteImageHostPolicy;
+use Psr\Log\LoggerInterface;
 
 use function fclose;
 use function feof;
@@ -26,10 +27,12 @@ use function str_starts_with;
 use function stream_context_create;
 use function stream_get_meta_data;
 use function strlen;
+use function strstr;
 use function strtolower;
 use function trim;
 
 use const DIRECTORY_SEPARATOR;
+use const PHP_URL_HOST;
 
 /**
  * Resolves <img src> to a temporary local path for PHPWord.
@@ -40,16 +43,22 @@ use const DIRECTORY_SEPARATOR;
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
-final class ImageResolver implements ImageResolverInterface
+final readonly class ImageResolver implements ImageResolverInterface
 {
     /** Default cap for remote image downloads (bytes). */
     public const DEFAULT_REMOTE_MAX_BYTES = 10485760;
 
-    private readonly RemoteAddressGuard $addressGuard;
+    private RemoteAddressGuard $addressGuard;
 
+    /**
+     * @param TemporaryImageFiles|null $temporaryFiles Registry that deletes downloaded images after the conversion
+     * @param RemoteAddressGuard|null $addressGuard SSRF guard resolving hosts to validated public IPs
+     * @param LoggerInterface|null $logger Logs remote downloads (host and size only, never the URL query) (REQ-OBS-001)
+     */
     public function __construct(
-        private readonly ?TemporaryImageFiles $temporaryFiles = null,
+        private ?TemporaryImageFiles $temporaryFiles = null,
         ?RemoteAddressGuard $addressGuard = null,
+        private ?LoggerInterface $logger = null,
     ) {
         $this->addressGuard = $addressGuard ?? new RemoteAddressGuard();
     }
@@ -154,7 +163,17 @@ final class ImageResolver implements ImageResolverInterface
         if ($maxBytes < 1) {
             $maxBytes = self::DEFAULT_REMOTE_MAX_BYTES;
         }
-        $raw = $this->download($src, $timeout, $maxBytes, (bool) $config->get('images.remote_allow_private_network', false));
+        $context = ['bundle' => 'html_to_word', 'action' => 'remote_image', 'host' => (string) parse_url($src, PHP_URL_HOST)];
+        try {
+            $raw = $this->download($src, $timeout, $maxBytes, (bool) $config->get('images.remote_allow_private_network', false));
+        } catch (ImageResolveException $e) {
+            // The exception message ends with the full URL (it may carry tokens in its query): log only the reason.
+            $reason = strstr($e->getMessage(), ': ', true);
+            $this->logger?->warning('Remote image download failed.', $context + ['reason' => $reason === false ? $e->getMessage() : $reason]);
+
+            throw $e;
+        }
+        $this->logger?->info('Remote image downloaded.', $context + ['bytes' => strlen($raw)]);
 
         $tmp = tempnam(sys_get_temp_dir(), 'htw_img_');
         // @codeCoverageIgnoreStart

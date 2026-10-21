@@ -67,10 +67,10 @@ final class RemoteImagePipelineTest extends KernelTestCase
             ]];
 
             $exporter->toFile($converter->convertWithOptions('<p><img src="http://127.0.0.1:' . $port . '/pixel.png"/></p>', $options), $out);
-            self::assertSame(1, self::mediaCount($out));
+            self::assertSame(1, $this->mediaCount($out));
 
             $exporter->toFile($converter->convertWithOptions('<p><img src="' . $secret . '"/></p>', $options), $out);
-            self::assertSame(0, self::mediaCount($out));
+            self::assertSame(0, $this->mediaCount($out));
         } finally {
             $server->stop(1);
             @unlink($out);
@@ -80,7 +80,7 @@ final class RemoteImagePipelineTest extends KernelTestCase
         }
     }
 
-    private static function mediaCount(string $docx): int
+    private function mediaCount(string $docx): int
     {
         $zip = new ZipArchive();
         self::assertTrue($zip->open($docx));

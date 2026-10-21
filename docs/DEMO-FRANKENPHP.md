@@ -84,9 +84,9 @@ The only blocking work in the bundle is the optional download of remote `<img sr
 | Layer | Setting | Demo value |
 | --- | --- | --- |
 | Operation | `nowo_html_to_word.profiles.<name>.images.remote_timeout` (per download) | **10 s** (bundle default) |
-| PHP | `max_execution_time` — must be greater than the sum of the remote downloads of one export | PHP default (30 s) |
-| HTTP server | Caddy `servers { timeouts { write … } }` — must be greater than PHP | Caddy default (no write timeout) |
-| FrankenPHP | `max_wait_time` in the `frankenphp` global block — caps the wait for a free PHP thread | not set in the demo |
+| PHP | `max_execution_time` / `max_input_time` — must be greater than the sum of the remote downloads of one export | **30 s** (`demo/symfony8/Dockerfile`, `conf.d/90-timeouts.ini`) |
+| HTTP server | Caddy `servers { timeouts { write … } }` — must be greater than PHP | not set: the demo serves long-lived Mercure / hot-reload SSE streams that a server-wide write timeout would cut; set it above `max_execution_time` in production when you do not serve SSE |
+| FrankenPHP | `max_wait_time` in the `frankenphp` global block — caps the wait for a free PHP thread | **30 s** (both `docker/frankenphp/Caddyfile*`) |
 
 When you raise `remote_timeout` in production, raise `max_execution_time` and the Caddy write timeout in the same change, and set `max_wait_time` (e.g. 30 s) so a busy worker pool answers 504 instead of queueing forever.
 

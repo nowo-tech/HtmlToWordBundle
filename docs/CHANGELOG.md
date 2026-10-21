@@ -30,6 +30,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Dependencies refreshed (Composer and pnpm/npm lock files of the bundle and its demos, campaign 2026-10-19).
 - `.php-cs-fixer.dist.php`: `new ParallelConfig(2)` (REQ-CS-001).
+- `ImageResolver` logs remote image downloads through an optional PSR-3 logger (autowired): host and size on success, a reason without the URL on failure (REQ-OBS-001); `psr/log` is now a declared requirement and PSR-3 is adopted in `docs/PSR.md`.
+- Demo: PHP `max_execution_time` 30 s and FrankenPHP `max_wait_time` 30 s complete the timeout hierarchy above the 10 s remote image timeout, documented in `docs/DEMO-FRANKENPHP.md` (REQ-RUNTIME-001).
+- Demo smoke boots the demo in classic mode (a fresh checkout has no `vendor/` yet, which worker mode cannot boot) and requires a final HTTP 200; `release-check` starts with `ensure-up` and runs the new `check-open-prs` and `igor` (REQ-MAKE-002, REQ-CS-008); new `Demo smoke` workflow (tags, weekly, manual) (REQ-TEST-011); the co-author check accepts git worktrees.
 - Documentation: wave-1 REQ compliance — README section order (Quick start before Version information), canonical FrankenPHP claim and documentation list order, canonical pull request template, CONTRIBUTING Cursor Agent settings (REQ-IDE-006), tables of contents, DEMO-FRANKENPHP rewritten for `FRANKENPHP_MODE` with development/production start, timeout hierarchy (REQ-RUNTIME-001) and troubleshooting, commented demo `.env.example`, Spec Kit inventory refresh (50/50).
 
 ## [1.5.0] - 2026-10-13

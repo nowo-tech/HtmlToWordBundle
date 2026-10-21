@@ -32,13 +32,13 @@ use function trim;
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
-final class RemoteHttpImageInliner
+final readonly class RemoteHttpImageInliner
 {
-    private readonly TemporaryImageFiles $temporaryFiles;
+    private TemporaryImageFiles $temporaryFiles;
 
     public function __construct(
-        private readonly HtmlParser $htmlParser,
-        private readonly ImageResolverInterface $imageResolver,
+        private HtmlParser $htmlParser,
+        private ImageResolverInterface $imageResolver,
         ?TemporaryImageFiles $temporaryFiles = null,
     ) {
         $this->temporaryFiles = $temporaryFiles ?? new TemporaryImageFiles();

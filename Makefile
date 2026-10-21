@@ -1,5 +1,5 @@
 # HtmlToWordBundle — Docker-driven development (REQ-MAKE-001)
-.PHONY: help up down down-dev build shell install test test-coverage coverage-check test-coverage-100 cs-check cs-fix qa clean assets release-check release-check-demos demo-smoke composer-sync ensure-up phpstan igor rector rector-dry update validate setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history update-deps
+.PHONY: help up down down-dev build shell install test test-coverage coverage-check test-coverage-100 cs-check cs-fix qa clean assets release-check release-check-demos demo-smoke composer-sync ensure-up phpstan igor rector rector-dry update validate setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history update-deps check-open-prs
 
 COMPOSE_FILE ?= docker-compose.yml
 # Prefer Compose V2 plugin (GitHub Actions / modern Docker Desktop); fall back to docker-compose V1 (REQ-MAKE-010).
@@ -91,15 +91,23 @@ composer-sync: ensure-up
 # Run Igor worker-state audit (REQ-CS-008)
 igor: ensure-up
 	$(COMPOSE) exec -T php composer igor
-release-check: check-no-cursor-coauthor
+release-check:
 	@$(MAKE) ensure-up
+	@$(MAKE) check-no-cursor-coauthor
+	@$(MAKE) check-open-prs
 	@$(MAKE) composer-sync
 	@$(MAKE) cs-fix
 	@$(MAKE) cs-check
 	@$(MAKE) rector-dry
 	@$(MAKE) phpstan
+	@$(MAKE) igor
 	@$(MAKE) coverage-check
 	@$(MAKE) release-check-demos
+
+# REQ-REL-003 — no unresolved open GitHub PRs before release
+check-open-prs:
+	@chmod +x .scripts/check-open-prs.sh
+	@bash .scripts/check-open-prs.sh
 
 release-check-demos:
 	@if [ -f demo/Makefile ]; then $(MAKE) -C demo release-check; else echo "No demo/Makefile — skip release-check-demos"; fi

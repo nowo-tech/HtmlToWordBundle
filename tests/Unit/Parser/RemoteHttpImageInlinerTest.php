@@ -130,7 +130,7 @@ HTML;
                 'images' => ['resolve_remote' => true],
             ]));
 
-            self::assertStringContainsString((string) (realpath($tmp) ?: $tmp), $out);
+            self::assertStringContainsString(realpath($tmp) ?: $tmp, $out);
             self::assertStringContainsString('data:image/png;base64,abc', $out);
             self::assertStringNotContainsString('cdn.example.com', $out);
         } finally {

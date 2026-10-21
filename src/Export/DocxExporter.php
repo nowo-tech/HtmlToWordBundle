@@ -87,7 +87,7 @@ final readonly class DocxExporter implements ExporterInterface
 
         $response = new BinaryFileResponse($tmp);
         $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        $response->headers->set('Content-Disposition', self::contentDisposition($filename));
+        $response->headers->set('Content-Disposition', $this->contentDisposition($filename));
         $response->deleteFileAfterSend(true);
 
         return $response;
@@ -176,7 +176,7 @@ final readonly class DocxExporter implements ExporterInterface
     {
         return [
             'Content-Type'        => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'Content-Disposition' => self::contentDisposition($filename),
+            'Content-Disposition' => $this->contentDisposition($filename),
         ];
     }
 
@@ -184,7 +184,7 @@ final readonly class DocxExporter implements ExporterInterface
      * Builds an RFC 6266 attachment header (quoted ASCII fallback + filename* UTF-8) via {@see HeaderUtils::makeDisposition()},
      * so quotes, CR/LF, path separators or non-ASCII characters in export.filename cannot break or inject headers.
      */
-    private static function contentDisposition(string $filename): string
+    private function contentDisposition(string $filename): string
     {
         // Control characters (incl. CR/LF) and path separators are never part of a download name.
         $filename = trim((string) preg_replace('/[\x00-\x1F\x7F\/\\\\]+/u', '_', $filename));

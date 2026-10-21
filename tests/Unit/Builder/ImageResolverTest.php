@@ -11,6 +11,8 @@ use Nowo\HtmlToWordBundle\Exception\ImageResolveException;
 use Nowo\HtmlToWordBundle\Security\RemoteAddressGuard;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+use Stringable;
 use Symfony\Component\Process\Process;
 
 use const PHP_BINARY;
@@ -142,6 +144,43 @@ final class ImageResolverTest extends TestCase
         );
     }
 
+    public function testRemoteDownloadsAreLoggedWithoutTheUrl(): void
+    {
+        $logger = new class extends AbstractLogger {
+            /** @var list<array{0: mixed, 1: string, 2: array<mixed>}> */
+            public array $records = [];
+
+            /** @param array<mixed> $context */
+            public function log(mixed $level, string|Stringable $message, array $context = []): void
+            {
+                $this->records[] = [$level, (string) $message, $context];
+            }
+        };
+        $config = ResolvedConfig::fromArray([
+            'images' => [
+                'resolve_remote'               => true,
+                'remote_host_allowlist'        => ['127.0.0.1'],
+                'remote_allow_private_network' => true,
+            ],
+        ]);
+        $resolver = new ImageResolver(null, null, $logger);
+
+        $tmpOut = $resolver->resolveToTempPath($this->baseUrl() . '/pixel.png?token=s3cr3t', $config);
+        @unlink($tmpOut);
+
+        try {
+            $resolver->resolveToTempPath('http://127.0.0.1:9/no-image.png?token=s3cr3t', $config);
+            self::fail('Download must fail.');
+        } catch (ImageResolveException) {
+        }
+
+        self::assertSame(['info', 'warning'], array_column($logger->records, 0));
+        self::assertSame('127.0.0.1', $logger->records[0][2]['host']);
+        self::assertGreaterThan(10, $logger->records[0][2]['bytes']);
+        self::assertSame('Could not download image', $logger->records[1][2]['reason']);
+        self::assertStringNotContainsString('s3cr3t', (string) json_encode($logger->records));
+    }
+
     public function testRemoteDownloadSuccessWithClampedTimeout(): void
     {
         $tmpOut = (new ImageResolver())->resolveToTempPath(
@@ -176,7 +215,7 @@ final class ImageResolverTest extends TestCase
         $port   = (string) parse_url($this->baseUrl(), PHP_URL_PORT);
         $tmpOut = (new ImageResolver(null, $guard))->resolveToTempPath(
             'http://img.example.com:' . $port . '/host-check.png?x=1',
-            self::remoteConfig(['img.example.com']),
+            $this->remoteConfig(['img.example.com']),
         );
         try {
             self::assertFileExists($tmpOut);
@@ -196,7 +235,7 @@ final class ImageResolverTest extends TestCase
         };
         $this->expectException(ImageResolveException::class);
         $this->expectExceptionMessage('Could not download image');
-        (new ImageResolver(null, $guard))->resolveToTempPath('http://v6.example.com:9/a.png', self::remoteConfig(['v6.example.com']));
+        (new ImageResolver(null, $guard))->resolveToTempPath('http://v6.example.com:9/a.png', $this->remoteConfig(['v6.example.com']));
     }
 
     /**
@@ -221,7 +260,7 @@ final class ImageResolverTest extends TestCase
         $host = (string) parse_url($url, PHP_URL_HOST);
         $this->expectException(ImageResolveException::class);
         $this->expectExceptionMessage('non-public');
-        (new ImageResolver())->resolveToTempPath($url, self::remoteConfig([trim($host, '[]')]));
+        (new ImageResolver())->resolveToTempPath($url, $this->remoteConfig([trim($host, '[]')]));
     }
 
     public function testRemoteHostResolvingToPrivateIpRejected(): void
@@ -229,7 +268,7 @@ final class ImageResolverTest extends TestCase
         $guard = new RemoteAddressGuard(static fn (string $host): array => ['93.184.215.14', '10.1.2.3']);
         $this->expectException(ImageResolveException::class);
         $this->expectExceptionMessage('non-public');
-        (new ImageResolver(null, $guard))->resolveToTempPath('https://img.example.com/a.png', self::remoteConfig(['example.com']));
+        (new ImageResolver(null, $guard))->resolveToTempPath('https://img.example.com/a.png', $this->remoteConfig(['example.com']));
     }
 
     public function testRemoteUnresolvableHostRejected(): void
@@ -237,21 +276,21 @@ final class ImageResolverTest extends TestCase
         $guard = new RemoteAddressGuard(static fn (string $host): array => []);
         $this->expectException(ImageResolveException::class);
         $this->expectExceptionMessage('non-public or unknown');
-        (new ImageResolver(null, $guard))->resolveToTempPath('https://aaaa-only.example.com/a.png', self::remoteConfig(['example.com']));
+        (new ImageResolver(null, $guard))->resolveToTempPath('https://aaaa-only.example.com/a.png', $this->remoteConfig(['example.com']));
     }
 
     public function testRemoteRedirectIsNotFollowed(): void
     {
         $this->expectException(ImageResolveException::class);
         $this->expectExceptionMessage('HTTP 302');
-        (new ImageResolver())->resolveToTempPath($this->baseUrl() . '/redirect', self::remoteConfig(['127.0.0.1'], true));
+        (new ImageResolver())->resolveToTempPath($this->baseUrl() . '/redirect', $this->remoteConfig(['127.0.0.1'], true));
     }
 
     public function testRemoteNon2xxRejected(): void
     {
         $this->expectException(ImageResolveException::class);
         $this->expectExceptionMessage('HTTP 404');
-        (new ImageResolver())->resolveToTempPath($this->baseUrl() . '/missing.png', self::remoteConfig(['127.0.0.1'], true));
+        (new ImageResolver())->resolveToTempPath($this->baseUrl() . '/missing.png', $this->remoteConfig(['127.0.0.1'], true));
     }
 
     public function testRemoteDownloadAbortedAboveMaxBytes(): void
@@ -272,7 +311,7 @@ final class ImageResolverTest extends TestCase
     public function testRemoteInvalidUrlRejected(): void
     {
         $this->expectException(ImageResolveException::class);
-        (new ImageResolver())->resolveToTempPath('http://:80/a.png', self::remoteConfig(['example.com']));
+        (new ImageResolver())->resolveToTempPath('http://:80/a.png', $this->remoteConfig(['example.com']));
     }
 
     /**
@@ -298,7 +337,7 @@ final class ImageResolverTest extends TestCase
 
     public function testLocalPathRejectedWithoutBaseDir(): void
     {
-        $tmp = self::writePng(sys_get_temp_dir() . '/htw_nobase_' . uniqid('', true) . '.png');
+        $tmp = $this->writePng(sys_get_temp_dir() . '/htw_nobase_' . uniqid('', true) . '.png');
         try {
             foreach (['/etc/passwd', '/var/www/secret.png', $tmp, 'C:\\Windows\\a.png'] as $src) {
                 try {
@@ -317,8 +356,8 @@ final class ImageResolverTest extends TestCase
     {
         $base = sys_get_temp_dir() . '/htw_base_' . uniqid('', true);
         self::assertTrue(mkdir($base . '/img', 0o777, true));
-        $inside  = self::writePng($base . '/img/a.png');
-        $outside = self::writePng(sys_get_temp_dir() . '/htw_outside_' . uniqid('', true) . '.png');
+        $inside  = $this->writePng($base . '/img/a.png');
+        $outside = $this->writePng(sys_get_temp_dir() . '/htw_outside_' . uniqid('', true) . '.png');
         $config  = ResolvedConfig::fromArray(['images' => ['local_base_dir' => $base . '/img/']]);
         try {
             self::assertSame(realpath($inside), (new ImageResolver())->resolveToTempPath('a.png', $config));
@@ -344,7 +383,7 @@ final class ImageResolverTest extends TestCase
     /** Temp files tracked for the current conversion (remote images inlined before PhpWord) stay accepted. */
     public function testTrackedTemporaryFileAccepted(): void
     {
-        $tmp     = self::writePng(sys_get_temp_dir() . '/htw_tracked_' . uniqid('', true) . '.png');
+        $tmp     = $this->writePng(sys_get_temp_dir() . '/htw_tracked_' . uniqid('', true) . '.png');
         $tracker = new TemporaryImageFiles();
         try {
             $resolver = new ImageResolver($tracker);
@@ -363,7 +402,7 @@ final class ImageResolverTest extends TestCase
     /**
      * @param list<string> $allowlist
      */
-    private static function remoteConfig(array $allowlist, bool $allowPrivate = false): ResolvedConfig
+    private function remoteConfig(array $allowlist, bool $allowPrivate = false): ResolvedConfig
     {
         return ResolvedConfig::fromArray(['images' => [
             'resolve_remote'               => true,
@@ -373,7 +412,7 @@ final class ImageResolverTest extends TestCase
         ]]);
     }
 
-    private static function writePng(string $path): string
+    private function writePng(string $path): string
     {
         file_put_contents($path, (string) base64_decode(self::PNG_1X1, true));
 

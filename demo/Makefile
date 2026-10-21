@@ -24,10 +24,10 @@ demo-smoke:
 	@PORT=$$(grep "^PORT=" symfony8/.env.example 2>/dev/null | cut -d= -f2 | tr -d '\r'); \
 	[ -z "$$PORT" ] && PORT=8021; \
 	echo "Demo smoke: symfony8 (http://127.0.0.1:$$PORT)"; \
-	$(MAKE) up8; sleep 8; \
-	code=$$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:$$PORT" 2>/dev/null || echo "000"); \
+	FRANKENPHP_MODE=classic $(MAKE) up8; sleep 8; \
+	code=$$(curl -sL -o /dev/null -w "%{http_code}" "http://127.0.0.1:$$PORT/" 2>/dev/null || echo "000"); \
 	$(MAKE) down8 2>/dev/null || true; \
-	if [ "$$code" != "200" ] && [ "$$code" != "302" ]; then echo "symfony8 failed with HTTP $$code"; exit 1; fi; \
+	if [ "$$code" != "200" ]; then echo "symfony8 failed with HTTP $$code"; exit 1; fi; \
 	echo "symfony8 OK (HTTP $$code)"
 
 release-verify release-verify8: demo-smoke
