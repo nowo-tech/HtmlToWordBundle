@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.6.0] - 2026-10-21](#160---2026-10-21)
 - [[1.5.0] - 2026-10-13](#150---2026-10-13)
 - [[1.4.0] - 2026-10-13](#140---2026-10-13)
 - [[1.3.0] - 2026-10-13](#130---2026-10-13)
@@ -25,6 +26,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - [[1.0.0] - 2026-05-07](#100---2026-05-07)
 
 ## [Unreleased]
+
+## [1.6.0] - 2026-10-21
+
+Dependency refresh, logged remote image downloads (psr/log), demo timeout hierarchy, open-PR and Igor release gates, demo smoke workflow. See [UPGRADING](UPGRADING.md#to-160).
 
 ### Changed
 
@@ -227,7 +232,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.2.6...v1.3.0
