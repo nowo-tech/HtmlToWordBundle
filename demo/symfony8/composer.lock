@@ -79,7 +79,7 @@
             "dist": {
                 "type": "path",
                 "url": "/var/html-to-word-bundle",
-                "reference": "068ae5f9171d08b1c739f01f73d10c444cbdb656"
+                "reference": "b6a6dbf99467e235962719b6ca7d5ab8df5f1d8a"
             },
             "require": {
                 "ext-dom": "*",
@@ -88,6 +88,7 @@
                 "masterminds/html5": "^2.9",
                 "php": ">=8.2 <8.6",
                 "phpoffice/phpword": "^1.3",
+                "psr/log": "^1.1 || ^2.0 || ^3.0",
                 "symfony/config": "^6.4 || ^7.4 || ^8.0",
                 "symfony/dependency-injection": "^6.4 || ^7.4 || ^8.0",
                 "symfony/http-foundation": "^6.4 || ^7.4 || ^8.0",
@@ -3591,16 +3592,16 @@
     "packages-dev": [
         {
             "name": "nowo-tech/hot-reload-bundle",
-            "version": "v1.6.1",
+            "version": "v1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nowo-tech/HotReloadBundle.git",
-                "reference": "6d3117328bd9d7f55a70743567d04ee25d6bc366"
+                "reference": "cf84e69a6f93f95f06876638337f9f792b2bcb0a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nowo-tech/HotReloadBundle/zipball/6d3117328bd9d7f55a70743567d04ee25d6bc366",
-                "reference": "6d3117328bd9d7f55a70743567d04ee25d6bc366",
+                "url": "https://api.github.com/repos/nowo-tech/HotReloadBundle/zipball/cf84e69a6f93f95f06876638337f9f792b2bcb0a",
+                "reference": "cf84e69a6f93f95f06876638337f9f792b2bcb0a",
                 "shasum": ""
             },
             "require": {
@@ -3678,7 +3679,7 @@
                 "issues": "https://github.com/nowo-tech/HotReloadBundle/issues",
                 "source": "https://github.com/nowo-tech/HotReloadBundle"
             },
-            "time": "2026-10-13T10:57:34+00:00"
+            "time": "2026-10-21T05:26:17+00:00"
         },
         {
             "name": "nowo-tech/twig-inspector-bundle",
