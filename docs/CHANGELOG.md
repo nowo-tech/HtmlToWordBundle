@@ -27,6 +27,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- **Developer tooling (REQ-MAKE-002):** `make release-check` runs the full REQ-MAKE-002 chain in order (ensure-up, co-author and open-PR gates, composer-sync, cs-fix, cs-check, rector-dry, phpstan, igor, coverage-check, demo release-check). New `make check-no-raw-html-form` target (`.scripts/check-no-raw-html-form.sh`, REQ-TWIG-005); it joins the chain once the demo raw form markup is migrated. `check-twig-extra` does not apply (no bundle Twig views).
+
 ## [1.6.0] - 2026-10-21
 
 Dependency refresh, logged remote image downloads (psr/log), demo timeout hierarchy, open-PR and Igor release gates, demo smoke workflow. See [UPGRADING](UPGRADING.md#to-160).

@@ -1,5 +1,5 @@
 # HtmlToWordBundle — Docker-driven development (REQ-MAKE-001)
-.PHONY: help up down down-dev build shell install test test-coverage coverage-check test-coverage-100 cs-check cs-fix qa clean assets release-check release-check-demos demo-smoke composer-sync ensure-up phpstan igor rector rector-dry update validate setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history update-deps check-open-prs
+.PHONY: help up down down-dev build shell install test test-coverage coverage-check test-coverage-100 cs-check cs-fix qa clean assets release-check release-check-demos demo-smoke composer-sync ensure-up phpstan igor rector rector-dry update validate setup-hooks check-no-cursor-coauthor strip-cursor-coauthor-from-history update-deps check-open-prs check-no-raw-html-form
 
 COMPOSE_FILE ?= docker-compose.yml
 # Prefer Compose V2 plugin (GitHub Actions / modern Docker Desktop); fall back to docker-compose V1 (REQ-MAKE-010).
@@ -91,6 +91,10 @@ composer-sync: ensure-up
 # Run Igor worker-state audit (REQ-CS-008)
 igor: ensure-up
 	$(COMPOSE) exec -T php composer igor
+
+# Pre-release (REQ-MAKE-002); coverage-check is the test-coverage step (100% gate)
+# check-twig-extra (REQ-TWIG-004) is omitted: the bundle ships no Twig views.
+# check-no-raw-html-form (REQ-TWIG-005) is wired once the remaining raw form markup is migrated
 release-check:
 	@$(MAKE) ensure-up
 	@$(MAKE) check-no-cursor-coauthor
@@ -103,6 +107,10 @@ release-check:
 	@$(MAKE) igor
 	@$(MAKE) coverage-check
 	@$(MAKE) release-check-demos
+
+# Fail on raw <form>/<input>/<textarea>/<select> in Twig (REQ-TWIG-005)
+check-no-raw-html-form:
+	@bash .scripts/check-no-raw-html-form.sh
 
 # REQ-REL-003 — no unresolved open GitHub PRs before release
 check-open-prs:
