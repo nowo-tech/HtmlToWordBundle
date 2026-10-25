@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Demo\DemoHtmlSamples;
+use App\Form\DemoCustomConfigType;
+use App\Form\DemoExportType;
 use JsonException;
 use Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface;
 use Nowo\HtmlToWordBundle\Exception\InvalidProfileException;
@@ -18,6 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use function array_keys;
 use function in_array;
 use function is_array;
+use function is_string;
 use function json_decode;
 use function json_encode;
 use function sprintf;
@@ -64,9 +67,26 @@ final class HtmlToWordDemoController extends AbstractController
         ExporterInterface $exporter,
     ): Response {
         $profileKeys = array_keys($this->htmlToWordProfiles);
+        $apiMethods  = [
+            self::API_PROFILE => 'convertWithProfile($html, $profile) — uses the selected YAML profile.',
+            self::API_CONVERT => 'convert($html) — always the YAML default profile (ignores profile selector).',
+            self::API_OPTIONS => 'convertWithOptions($html, overlay export filename, $profile) — merges options onto the profile.',
+        ];
+        $form = $this->createForm(DemoExportType::class, [
+            'api'     => self::API_PROFILE,
+            'profile' => in_array('default', $profileKeys, true) ? 'default' : null,
+            'html'    => '<p>Paste HTML or click a preset.</p>',
+        ], [
+            'action'      => $this->generateUrl('demo_home'),
+            'profiles'    => $profileKeys,
+            'api_methods' => $apiMethods,
+            'attr'        => ['id' => 'export-form', 'class' => 'mb-4'],
+        ]);
+        $form->handleRequest($request);
 
-        if ($request->isMethod('POST')) {
-            $profile = $request->request->getString('profile');
+        if ($form->isSubmitted()) {
+            // Invalid choices come back as null: keep the previous fallbacks (default profile / convertWithProfile).
+            $profile = self::field($form->get('profile')->getData());
             if (!in_array($profile, $profileKeys, true)) {
                 $profile = in_array($this->htmlToWordDefaultProfile, $profileKeys, true)
                     ? $this->htmlToWordDefaultProfile
@@ -74,17 +94,17 @@ final class HtmlToWordDemoController extends AbstractController
             }
 
             $samplePath = $this->getParameter('kernel.project_dir') . '/public/demo/sample.png';
-            $preset     = $request->request->getString('preset');
+            $preset     = self::field($form->get('preset')->getData());
             $html       = DemoHtmlSamples::html($preset);
             if ($html === null) {
-                $html = $request->request->getString('html');
+                $html = self::field($form->get('html')->getData());
             }
             if ($html === '') {
                 $html = '<p><em>Empty</em> — pick a preset or paste HTML.</p>';
             }
             $html = str_replace(DemoHtmlSamples::DEMO_SAMPLE_IMAGE_PLACEHOLDER, $samplePath, $html);
 
-            $api = $request->request->getString('api', self::API_PROFILE);
+            $api = self::field($form->get('api')->getData());
             if (!in_array($api, [self::API_CONVERT, self::API_PROFILE, self::API_OPTIONS], true)) {
                 $api = self::API_PROFILE;
             }
@@ -113,16 +133,11 @@ final class HtmlToWordDemoController extends AbstractController
         $presets    = DemoHtmlSamples::presetsWithResolvedSampleImage($samplePath);
 
         return $this->render('demo/index.html.twig', [
-            'profiles'         => $profileKeys,
             'presets'          => $presets,
             'preset_meta'      => DemoHtmlSamples::PRESET_META,
             'preset_meta_json' => json_encode(DemoHtmlSamples::PRESET_META, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
             'presets_json'     => json_encode($presets, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT),
-            'api_methods'      => [
-                self::API_PROFILE => 'convertWithProfile($html, $profile) — uses the selected YAML profile.',
-                self::API_CONVERT => 'convert($html) — always the YAML default profile (ignores profile selector).',
-                self::API_OPTIONS => 'convertWithOptions($html, overlay export filename, $profile) — merges options onto the profile.',
-            ],
+            'form'             => $form->createView(),
         ]);
     }
 
@@ -141,8 +156,20 @@ final class HtmlToWordDemoController extends AbstractController
             JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR,
         );
 
-        if ($request->isMethod('POST')) {
-            $rawJson = $request->request->getString('config_json');
+        $form = $this->createForm(DemoCustomConfigType::class, [
+            'mode'        => self::MODE_MERGE,
+            'profile'     => $this->htmlToWordDefaultProfile,
+            'html'        => DemoHtmlSamples::CUSTOM_CONFIG_DEFAULT_HTML,
+            'config_json' => $headerFooterDemoJson,
+        ], [
+            'action'   => $this->generateUrl('demo_custom_config'),
+            'profiles' => $profileKeys,
+            'attr'     => ['class' => 'mb-4'],
+        ]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $rawJson = self::field($form->get('config_json')->getData());
             try {
                 $options = json_decode($rawJson, true, 512, JSON_THROW_ON_ERROR);
             } catch (JsonException $e) {
@@ -157,12 +184,12 @@ final class HtmlToWordDemoController extends AbstractController
                 return $this->redirectToRoute('demo_custom_config');
             }
 
-            $html = $request->request->getString('html');
+            $html = self::field($form->get('html')->getData());
             if ($html === '') {
                 $html = '<p><em>No HTML</em> — using a minimal fallback paragraph.</p>';
             }
 
-            $mode = $request->request->getString('mode', self::MODE_MERGE);
+            $mode = self::field($form->get('mode')->getData());
             if (!in_array($mode, [self::MODE_MERGE, self::MODE_INLINE], true)) {
                 $mode = self::MODE_MERGE;
             }
@@ -171,7 +198,7 @@ final class HtmlToWordDemoController extends AbstractController
                 if ($mode === self::MODE_INLINE) {
                     $document = $converter->convertWithInlineProfile($html, $options);
                 } else {
-                    $profile = $request->request->getString('profile');
+                    $profile = self::field($form->get('profile')->getData());
                     if (!in_array($profile, $profileKeys, true)) {
                         $profile = in_array($this->htmlToWordDefaultProfile, $profileKeys, true)
                             ? $this->htmlToWordDefaultProfile
@@ -189,11 +216,17 @@ final class HtmlToWordDemoController extends AbstractController
         }
 
         return $this->render('demo/custom_config.html.twig', [
-            'profiles'                   => $profileKeys,
-            'default_profile'            => $this->htmlToWordDefaultProfile,
-            'sample_config_json'         => $sampleConfigJson,
-            'header_footer_demo_json'    => $headerFooterDemoJson,
-            'default_custom_config_html' => DemoHtmlSamples::CUSTOM_CONFIG_DEFAULT_HTML,
+            'default_profile'    => $this->htmlToWordDefaultProfile,
+            'sample_config_json' => $sampleConfigJson,
+            'form'               => $form->createView(),
         ]);
+    }
+
+    /**
+     * Submitted scalar field value as a string ('' when empty or not a valid choice).
+     */
+    private static function field(mixed $value): string
+    {
+        return is_string($value) ? $value : '';
     }
 }

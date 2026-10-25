@@ -9,6 +9,7 @@
 - [Images: URLs in stored HTML (recommended)](#images-urls-in-stored-html-recommended)
 - [Images: uploads without URL](#images-uploads-without-url)
 - [Extending behaviour](#extending-behaviour)
+- [Forms in Twig (REQ-TWIG-005)](#forms-in-twig-req-twig-005)
 
 ## Injecting services
 
@@ -79,3 +80,20 @@ After a Symfony `UploadedFile`, save the file where PHP can read it and put that
 ## Extending behaviour
 
 Register additional `Nowo\HtmlToWordBundle\Transformer\TransformerInterface` implementations and tag them `html_to_word.transformer`. Higher `getPriority()` runs first when multiple transformers match the same tag.
+
+## Forms in Twig (REQ-TWIG-005)
+
+Every UI form — bundle views and the demo apps — is a PHP Symfony Form Type (FormKit types when FormKit is in the stack) rendered with `form_start`, the REQ-TWIG-003 child loop and `form_end`; submit / cancel buttons may stay outside the loop:
+
+```twig
+{{ form_start(form) }}
+    {% for child in form %}
+        {% if not child.rendered %}
+            {{ form_row(child) }}
+        {% endif %}
+    {% endfor %}
+    <button type="submit">Save</button>
+{{ form_end(form) }}
+```
+
+CSRF-only actions (delete, logout-style buttons, toggles) use an empty Form Type too, and login forms map `_username` / `_password` / `_csrf_token` (token id `authenticate`) on a Form Type. Host overrides and demos must not reintroduce raw `<form>` / `<input>` / `<textarea>` / `<select>` markup: `make check-no-raw-html-form` (part of `make release-check`) fails when it appears.

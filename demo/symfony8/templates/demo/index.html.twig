@@ -2,6 +2,8 @@
 
 {% block title %}HtmlToWord — demos (Symfony 8){% endblock %}
 
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
 {% block body %}
   <h1>HtmlToWordBundle <span class="text-secondary fs-5">(Symfony 8)</span></h1>
   <p class="lead">
@@ -43,28 +45,15 @@
     </div>
   </div>
 
-  <form method="post" action="{{ path('demo_home') }}" id="export-form" class="mb-4">
-    <fieldset class="border rounded p-3 mb-3">
-      <legend class="float-none w-auto px-2 fs-6">Converter method</legend>
-      {% for key, desc in api_methods %}
-        <div class="form-check">
-          <input class="form-check-input" type="radio" name="api" id="api-{{ key }}" value="{{ key }}" {% if key == 'convertWithProfile' %}checked{% endif %}>
-          <label class="form-check-label" for="api-{{ key }}"><code>{{ key }}</code> — {{ desc }}</label>
-        </div>
-      {% endfor %}
-    </fieldset>
+  {{ form_start(form) }}
+    {{ form_row(form.api) }}
 
     <div class="row g-3 mb-3">
       <div class="col-md-6">
-        <label for="profile" class="form-label">Profile <code>nowo_html_to_word</code></label>
-        <select class="form-select" id="profile" name="profile" required>
-          {% for p in profiles %}
-            <option value="{{ p }}" {% if p == 'default' %}selected{% endif %}>{{ p }}</option>
-          {% endfor %}
-        </select>
+        {{ form_row(form.profile) }}
       </div>
       <div class="col-md-6 d-flex align-items-end">
-        <input type="hidden" name="preset" id="preset-field" value="">
+        {{ form_widget(form.preset) }}
         <button type="submit" class="btn btn-primary">Download .docx</button>
       </div>
     </div>
@@ -76,11 +65,7 @@
       {% endfor %}
     </div>
 
-    <label for="html-field" class="form-label">HTML</label>
-    <textarea class="form-control font-monospace small" id="html-field" name="html" rows="18" spellcheck="false">&lt;p&gt;Paste HTML or click a preset.&lt;/p&gt;</textarea>
-    <p class="form-text">
-      When you load a preset, the suggested profile can be applied from the table below (button tooltip = relevant stack layer).
-    </p>
+    {{ form_row(form.html) }}
 
     <div class="table-responsive">
       <table class="table table-sm table-bordered caption-top">
@@ -99,20 +84,26 @@
         </tbody>
       </table>
     </div>
-  </form>
+
+    {% for child in form %}
+      {% if not child.rendered %}
+        {{ form_row(child) }}
+      {% endif %}
+    {% endfor %}
+  {{ form_end(form) }}
 
   <script>
     const DEMO_PRESETS = {{ presets_json|raw }};
     document.querySelectorAll('[data-load-preset]').forEach(function (btn) {
       btn.addEventListener('click', function () {
         const id = btn.getAttribute('data-load-preset');
-        const ta = document.getElementById('html-field');
-        const pf = document.getElementById('preset-field');
+        const ta = document.getElementById('{{ form.html.vars.id }}');
+        const pf = document.getElementById('{{ form.preset.vars.id }}');
         ta.value = DEMO_PRESETS[id] || '';
         pf.value = '';
         const sug = {{ preset_meta_json|raw }};
         if (sug[id] && sug[id].profile) {
-          const sel = document.getElementById('profile');
+          const sel = document.getElementById('{{ form.profile.vars.id }}');
           const opt = Array.from(sel.options).find(function (o) { return o.value === sug[id].profile; });
           if (opt) { sel.value = sug[id].profile; }
         }

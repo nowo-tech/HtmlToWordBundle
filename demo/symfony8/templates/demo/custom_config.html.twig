@@ -2,6 +2,8 @@
 
 {% block title %}HtmlToWord — JSON configuration (Symfony 8){% endblock %}
 
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
 {% block body %}
   <header class="rounded-3 border border-primary border-opacity-25 shadow-sm mb-4 overflow-hidden">
     <div class="bg-primary bg-opacity-10 px-4 py-3 border-bottom border-primary border-opacity-25">
@@ -65,45 +67,31 @@
     </div>
   </div>
 
-  <form method="post" action="{{ path('demo_custom_config') }}" class="mb-4">
-    <fieldset class="border rounded p-3 mb-3">
-      <legend class="float-none w-auto px-2 fs-6">Mode</legend>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="mode" id="mode-merge" value="merge" checked>
-        <label class="form-check-label" for="mode-merge">Merge JSON on top of YAML profiles (pick base profile)</label>
-      </div>
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="mode" id="mode-inline" value="inline">
-        <label class="form-check-label" for="mode-inline">JSON only (inline / typical DB) — <code>convertWithInlineProfile</code></label>
-      </div>
-    </fieldset>
+  {{ form_start(form) }}
+    {{ form_row(form.mode) }}
 
     <div class="row g-3 mb-3" id="profile-row">
       <div class="col-md-6">
-        <label for="profile" class="form-label">YAML profile (merge mode only)</label>
-        <select class="form-select" id="profile" name="profile">
-          {% for p in profiles %}
-            <option value="{{ p }}" {% if p == default_profile %}selected{% endif %}>{{ p }}</option>
-          {% endfor %}
-        </select>
+        {{ form_row(form.profile) }}
       </div>
     </div>
 
-    <label for="html-field" class="form-label">HTML</label>
-    <p class="form-text small mb-1">Default content: long multi-page sample (tables, lists, quotes, <code>pre</code>, typography, <code>page-break</code>).</p>
-    <textarea class="form-control font-monospace small mb-3" id="html-field" name="html" rows="28" spellcheck="false">{{ default_custom_config_html|raw }}</textarea>
-
-    <label for="config-json" class="form-label">Configuración JSON (cabecera / pie / export)</label>
-    <textarea class="form-control font-monospace small mb-2" id="config-json" name="config_json" rows="22" spellcheck="false" required>{{ header_footer_demo_json }}</textarea>
-    <p class="form-text mb-2">Plantilla inicial: overlay con <code>header</code>, <code>footer</code> y <code>export.filename</code>. Modifica textos, quita el logo o cambia el perfil base en modo merge.</p>
+    {{ form_row(form.html) }}
+    {{ form_row(form.config_json) }}
     <details class="small mb-3">
       <summary class="fw-medium">Referencia: JSON mínimo del perfil YAML «{{ default_profile }}» (solo lo que exporta la config)</summary>
       <pre class="bg-body-secondary p-2 rounded mt-2 mb-0 font-monospace">{{ sample_config_json }}</pre>
     </details>
 
+    {% for child in form %}
+      {% if not child.rendered %}
+        {{ form_row(child) }}
+      {% endif %}
+    {% endfor %}
+
     <button type="submit" class="btn btn-primary">Download .docx</button>
     <a href="{{ path('demo_home') }}" class="btn btn-outline-secondary ms-2">Back to main demo</a>
-  </form>
+  {{ form_end(form) }}
 
   <footer class="mt-5 pt-4 border-top border-secondary-subtle">
     <div class="row g-3 align-items-center text-body-secondary small">
@@ -125,14 +113,16 @@
   </footer>
 
   <script>
+    const modeInline = document.querySelector('input[name="{{ form.mode.vars.full_name }}"][value="inline"]');
     function syncProfileRow() {
-      const inline = document.getElementById('mode-inline').checked;
+      const inline = modeInline.checked;
       document.getElementById('profile-row').style.display = inline ? 'none' : '';
-      const sel = document.getElementById('profile');
+      const sel = document.getElementById('{{ form.profile.vars.id }}');
       if (sel) { sel.disabled = inline; }
     }
-    document.getElementById('mode-merge').addEventListener('change', syncProfileRow);
-    document.getElementById('mode-inline').addEventListener('change', syncProfileRow);
+    document.querySelectorAll('input[name="{{ form.mode.vars.full_name }}"]').forEach(function (radio) {
+      radio.addEventListener('change', syncProfileRow);
+    });
     syncProfileRow();
   </script>
 {% endblock %}

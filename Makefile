@@ -15,7 +15,7 @@ help:
 	@echo "  Assets: assets (no-op; no frontend in this bundle)"
 	@echo "  Tests: test, test-coverage, coverage-check, test-coverage-100"
 	@echo "  Quality: cs-check, cs-fix, rector, rector-dry, phpstan, qa"
-	@echo "  Release: release-check, demo-smoke, composer-sync"
+	@echo "  Release: release-check, demo-smoke, composer-sync, check-no-raw-html-form (REQ-TWIG-005)"
 	@echo "  Git hooks: setup-hooks"
 	@echo "  Cleanup: clean"
 	@echo "  Composer: update, validate"
@@ -94,11 +94,11 @@ igor: ensure-up
 
 # Pre-release (REQ-MAKE-002); coverage-check is the test-coverage step (100% gate)
 # check-twig-extra (REQ-TWIG-004) is omitted: the bundle ships no Twig views.
-# check-no-raw-html-form (REQ-TWIG-005) is wired once the remaining raw form markup is migrated
 release-check:
 	@$(MAKE) ensure-up
 	@$(MAKE) check-no-cursor-coauthor
 	@$(MAKE) check-open-prs
+	@$(MAKE) check-no-raw-html-form
 	@$(MAKE) composer-sync
 	@$(MAKE) cs-fix
 	@$(MAKE) cs-check
