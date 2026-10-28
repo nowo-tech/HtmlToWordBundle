@@ -16,6 +16,7 @@ use function feof;
 use function fopen;
 use function fread;
 use function in_array;
+use function intdiv;
 use function is_string;
 use function parse_url;
 use function preg_match;
@@ -48,6 +49,9 @@ final readonly class ImageResolver implements ImageResolverInterface
     /** Default cap for remote image downloads (bytes). */
     public const DEFAULT_REMOTE_MAX_BYTES = 10485760;
 
+    /** Default cap for decoded data: URI images (bytes). */
+    public const DEFAULT_DATA_URI_MAX_BYTES = 10485760;
+
     private RemoteAddressGuard $addressGuard;
 
     /**
@@ -74,7 +78,7 @@ final readonly class ImageResolver implements ImageResolverInterface
         }
 
         if (str_starts_with($src, 'data:')) {
-            $path = $this->fromDataUri($src);
+            $path = $this->fromDataUri($src, $config);
             $this->assertRasterImage($path, true);
             $this->temporaryFiles?->register($path);
 
@@ -258,10 +262,15 @@ final readonly class ImageResolver implements ImageResolverInterface
     /**
      * @throws ImageResolveException
      */
-    private function fromDataUri(string $src): string
+    private function fromDataUri(string $src, ResolvedConfig $config): string
     {
         if (!preg_match('#^data:image/[^;]+;base64,(.+)$#', $src, $m)) {
             throw new ImageResolveException('Invalid data URI image.');
+        }
+        // Checked on the encoded length (decoded size is 3/4 of it), before allocating the decoded copy.
+        $maxBytes = (int) $config->get('images.data_uri_max_bytes', self::DEFAULT_DATA_URI_MAX_BYTES);
+        if (intdiv(strlen($m[1]) * 3, 4) > $maxBytes) {
+            throw new ImageResolveException(sprintf('Data URI image exceeds images.data_uri_max_bytes (%d bytes).', $maxBytes));
         }
         $bin = base64_decode($m[1], true);
         if ($bin === false) {

@@ -26,6 +26,8 @@
 
 ## Unreleased
 
+- New input limits: HTML above `limits.max_html_bytes` (32 MiB) or with more than `images.max_count` (200) `<img>` tags throws `HtmlParseException`; a `data:` image above `images.data_uri_max_bytes` (10 MiB decoded) throws `ImageResolveException`. Raise them per profile for very large documents.
+
 ## To 1.6.0
 
 From **1.5.0**:

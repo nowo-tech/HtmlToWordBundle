@@ -27,6 +27,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Security
+
+- **Input size limits (DoS hardening).** The converter rejects HTML above the new `limits.max_html_bytes` (default
+  32 MiB, embedded images included) and documents with more `<img>` tags than `images.max_count` (default 200) with an
+  `HtmlParseException` before parsing; a `data:` image whose decoded size exceeds `images.data_uri_max_bytes` (default
+  10 MiB) is rejected before it is decoded (`ImageResolveException`). Previously one request could decode hundreds of
+  large data URIs or download hundreds of remote images.
+
 ### Changed
 
 - Demo: the export form (`/`) and the JSON configuration form (`/custom-config`) render through Symfony Form Types (`DemoExportType`, `DemoCustomConfigType`; flat field names unchanged, bootstrap 5 form theme) with `form_start` / `form_row` / child loop / `form_end`; the controller reads the submitted values through `handleRequest`; the demo now requires `symfony/form` (REQ-TWIG-005).

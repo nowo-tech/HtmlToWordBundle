@@ -41,6 +41,16 @@ final class ImageResolverTest extends TestCase
         @unlink($path);
     }
 
+    public function testDataUriAboveLimitIsRejectedBeforeDecoding(): void
+    {
+        $this->expectException(ImageResolveException::class);
+        $this->expectExceptionMessage('images.data_uri_max_bytes');
+        (new ImageResolver())->resolveToTempPath(
+            'data:image/png;base64,' . self::PNG_1X1,
+            ResolvedConfig::fromArray(['images' => ['data_uri_max_bytes' => 10]]),
+        );
+    }
+
     public function testEmptySrcThrows(): void
     {
         $this->expectException(ImageResolveException::class);

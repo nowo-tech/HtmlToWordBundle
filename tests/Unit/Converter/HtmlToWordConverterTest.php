@@ -10,6 +10,7 @@ use Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter;
 use Nowo\HtmlToWordBundle\Engine\EngineRegistry;
 use Nowo\HtmlToWordBundle\Engine\WordEngineInterface;
 use Nowo\HtmlToWordBundle\Exception\EngineNotAvailableException;
+use Nowo\HtmlToWordBundle\Exception\HtmlParseException;
 use Nowo\HtmlToWordBundle\Model\WordDocument;
 use PhpOffice\PhpWord\PhpWord;
 use PHPUnit\Framework\TestCase;
@@ -75,5 +76,44 @@ final class HtmlToWordConverterTest extends TestCase
             'strict_mode' => true,
             'export'      => ['filename' => 'from-inline.docx'],
         ]);
+    }
+
+    public function testHtmlAboveMaxHtmlBytesIsRejected(): void
+    {
+        $engine = $this->createMock(WordEngineInterface::class);
+        $engine->method('getName')->willReturn('phpword');
+        $engine->method('isAvailable')->willReturn(true);
+        $engine->expects($this->never())->method('build');
+        $converter = new HtmlToWordConverter(new ProfileResolver(['default' => []], 'default'), new EngineRegistry([$engine]), 'phpword');
+
+        $this->expectException(HtmlParseException::class);
+        $this->expectExceptionMessage('limits.max_html_bytes');
+        $converter->convertWithInlineProfile('<p>' . str_repeat('x', 20) . '</p>', ['limits' => ['max_html_bytes' => 16]]);
+    }
+
+    public function testTooManyImagesAreRejected(): void
+    {
+        $engine = $this->createMock(WordEngineInterface::class);
+        $engine->method('getName')->willReturn('phpword');
+        $engine->method('isAvailable')->willReturn(true);
+        $engine->expects($this->never())->method('build');
+        $converter = new HtmlToWordConverter(new ProfileResolver(['default' => ['images' => ['max_count' => 1]]], 'default'), new EngineRegistry([$engine]), 'phpword');
+
+        $this->expectException(HtmlParseException::class);
+        $this->expectExceptionMessage('images.max_count');
+        $converter->convert('<p><img src="a.png"><IMG src="b.png"></p>');
+    }
+
+    public function testInputWithinLimitsIsBuilt(): void
+    {
+        $engine = $this->createMock(WordEngineInterface::class);
+        $engine->method('getName')->willReturn('phpword');
+        $engine->method('isAvailable')->willReturn(true);
+        $engine->expects($this->once())->method('build')->willReturnCallback(
+            static fn (string $html, ResolvedConfig $config): WordDocument => new WordDocument(new PhpWord(), $config, 'phpword'),
+        );
+        $converter = new HtmlToWordConverter(new ProfileResolver(['default' => []], 'default'), new EngineRegistry([$engine]), 'phpword');
+
+        $converter->convert('<p><img src="a.png"></p>');
     }
 }
