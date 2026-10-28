@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.7.0](#to-170)
 - [To 1.6.0](#to-160)
 - [To 1.5.0](#to-150)
 - [To 1.4.0](#to-140)
@@ -25,6 +26,14 @@
 - [Version 1.x](#version-1x)
 
 ## Unreleased
+
+## To 1.7.0
+
+From **1.6.0**:
+
+```bash
+composer update nowo-tech/html-to-word-bundle
+```
 
 - New input limits: HTML above `limits.max_html_bytes` (32 MiB) or with more than `images.max_count` (200) `<img>` tags throws `HtmlParseException`; a `data:` image above `images.data_uri_max_bytes` (10 MiB decoded) throws `ImageResolveException`. Raise them per profile for very large documents.
 
