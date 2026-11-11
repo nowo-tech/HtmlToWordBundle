@@ -19,13 +19,24 @@ use function unlink;
  *
  * Each {@see beginCollection()} / {@see endCollection()} pair returns the files of one conversion, so the
  * exporter can delete exactly those files after PHPWord copied them into the DOCX. Files that were never
- * released (document built but not exported, exception) are deleted on {@code kernel.terminate} and on
- * {@see reset()}, so a long-lived worker never keeps them past the request.
+ * released (document built but not exported, exception) are deleted at every boundary of a long-lived process:
+ * {@code kernel.terminate}, {@code console.terminate}, after every Messenger message (handled or failed) and on
+ * {@see reset()}. A FrankenPHP worker or a Messenger consumer without the services resetter
+ * ({@code FRANKENPHP_RESET_KERNEL=false}) therefore never keeps them past the request, command or message.
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
 final class TemporaryImageFiles implements ResetInterface, EventSubscriberInterface
 {
+    /** `ConsoleEvents::TERMINATE` (string: symfony/console is optional). */
+    public const CONSOLE_TERMINATE = 'console.terminate';
+
+    /** Messenger `WorkerMessageHandledEvent` (string: symfony/messenger is optional). */
+    public const WORKER_MSG_HANDLED = 'Symfony\\Component\\Messenger\\Event\\WorkerMessageHandledEvent';
+
+    /** Messenger `WorkerMessageFailedEvent` (string: symfony/messenger is optional). */
+    public const WORKER_MSG_FAILED = 'Symfony\\Component\\Messenger\\Event\\WorkerMessageFailedEvent';
+
     /** @var array<string, true> path => true, every file not yet released */
     private array $pending = [];
 
@@ -34,7 +45,12 @@ final class TemporaryImageFiles implements ResetInterface, EventSubscriberInterf
 
     public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::TERMINATE => ['releaseAll', -1024]];
+        return [
+            KernelEvents::TERMINATE  => ['releaseAll', -1024],
+            self::CONSOLE_TERMINATE  => ['releaseAll', -1024],
+            self::WORKER_MSG_HANDLED => ['releaseAll', -1024],
+            self::WORKER_MSG_FAILED  => ['releaseAll', -1024],
+        ];
     }
 
     public function register(string $path): void
@@ -105,5 +121,8 @@ final class TemporaryImageFiles implements ResetInterface, EventSubscriberInterf
     public function reset(): void
     {
         $this->releaseAll();
+        // Already emptied by releaseAll(); assigned here as well so the reset contract is explicit.
+        $this->pending     = [];
+        $this->collections = [];
     }
 }

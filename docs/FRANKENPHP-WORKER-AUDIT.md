@@ -7,6 +7,7 @@
 | Audit date | 2026-09-24 |
 | Method | Manual review of every file under `src/` (services, DI extension, `Resources/config/services.yaml`, transformers, exporter) plus the static state of `phpoffice/phpword` 1.4.0 used by the bundle |
 | Remediation (2026-09-23/24) | W-01 and W-02 fixed: temp images are tracked per document (`Builder\TemporaryImageFiles`), deleted after export, and leftovers are deleted on `kernel.terminate` and `kernel.reset`; regression tests run consecutive requests on the same container without `reset()` |
+| Re-audit (2026-11-11, 1.7.1) | Igor (`composer igor`, igor-php 0.10.1) WARN on `TemporaryImageFiles` (`pending` / `collections` "not reset in reset()"): false positive, `reset()` delegates to `releaseAll()` (now also assigned in `reset()` itself). Gap fixed: a Messenger consumer or a long-running command has no `kernel.terminate`; the tracker now also releases on `console.terminate` and after every Messenger message (handled or failed), so it no longer depends on the services resetter there. Test: 300 units in one container without the resetter (`WorkerModeTemporaryFilesTest::testMessengerAndConsoleBoundariesDeleteTempImagesWithoutReset`). Igor: 0 KO / 0 WARN; `igor` CI job added |
 | **Verdict** | ✅ **Viable under scenario B** — no cross-request state; temp images never outlive the request. Remaining items are accepted (W-03 remote download limits, W-04 PHPWord `Settings` owned by the application) |
 
 ## Table of contents
@@ -102,7 +103,7 @@ No other findings. Profiles are compiled into container parameters, and `Resolve
 ## Usage recommendations in worker mode
 
 - Temp images are deleted after export; `toStreamResponse()` deletes them when the streaming callback runs, otherwise on `kernel.terminate`.
-- In long-running CLI workers (Messenger), keep `services_resetter` enabled (default) so documents that are converted but never exported do not leave temp images behind.
+- In long-running CLI workers (Messenger) the temp images of documents that are converted but never exported are deleted after every message (handled or failed) and at `console.terminate` (since 1.7.1), with or without `services_resetter`. A host command that loops over many documents without exporting them calls `TemporaryImageFiles::releaseAll()` between items.
 - Do not set PHPWord `Settings` per request; do it once at boot.
 - Custom transformers (`html_to_word.transformer`) and custom `ImageResolverInterface` implementations are shared services: keep them stateless, or implement `ResetInterface`.
 - The demo (`demo/symfony8/docker/frankenphp/Caddyfile`) runs FrankenPHP with a `worker` block, which can be used to reproduce these scenarios.
