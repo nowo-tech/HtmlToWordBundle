@@ -28,6 +28,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+Target: 1.7.1 (patch).
+
+### Fixed
+
+- **FrankenPHP / Messenger worker without the services resetter:** temp images of documents that are converted but
+  never exported are now also deleted after every Messenger message (handled or failed) and on `console.terminate`,
+  not only on `kernel.terminate` / `kernel.reset`. A consumer running with `reset_on_message` off no longer
+  accumulates temp files.
+
+### Changed
+
+- CI: standalone `igor` job (igor-php worker-state audit, REQ-CS-008). `docs/FRANKENPHP-WORKER-AUDIT.md` re-audited.
+
 ## [1.7.0] - 2026-10-28
 
 HtmlToWord: HTML size, image count and data: URI size limits. See [UPGRADING](UPGRADING.md#to-170).

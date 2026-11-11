@@ -27,7 +27,10 @@ final class TemporaryImageFilesTest extends TestCase
 
     public function testSubscribesToKernelTerminate(): void
     {
-        self::assertArrayHasKey(KernelEvents::TERMINATE, TemporaryImageFiles::getSubscribedEvents());
+        self::assertSame(
+            [KernelEvents::TERMINATE, 'console.terminate', 'Symfony\\Component\\Messenger\\Event\\WorkerMessageHandledEvent', 'Symfony\\Component\\Messenger\\Event\\WorkerMessageFailedEvent'],
+            array_keys(TemporaryImageFiles::getSubscribedEvents()),
+        );
     }
 
     public function testCollectionsReleaseOnlyTheirOwnFiles(): void

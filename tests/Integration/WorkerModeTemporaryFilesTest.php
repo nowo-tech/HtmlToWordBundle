@@ -12,10 +12,16 @@ use Nowo\HtmlToWordBundle\Tests\Fixtures\AppKernel;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -116,6 +122,45 @@ final class WorkerModeTemporaryFilesTest extends KernelTestCase
         $resetter->reset();
 
         self::assertFileDoesNotExist($file);
+    }
+
+    /**
+     * A Messenger consumer or a long-running command (no `kernel.terminate`, no services resetter) converts many
+     * documents that are never exported: every message / command boundary deletes the temp images of that unit, and
+     * memory stays flat over the run.
+     */
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testMessengerAndConsoleBoundariesDeleteTempImagesWithoutReset(): void
+    {
+        self::bootKernel();
+        [$converter, , $tracker] = $this->services();
+        $dispatcher              = self::getContainer()->get('event_dispatcher');
+        self::assertInstanceOf(EventDispatcherInterface::class, $dispatcher);
+        $html   = '<img src="data:image/png;base64,' . self::PNG_1X1 . '"/>';
+        $events = [TemporaryImageFiles::WORKER_MSG_HANDLED, TemporaryImageFiles::WORKER_MSG_FAILED, TemporaryImageFiles::CONSOLE_TERMINATE];
+        $before = 0;
+
+        for ($i = 0; $i < 300; ++$i) {
+            $files = $converter->convert($html)->temporaryFiles();
+            self::assertCount(1, $files);
+            self::assertFileExists($files[0]);
+            self::assertSame($files, $tracker->pending(), 'only this unit\'s file is pending (#' . $i . ')');
+
+            $event = $events[$i % 3] === TemporaryImageFiles::CONSOLE_TERMINATE
+                ? new ConsoleTerminateEvent(new Command('app:export'), new ArrayInput([]), new NullOutput(), 0)
+                : new Event();
+            $dispatcher->dispatch($event, $events[$i % 3]);
+
+            self::assertFileDoesNotExist($files[0], 'boundary ' . $events[$i % 3] . ' #' . $i);
+            self::assertSame([], $tracker->pending());
+            if ($i === 49) {
+                gc_collect_cycles();
+                $before = memory_get_usage();
+            }
+        }
+        gc_collect_cycles();
+        self::assertLessThan(2 * 1024 * 1024, memory_get_usage() - $before, 'Memory must stay flat over 250 units.');
     }
 
     /**
