@@ -10,7 +10,7 @@ use App\Form\DemoExportType;
 use JsonException;
 use Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface;
 use Nowo\HtmlToWordBundle\Exception\InvalidProfileException;
-use Nowo\HtmlToWordBundle\Export\ExporterInterface;
+use Nowo\HtmlToWordBundle\Http\DocxResponseFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -64,7 +64,7 @@ final class HtmlToWordDemoController extends AbstractController
     public function home(
         Request $request,
         HtmlToWordConverterInterface $converter,
-        ExporterInterface $exporter,
+        DocxResponseFactory $responses,
     ): Response {
         $profileKeys = array_keys($this->htmlToWordProfiles);
         $apiMethods  = [
@@ -126,7 +126,7 @@ final class HtmlToWordDemoController extends AbstractController
                 $document = $converter->convert($html);
             }
 
-            return $exporter->toStreamResponse($document);
+            return $responses->streamed($document);
         }
 
         $samplePath = $this->getParameter('kernel.project_dir') . '/public/demo/sample.png';
@@ -145,7 +145,7 @@ final class HtmlToWordDemoController extends AbstractController
     public function customConfig(
         Request $request,
         HtmlToWordConverterInterface $converter,
-        ExporterInterface $exporter,
+        DocxResponseFactory $responses,
     ): Response {
         $profileKeys  = array_keys($this->htmlToWordProfiles);
         $sampleSource = $this->htmlToWordProfiles[$this->htmlToWordDefaultProfile]
@@ -212,7 +212,7 @@ final class HtmlToWordDemoController extends AbstractController
                 return $this->redirectToRoute('demo_custom_config');
             }
 
-            return $exporter->toStreamResponse($document);
+            return $responses->streamed($document);
         }
 
         return $this->render('demo/custom_config.html.twig', [

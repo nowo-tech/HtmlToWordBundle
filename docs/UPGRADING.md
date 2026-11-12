@@ -3,6 +3,7 @@
 ## Table of contents
 
 - [Unreleased](#unreleased)
+- [To 1.8.0](#to-180)
 - [To 1.7.1](#to-171)
 - [To 1.7.0](#to-170)
 - [To 1.6.0](#to-160)
@@ -27,6 +28,35 @@
 - [Version 1.x](#version-1x)
 
 ## Unreleased
+
+## To 1.8.0
+
+From **1.7.x**: no breaking change.
+
+```bash
+composer update nowo-tech/html-to-word-bundle
+```
+
+`ExporterInterface` is deprecated (REQ-ARCH-001 rule 3: it mixes HttpFoundation responses with storage) and is removed
+in **2.0**. Replace it as follows:
+
+| Deprecated (1.x) | Since 1.8.0 |
+|---|---|
+| `ExporterInterface::toStreamResponse($doc)` | `DocxResponseFactory::streamed($doc)` |
+| `ExporterInterface::toBinaryResponse($doc)` | `DocxResponseFactory::binaryFile($doc)` |
+| `ExporterInterface::toFile($doc, $path)` | `DocumentWriterInterface::toFile($doc, $path)` |
+| `ExporterInterface::toFlysystem($doc, $path)` | `DocumentWriterInterface::toFlysystem($doc, $path)` |
+| `toFile()` on a temp file + `file_get_contents()` | `DocumentWriterInterface::toBytes($doc)` |
+
+- Inject `Nowo\HtmlToWordBundle\Http\DocxResponseFactory` in controllers and
+  `Nowo\HtmlToWordBundle\Export\DocumentWriterInterface` everywhere else.
+- **Hosts implementing `ExporterInterface`:** implement `DocumentWriterInterface` instead (or both during the
+  migration) and alias or decorate `DocumentWriterInterface`; `DocxResponseFactory` then uses your service. If you
+  keep re-aliasing `ExporterInterface`, point it at a service that implements it (`lint:container` checks it). The
+  bundle never aliases `ExporterInterface` to your `DocumentWriterInterface` service.
+- `DocxResponseFactory::streamed()` writes the document while the response is sent, so a document from a non-`phpword`
+  engine fails at send time (the deprecated `toStreamResponse()` failed before returning). `binaryFile()` fails before
+  it returns, as before.
 
 ## To 1.7.1
 

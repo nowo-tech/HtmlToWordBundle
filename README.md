@@ -27,11 +27,14 @@ Register `Nowo\HtmlToWordBundle\HtmlToWordBundle` if Flex does not, then add `co
 
 ```php
 use Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface;
-use Nowo\HtmlToWordBundle\Export\ExporterInterface;
+use Nowo\HtmlToWordBundle\Http\DocxResponseFactory;
 
 $doc = $converter->convert($html);
-return $exporter->toStreamResponse($doc);
+return $responses->streamed($doc); // or $writer->toBytes($doc) with DocumentWriterInterface outside HTTP
 ```
+
+Both host kinds are supported: see [Standard Symfony host](docs/USAGE.md#standard-symfony-host) (zero config) and
+[DDD / hexagonal host](docs/USAGE.md#ddd--hexagonal-host) (framework-free `DocumentWriterInterface`).
 
 ## Requirements
 

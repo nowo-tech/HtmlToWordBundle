@@ -7,30 +7,41 @@ namespace Nowo\HtmlToWordBundle\Export;
 use League\Flysystem\FilesystemOperator;
 use Nowo\HtmlToWordBundle\Engine\PhpWordEngine;
 use Nowo\HtmlToWordBundle\Exception\ExportException;
+use Nowo\HtmlToWordBundle\Http\DocxDownloadHeaders;
+use Nowo\HtmlToWordBundle\Http\DocxResponseFactory;
 use Nowo\HtmlToWordBundle\Model\WordDocument;
 use Nowo\HtmlToWordBundle\Parser\RemoteHttpImageInliner;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpWord\PhpWord;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\HeaderUtils;
-use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
+use function fclose;
+use function file_get_contents;
+use function filesize;
+use function fopen;
+use function is_resource;
 use function is_string;
-use function preg_replace;
 use function sprintf;
+use function stream_copy_to_stream;
+use function sys_get_temp_dir;
+use function tempnam;
+use function trigger_deprecation;
 use function trim;
+use function unlink;
 
 /**
+ * Default {@see DocumentWriterInterface} (and the deprecated {@see ExporterInterface}) on PHPWord's Word2007 writer.
+ *
  * {@code league/flysystem} is optional: {@see toFlysystem()} only works when it is installed and either a
  * profile sets {@code export.flysystem_adapter} (resolved through {@code $flysystemAdapters}) or a
  * {@code $flysystem} operator is injected.
  *
  * @author Héctor Franco Aceituno <hectorfranco@nowo.tech>
  */
-final readonly class DocxExporter implements ExporterInterface
+final readonly class DocxExporter implements DocumentWriterInterface, ExporterInterface
 {
     public function __construct(
         private RemoteHttpImageInliner $remoteHttpImageInliner,
@@ -39,8 +50,63 @@ final readonly class DocxExporter implements ExporterInterface
     ) {
     }
 
+    public function toBytes(WordDocument $document): string
+    {
+        $tmp = $this->temporaryPath('html_to_word_bytes_');
+
+        try {
+            $this->toFile($document, $tmp);
+            $bytes = file_get_contents($tmp);
+            // @codeCoverageIgnoreStart
+            if ($bytes === false) {
+                throw new ExportException('Could not read the temporary DOCX.');
+            }
+            // @codeCoverageIgnoreEnd
+
+            return $bytes;
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
+    public function toStream(WordDocument $document, mixed $stream): void
+    {
+        if (!is_resource($stream)) {
+            $this->remoteHttpImageInliner->releaseTemporaryFiles($document);
+
+            throw new ExportException('DocumentWriterInterface::toStream() expects an open, writable stream resource.');
+        }
+
+        $tmp = $this->temporaryPath('html_to_word_stream_');
+
+        try {
+            $this->toFile($document, $tmp);
+            $source = fopen($tmp, 'r');
+            // @codeCoverageIgnoreStart
+            if ($source === false) {
+                throw new ExportException('Could not open the temporary DOCX.');
+            }
+            // @codeCoverageIgnoreEnd
+            try {
+                $copied = @stream_copy_to_stream($source, $stream);
+                if ($copied === false || $copied !== filesize($tmp)) {
+                    throw new ExportException('Could not copy the DOCX into the target stream.');
+                }
+            } finally {
+                fclose($source);
+            }
+        } finally {
+            @unlink($tmp);
+        }
+    }
+
+    /**
+     * @deprecated since 1.8.0, use {@see DocxResponseFactory::streamed()}
+     */
     public function toStreamResponse(WordDocument $document): StreamedResponse
     {
+        trigger_deprecation('nowo-tech/html-to-word-bundle', '1.8', 'Calling "%s()" is deprecated, use "%s::streamed()" instead.', __METHOD__, DocxResponseFactory::class);
+
         $filename = $document->suggestedFilename();
         $writer   = IOFactory::createWriter($this->requirePhpWord($document), 'Word2007');
         $inliner  = $this->remoteHttpImageInliner;
@@ -59,12 +125,17 @@ final readonly class DocxExporter implements ExporterInterface
                 }
             },
             200,
-            $this->responseHeaders($filename),
+            DocxDownloadHeaders::for($filename),
         );
     }
 
+    /**
+     * @deprecated since 1.8.0, use {@see DocxResponseFactory::binaryFile()}
+     */
     public function toBinaryResponse(WordDocument $document): BinaryFileResponse
     {
+        trigger_deprecation('nowo-tech/html-to-word-bundle', '1.8', 'Calling "%s()" is deprecated, use "%s::binaryFile()" instead.', __METHOD__, DocxResponseFactory::class);
+
         $filename = $document->suggestedFilename();
         $tmp      = tempnam(sys_get_temp_dir(), 'html_to_word_');
         // @codeCoverageIgnoreStart
@@ -86,8 +157,8 @@ final readonly class DocxExporter implements ExporterInterface
         }
 
         $response = new BinaryFileResponse($tmp);
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-        $response->headers->set('Content-Disposition', $this->contentDisposition($filename));
+        $response->headers->set('Content-Type', DocxDownloadHeaders::CONTENT_TYPE);
+        $response->headers->set('Content-Disposition', DocxDownloadHeaders::contentDisposition($filename));
         $response->deleteFileAfterSend(true);
 
         return $response;
@@ -169,30 +240,15 @@ final readonly class DocxExporter implements ExporterInterface
         return $document->phpWord();
     }
 
-    /**
-     * @return array<string, string>
-     */
-    private function responseHeaders(string $filename): array
+    private function temporaryPath(string $prefix): string
     {
-        return [
-            'Content-Type'        => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'Content-Disposition' => $this->contentDisposition($filename),
-        ];
-    }
-
-    /**
-     * Builds an RFC 6266 attachment header (quoted ASCII fallback + filename* UTF-8) via {@see HeaderUtils::makeDisposition()},
-     * so quotes, CR/LF, path separators or non-ASCII characters in export.filename cannot break or inject headers.
-     */
-    private function contentDisposition(string $filename): string
-    {
-        // Control characters (incl. CR/LF) and path separators are never part of a download name.
-        $filename = trim((string) preg_replace('/[\x00-\x1F\x7F\/\\\\]+/u', '_', $filename));
-        if (trim($filename, ' _.') === '') {
-            $filename = 'document.docx';
+        $tmp = tempnam(sys_get_temp_dir(), $prefix);
+        // @codeCoverageIgnoreStart
+        if ($tmp === false) {
+            throw new ExportException('Could not create temporary file for DOCX.');
         }
-        $fallback = (string) preg_replace('/[^\x20-\x7E]|[%"]/u', '_', $filename);
+        // @codeCoverageIgnoreEnd
 
-        return HeaderUtils::makeDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $filename, $fallback);
+        return $tmp;
     }
 }
