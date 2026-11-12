@@ -57,6 +57,10 @@ Target: **1.8.0** (minor). REQ-ARCH-001 rule 3: a framework-free output port. Se
 
 ### Changed
 
+- `toFlysystem()` resolves the Flysystem adapter inside its `try`/`finally` (audit MW-W-L1): a missing or invalid
+  adapter now also deletes the document's temporary images (the `ExportException` is unchanged).
+- Docs: `DocxResponseFactory::streamed()` writes the DOCX at send time (temp file, then copied to the output); USAGE
+  recommends `binaryFile()` when an export error must become an error response (audit MW-H-L1/L2).
 - Demo controller uses `DocxResponseFactory`. `symfony/deprecation-contracts` is now a direct requirement (it was
   already installed through `symfony/dependency-injection`).
 

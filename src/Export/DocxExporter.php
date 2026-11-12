@@ -180,16 +180,18 @@ final readonly class DocxExporter implements DocumentWriterInterface, ExporterIn
 
     public function toFlysystem(WordDocument $document, string $remotePath): void
     {
-        $filesystem = $this->resolveFilesystem($document);
-
         $tmp = tempnam(sys_get_temp_dir(), 'html_to_word_fs_');
         // @codeCoverageIgnoreStart
         if ($tmp === false) {
+            $this->remoteHttpImageInliner->releaseTemporaryFiles($document);
+
             throw new ExportException('Could not create temporary file for Flysystem upload.');
         }
         // @codeCoverageIgnoreEnd
 
         try {
+            // Inside the try: a missing or invalid adapter still deletes the temp DOCX and the document's temp images.
+            $filesystem = $this->resolveFilesystem($document);
             $this->toFile($document, $tmp);
             $stream = fopen($tmp, 'r');
             // @codeCoverageIgnoreStart
@@ -204,6 +206,7 @@ final readonly class DocxExporter implements DocumentWriterInterface, ExporterIn
             }
         } finally {
             @unlink($tmp);
+            $this->remoteHttpImageInliner->releaseTemporaryFiles($document);
         }
     }
 

@@ -71,6 +71,12 @@ Each call writes the document once and deletes its temporary images; convert aga
 while the response is sent and `binaryFile()` fails before it returns; the deprecated `toStreamResponse()` failed
 before it returned.
 
+**Prefer `binaryFile()` when an export error must become a proper error response.** `streamed()` writes the DOCX
+(to a temporary file, then copied to the output) only while the response is sent, after the `200` status and the
+headers have gone out, so a failure there can only cut the download short. `binaryFile()` writes the DOCX before it
+returns: an `ExportException` reaches your controller (or the framework's error handling) and becomes a regular
+error response.
+
 If you **bypass** `DocxExporter` and call `IOFactory::createWriter($document->phpWord(), 'Word2007')->save($path)` yourself, delete the document’s temp images afterwards with **`RemoteHttpImageInliner::releaseTemporaryFiles($document)`** (or `cleanupInlineSession()` to wipe every pending temp image). Prefer the exporter for a correct lifecycle — it also works under FrankenPHP worker mode without kernel reset (see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md)).
 
 ## HTML expectations

@@ -192,6 +192,25 @@ final class DocumentWriterEquivalenceTest extends KernelTestCase
         self::assertSame($before, glob(sys_get_temp_dir() . '/html_to_word_*') ?: []);
     }
 
+    /** Audit MW-W-L1: a missing Flysystem adapter leaves no temp DOCX and releases the document's temp images. */
+    public function testMissingFlysystemAdapterCleansUp(): void
+    {
+        [$converter, $writer] = $this->services();
+        $document             = $converter->convert(self::HTML);
+        $before               = glob(sys_get_temp_dir() . '/html_to_word_fs_*') ?: [];
+        self::assertFileExists($document->temporaryFiles()[0]);
+
+        try {
+            $writer->toFlysystem($document, 'remote/x.docx');
+            self::fail('Expected ExportException.');
+        } catch (ExportException $e) {
+            self::assertStringContainsString('Flysystem adapter is not configured', $e->getMessage());
+        }
+
+        self::assertFileDoesNotExist($document->temporaryFiles()[0]);
+        self::assertSame($before, glob(sys_get_temp_dir() . '/html_to_word_fs_*') ?: []);
+    }
+
     public function testFactoryWritesThroughAnyDocumentWriter(): void
     {
         $writer = new class implements DocumentWriterInterface {

@@ -6,6 +6,7 @@ namespace Nowo\HtmlToWordBundle\Http;
 
 use Nowo\HtmlToWordBundle\Exception\ExportException;
 use Nowo\HtmlToWordBundle\Export\DocumentWriterInterface;
+use Nowo\HtmlToWordBundle\Export\DocxExporter;
 use Nowo\HtmlToWordBundle\Export\ExporterInterface;
 use Nowo\HtmlToWordBundle\Model\WordDocument;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -38,7 +39,10 @@ final readonly class DocxResponseFactory
     }
 
     /**
-     * Streams the DOCX to the client while it is written (the document is written when the response is sent).
+     * Sends the DOCX as a streamed response. Nothing is written when this method returns: when the response is sent,
+     * the writer writes the DOCX to a temporary file and then copies it to the output (with the default
+     * {@see DocxExporter}). A write error therefore happens after the headers are
+     * sent and cannot become an error response; use {@see binaryFile()} when it must.
      */
     public function streamed(WordDocument $document): StreamedResponse
     {
