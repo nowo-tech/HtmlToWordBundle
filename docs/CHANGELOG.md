@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Table of contents
 
 - [[Unreleased]](#unreleased)
+- [[1.8.0] - 2026-11-12](#180---2026-11-12)
 - [[1.7.1] - 2026-11-11](#171---2026-11-11)
 - [[1.7.0] - 2026-10-28](#170---2026-10-28)
 - [[1.6.0] - 2026-10-21](#160---2026-10-21)
@@ -28,6 +29,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - [[1.0.0] - 2026-05-07](#100---2026-05-07)
 
 ## [Unreleased]
+
+## [1.8.0] - 2026-11-12
 
 Target: **1.8.0** (minor). REQ-ARCH-001 rule 3: a framework-free output port. See [UPGRADING](UPGRADING.md#to-180).
 
@@ -301,7 +304,8 @@ Dependency refresh, logged remote image downloads (psr/log), demo timeout hierar
 
 - **BC:** Symfony configuration root key is **`nowo_html_to_word`** (was `html_to_word`). Rename `config/packages/html_to_word.yaml` → `nowo_html_to_word.yaml` and parameters `%html_to_word.*%` → `%nowo_html_to_word.*%`. DI tags `html_to_word.transformer` / `html_to_word.engine` are unchanged.
 
-[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.7.1...HEAD
+[Unreleased]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.7.1...v1.8.0
 [1.7.1]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.7.0...v1.7.1
 [1.7.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/nowo-tech/HtmlToWordBundle/compare/v1.5.0...v1.6.0
