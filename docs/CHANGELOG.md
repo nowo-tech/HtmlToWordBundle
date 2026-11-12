@@ -29,6 +29,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+Target: **1.8.0** (minor). REQ-ARCH-001 rule 3: a framework-free output port. See [UPGRADING](UPGRADING.md#to-180).
+
+### Added
+
+- `Export\DocumentWriterInterface`: framework-free output port with `toBytes()`, `toStream($stream)`, `toFile()` and
+  `toFlysystem()` (no Symfony or HTTP type in its signatures). `DocxExporter` implements it; the service alias is
+  public.
+- `Http\DocxResponseFactory` (HTTP edge): `streamed()` and `binaryFile()` build the download responses through
+  `DocumentWriterInterface`, with the same `Content-Type` and RFC 6266 `Content-Disposition` headers as before. When
+  the host aliases or decorates `DocumentWriterInterface`, the factory uses the host service.
+- Docs: "Standard Symfony host" and "DDD / hexagonal host" sections in `docs/USAGE.md`, linked from the README.
+
+### Deprecated
+
+- `Export\ExporterInterface` (and its service alias) and `DocxExporter::toStreamResponse()` /
+  `DocxExporter::toBinaryResponse()`: use `DocumentWriterInterface` and `DocxResponseFactory`. Removed in 2.0. The
+  deprecated methods behave as before and now trigger a deprecation.
+
+### Tests
+
+- `DocumentWriterEquivalenceTest`: the new methods produce the same DOCX parts and headers as the deprecated ones and
+  release temporary images the same way; error paths (non-stream, read-only stream, foreign engine).
+- `Kernel\PortAliasValidityKernelTest`: `lint:container` passes for a host on the new port only, the deprecated port
+  only, both, and a decorator of the new port; `DocxResponseFactory` gets the host service of the new port.
+- `Kernel\DddHostKernelTest`: a DDD host adapter renders through the framework-free ports.
+
+### Changed
+
+- `toFlysystem()` resolves the Flysystem adapter inside its `try`/`finally` (audit MW-W-L1): a missing or invalid
+  adapter now also deletes the document's temporary images (the `ExportException` is unchanged).
+- Docs: `DocxResponseFactory::streamed()` writes the DOCX at send time (temp file, then copied to the output); USAGE
+  recommends `binaryFile()` when an export error must become an error response (audit MW-H-L1/L2).
+- Demo controller uses `DocxResponseFactory`. `symfony/deprecation-contracts` is now a direct requirement (it was
+  already installed through `symfony/dependency-injection`).
+
 ## [1.7.1] - 2026-11-11
 
 Target: 1.7.1 (patch).

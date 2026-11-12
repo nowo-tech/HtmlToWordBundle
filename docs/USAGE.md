@@ -9,12 +9,19 @@
 - [Images: URLs in stored HTML (recommended)](#images-urls-in-stored-html-recommended)
 - [Images: uploads without URL](#images-uploads-without-url)
 - [Extending behaviour](#extending-behaviour)
+- [Standard Symfony host](#standard-symfony-host)
+- [DDD / hexagonal host](#ddd--hexagonal-host)
 - [Forms in Twig (REQ-TWIG-005)](#forms-in-twig-req-twig-005)
 
 ## Injecting services
 
 - `Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface` — converts HTML strings to `WordDocument`.
-- `Nowo\HtmlToWordBundle\Export\ExporterInterface` — builds Symfony responses or writes files / Flysystem.
+- `Nowo\HtmlToWordBundle\Export\DocumentWriterInterface` (since 1.8.0) — framework-free output port: DOCX bytes, a
+  stream, a local path or Flysystem.
+- `Nowo\HtmlToWordBundle\Http\DocxResponseFactory` (since 1.8.0) — HTTP edge: builds the download responses through
+  `DocumentWriterInterface`. Use it in controllers.
+- `Nowo\HtmlToWordBundle\Export\ExporterInterface` — **deprecated since 1.8.0**, removed in 2.0 (see
+  [UPGRADING](UPGRADING.md#to-180)).
 
 ## Converting HTML
 
@@ -44,13 +51,31 @@ $document = $converter->convertWithInlineProfile($html, [
 ## Exporting
 
 ```php
-use Nowo\HtmlToWordBundle\Export\ExporterInterface;
+use Nowo\HtmlToWordBundle\Export\DocumentWriterInterface;
+use Nowo\HtmlToWordBundle\Http\DocxResponseFactory;
 
-$response = $exporter->toStreamResponse($document);
-$response = $exporter->toBinaryResponse($document);
-$exporter->toFile($document, '/tmp/out.docx');
-$exporter->toFlysystem($document, 'exports/out.docx'); // requires league/flysystem + export.flysystem_adapter (or $flysystem)
+// Framework-free (services, CLI, Messenger, domain adapters)
+$bytes = $writer->toBytes($document);
+$writer->toStream($document, $stream);           // an open, writable resource; you close it
+$writer->toFile($document, '/tmp/out.docx');
+$writer->toFlysystem($document, 'exports/out.docx'); // requires league/flysystem + export.flysystem_adapter (or $flysystem)
+
+// HTTP edge (controllers)
+return $responses->streamed($document);   // StreamedResponse, written while it is sent
+return $responses->binaryFile($document); // BinaryFileResponse on a temp file deleted after sending
 ```
+
+Each call writes the document once and deletes its temporary images; convert again to write it a second time.
+`DocxResponseFactory` sends the same `Content-Type` and RFC 6266 `Content-Disposition` headers as the deprecated
+`ExporterInterface::toStreamResponse()` / `toBinaryResponse()`. When the engine is not `phpword`, `streamed()` fails
+while the response is sent and `binaryFile()` fails before it returns; the deprecated `toStreamResponse()` failed
+before it returned.
+
+**Prefer `binaryFile()` when an export error must become a proper error response.** `streamed()` writes the DOCX
+(to a temporary file, then copied to the output) only while the response is sent, after the `200` status and the
+headers have gone out, so a failure there can only cut the download short. `binaryFile()` writes the DOCX before it
+returns: an `ExportException` reaches your controller (or the framework's error handling) and becomes a regular
+error response.
 
 If you **bypass** `DocxExporter` and call `IOFactory::createWriter($document->phpWord(), 'Word2007')->save($path)` yourself, delete the document’s temp images afterwards with **`RemoteHttpImageInliner::releaseTemporaryFiles($document)`** (or `cleanupInlineSession()` to wipe every pending temp image). Prefer the exporter for a correct lifecycle — it also works under FrankenPHP worker mode without kernel reset (see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md)).
 
@@ -80,6 +105,65 @@ After a Symfony `UploadedFile`, save the file where PHP can read it and put that
 ## Extending behaviour
 
 Register additional `Nowo\HtmlToWordBundle\Transformer\TransformerInterface` implementations and tag them `html_to_word.transformer`. Higher `getPriority()` runs first when multiple transformers match the same tag.
+
+## Standard Symfony host
+
+Zero configuration. Inject `HtmlToWordConverterInterface` and `DocxResponseFactory` in your controllers (or
+`DocumentWriterInterface` in services) and return the response:
+
+```php
+#[Route('/report.docx')]
+public function report(HtmlToWordConverterInterface $converter, DocxResponseFactory $responses): Response
+{
+    return $responses->streamed($converter->convertWithProfile($this->renderView('report.html.twig'), 'report'));
+}
+```
+
+To replace the writer (another storage, audit logging), alias or decorate `DocumentWriterInterface`;
+`DocxResponseFactory` then writes through your service. The deprecated `ExporterInterface` alias keeps pointing at
+`DocxExporter` unless you re-alias it yourself, to a service that implements it (`bin/console lint:container`
+checks that).
+
+## DDD / hexagonal host
+
+HtmlToWordBundle is **infrastructure**: a document-rendering adapter that turns HTML into DOCX. It has no entities,
+no Doctrine dependency and nothing to map. Define the port in your application and implement it in your
+infrastructure layer with the bundle's framework-free ports (`HtmlToWordConverterInterface` and
+`DocumentWriterInterface`); never let `WordDocument` or PHPWord types reach your domain. Keep `DocxResponseFactory`
+in your HTTP adapters (controllers) only.
+
+```php
+// Domain / application port (yours)
+interface ContractDocumentRenderer
+{
+    public function render(string $contractId, string $html): string; // DOCX bytes
+}
+
+// Infrastructure adapter (yours)
+final readonly class HtmlToWordContractRenderer implements ContractDocumentRenderer
+{
+    public function __construct(
+        private HtmlToWordConverterInterface $converter,
+        private DocumentWriterInterface $writer,
+    ) {}
+
+    public function render(string $contractId, string $html): string
+    {
+        $document = $this->converter->convertWithOptions($html, ['export' => ['filename' => $contractId . '.docx']]);
+
+        return $this->writer->toBytes($document);
+    }
+}
+```
+
+- Configuration: named profiles in YAML, or `convertWithInlineProfile()` with a profile array your application stores
+  (database, settings provider); no InstanceSettings or ORM dependency.
+- Extension points (SPI): `ImageResolverInterface`, `TransformerInterface` (tag `html_to_word.transformer`) and
+  `WordEngineInterface` (tag `html_to_word.engine`).
+- Worker mode: the ports keep no request state; temporary images are released per document and at every request,
+  Messenger and console boundary (see [FRANKENPHP-WORKER-AUDIT.md](FRANKENPHP-WORKER-AUDIT.md)).
+- Tested: `tests/Integration/Kernel/DddHostKernelTest.php` boots this adapter in a host kernel and checks that the
+  adapter and `DocumentWriterInterface` import no Symfony component or Doctrine type.
 
 ## Forms in Twig (REQ-TWIG-005)
 

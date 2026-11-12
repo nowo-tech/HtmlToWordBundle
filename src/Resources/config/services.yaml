@@ -83,5 +83,20 @@ services:
     Nowo\HtmlToWordBundle\Converter\HtmlToWordConverterInterface:
         alias: Nowo\HtmlToWordBundle\Converter\HtmlToWordConverter
 
+    # Framework-free output port (1.8.0). Alias or decorate it to replace the writer: DocxResponseFactory follows it.
+    Nowo\HtmlToWordBundle\Export\DocumentWriterInterface:
+        alias: Nowo\HtmlToWordBundle\Export\DocxExporter
+        public: true
+
+    # HTTP edge (1.8.0): responses built through DocumentWriterInterface.
+    Nowo\HtmlToWordBundle\Http\DocxResponseFactory:
+        public: true
+
+    # Deprecated since 1.8.0 (removed in 2.0). DocxExporter implements it; a host that re-aliases it must point it at
+    # a service that implements it (Symfony's lint:container checks this).
     Nowo\HtmlToWordBundle\Export\ExporterInterface:
         alias: Nowo\HtmlToWordBundle\Export\DocxExporter
+        deprecated:
+            package: nowo-tech/html-to-word-bundle
+            version: '1.8'
+            message: 'The "%alias_id%" service alias is deprecated, use "Nowo\HtmlToWordBundle\Export\DocumentWriterInterface" and "Nowo\HtmlToWordBundle\Http\DocxResponseFactory" instead.'

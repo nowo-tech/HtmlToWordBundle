@@ -62,6 +62,7 @@ A bundle that is safe under **B** is safe under **A** and under classic mode / P
 | `Nowo\HtmlToWordBundle\Builder\ImageResolver` | yes | none; registers every temp file it creates in `TemporaryImageFiles` | ✅ | ✅ |
 | `Nowo\HtmlToWordBundle\Builder\TemporaryImageFiles` | yes | pending temp paths + per-document collections; `ResetInterface` + `kernel.terminate` subscriber | ✅ | ✅ |
 | `Nowo\HtmlToWordBundle\Export\DocxExporter` | yes | none (`final readonly`, optional Flysystem operator) | ✅ | ✅ |
+| `Nowo\HtmlToWordBundle\Http\DocxResponseFactory` (1.8.0) | yes | none (`final readonly`, only the `DocumentWriterInterface` dependency; every `toBytes()` / `toStream()` temp DOCX is deleted in a `finally` block) | ✅ | ✅ |
 | `Nowo\HtmlToWordBundle\Transformer\TransformerChain` | yes | `$sorted`, built once in the constructor | ✅ | ✅ |
 | 9 transformers (`Paragraph`, `Heading`, `List`, `Table`, `Blockquote`, `Pre`, `Hr`, `Div`, `ImageBlock`) | yes | none (stateless or `readonly` dependencies, `private const` only) | ✅ | ✅ |
 | `HtmlParser`, `HtmlSanitizer`, `InlineComposer`, `StyleMapper`, `SectionConfigurator`, `HeaderFooterBuilder` | yes | none (stateless; `HtmlParser` creates a new `Masterminds\HTML5` per call) | ✅ | ✅ |
