@@ -5,7 +5,9 @@
     "license": "MIT",
     "require": {
         "php": ">=8.4",
+        "nowo-tech/form-kit-bundle": "^2.22",
         "nowo-tech/html-to-word-bundle": "@dev",
+        "nowo-tech/ui-kit-bundle": "^2.49",
         "symfony/asset": "8.1.*",
         "symfony/console": "^8.0",
         "symfony/dotenv": "^8.0",
@@ -13,6 +15,8 @@
         "symfony/form": "8.1.*",
         "symfony/framework-bundle": "^8.0",
         "symfony/runtime": "^8.0",
+        "symfony/security-csrf": "^8.0",
+        "symfony/translation": "^8.0",
         "symfony/twig-bundle": "^8.0",
         "symfony/yaml": "^8.0",
         "twig/extra-bundle": "^3.12",
@@ -37,8 +41,12 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
-        "post-install-cmd": ["@auto-scripts"],
-        "post-update-cmd": ["@auto-scripts"]
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
     },
     "conflict": {
         "symfony/symfony": "*"

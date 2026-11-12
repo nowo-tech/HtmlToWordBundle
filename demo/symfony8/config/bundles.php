@@ -1,9 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
+use Nowo\FormKitBundle\NowoFormKitBundle;
 use Nowo\HotReloadBundle\NowoHotReloadBundle;
 use Nowo\HtmlToWordBundle\HtmlToWordBundle;
 use Nowo\TwigInspectorBundle\NowoTwigInspectorBundle;
+use Nowo\UiKitBundle\NowoUiKitBundle;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\TwigBundle\TwigBundle;
@@ -18,5 +21,7 @@ return [
     HtmlToWordBundle::class        => ['all' => true],
     NowoHotReloadBundle::class     => ['dev' => true, 'test' => true],
     NowoTwigInspectorBundle::class => ['dev' => true, 'test' => true],
+    NowoFormKitBundle::class       => ['all' => true],
+    NowoUiKitBundle::class         => ['all' => true],
     TwigExtraBundle::class         => ['all' => true],
 ];
