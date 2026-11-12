@@ -30,6 +30,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Demo uses the UiKit base style and FormKit forms (REQ-DEMO-014/015).
+
 ## [1.8.0] - 2026-11-12
 
 Target: **1.8.0** (minor). REQ-ARCH-001 rule 3: a framework-free output port. See [UPGRADING](UPGRADING.md#to-180).

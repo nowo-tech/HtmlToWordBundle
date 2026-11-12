@@ -80,11 +80,11 @@ final class HtmlToWordDemoController extends AbstractController
             'action'      => $this->generateUrl('demo_home'),
             'profiles'    => $profileKeys,
             'api_methods' => $apiMethods,
-            'attr'        => ['id' => 'export-form', 'class' => 'mb-4'],
+            'attr'        => ['id' => 'export-form'],
         ]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             // Invalid choices come back as null: keep the previous fallbacks (default profile / convertWithProfile).
             $profile = self::field($form->get('profile')->getData());
             if (!in_array($profile, $profileKeys, true)) {
@@ -137,7 +137,7 @@ final class HtmlToWordDemoController extends AbstractController
             'preset_meta'      => DemoHtmlSamples::PRESET_META,
             'preset_meta_json' => json_encode(DemoHtmlSamples::PRESET_META, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE),
             'presets_json'     => json_encode($presets, JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT),
-            'form'             => $form->createView(),
+            'form'             => $form,
         ]);
     }
 
@@ -164,22 +164,21 @@ final class HtmlToWordDemoController extends AbstractController
         ], [
             'action'   => $this->generateUrl('demo_custom_config'),
             'profiles' => $profileKeys,
-            'attr'     => ['class' => 'mb-4'],
         ]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $rawJson = self::field($form->get('config_json')->getData());
             try {
                 $options = json_decode($rawJson, true, 512, JSON_THROW_ON_ERROR);
             } catch (JsonException $e) {
-                $this->addFlash('danger', 'Invalid JSON: ' . $e->getMessage());
+                $this->addFlash('error', 'Invalid JSON: ' . $e->getMessage());
 
                 return $this->redirectToRoute('demo_custom_config');
             }
 
             if (!is_array($options)) {
-                $this->addFlash('danger', 'Configuration must be a JSON object (associative array at the root).');
+                $this->addFlash('error', 'Configuration must be a JSON object (associative array at the root).');
 
                 return $this->redirectToRoute('demo_custom_config');
             }
@@ -207,7 +206,7 @@ final class HtmlToWordDemoController extends AbstractController
                     $document = $converter->convertWithOptions($html, $options, $profile);
                 }
             } catch (InvalidProfileException) {
-                $this->addFlash('danger', 'Unknown YAML profile for merge mode.');
+                $this->addFlash('error', 'Unknown YAML profile for merge mode.');
 
                 return $this->redirectToRoute('demo_custom_config');
             }
@@ -218,7 +217,7 @@ final class HtmlToWordDemoController extends AbstractController
         return $this->render('demo/custom_config.html.twig', [
             'default_profile'    => $this->htmlToWordDefaultProfile,
             'sample_config_json' => $sampleConfigJson,
-            'form'               => $form->createView(),
+            'form'               => $form,
         ]);
     }
 

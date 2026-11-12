@@ -2,95 +2,71 @@
 
 {% block title %}HtmlToWord — demos (Symfony 8){% endblock %}
 
-{% form_theme form 'bootstrap_5_layout.html.twig' %}
+{% block nowo_ui_page_header %}
+    {{ include(nowo_ui_partial('page_header'), {
+        title: 'HtmlToWordBundle',
+        intro: 'The configured engine is always phpword (PhpOffice). HTML is parsed with masterminds/html5, light sanitization, the bundle transformer chain, and PhpWord section setup (margins, orientation, header/footer). DOCX export is in-memory; League Flysystem is optional for other targets — this demo uses HTTP download only.',
+    }) }}
+{% endblock %}
 
 {% block body %}
-  <h1>HtmlToWordBundle <span class="text-secondary fs-5">(Symfony 8)</span></h1>
-  <p class="lead">
-    The configured engine is always <strong><code>phpword</code></strong> (PhpOffice). HTML is parsed with
-    <strong>masterminds/html5</strong>, light sanitization, the bundle <strong>transformer</strong> chain, and
-    PhpWord section setup (margins, orientation, header/footer). DOCX export is in-memory;
-    <strong>League Flysystem</strong> is optional for other targets — this demo uses HTTP download only.
-  </p>
-
-  <div class="alert alert-info small mb-3">
+  <div class="nowo-ui-flash nowo-ui-flash--info" role="note">
     <strong>Same API, three calls:</strong> depending on the mode, the controller uses one of these
     <code>HtmlToWordConverterInterface</code> methods:
     <code>convertWithProfile()</code>, <code>convert()</code> (YAML <code>default</code> profile) or
     <code>convertWithOptions()</code> (merge options + profile). The internal pipeline is unchanged.
-    <span class="d-block mt-2 mb-0"><a href="{{ path('demo_custom_config') }}">Formulario JSON</a>
-      — cabecera / pie de Word (<code>header</code> / <code>footer</code>), merge YAML o solo inline (<code>convertWithInlineProfile</code>).</span>
+    <a href="{{ path('demo_custom_config') }}">Formulario JSON</a>
+    — cabecera / pie de Word (<code>header</code> / <code>footer</code>), merge YAML o solo inline (<code>convertWithInlineProfile</code>).
   </div>
 
-  <div class="accordion mb-4" id="profiles-acc">
-    <div class="accordion-item">
-      <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#profiles-collapse">
-          YAML profiles in this demo (different config, same builder)
-        </button>
-      </h2>
-      <div id="profiles-collapse" class="accordion-collapse collapse" data-bs-parent="#profiles-acc">
-        <div class="accordion-body small">
-          <ul class="mb-0">
-            <li><code>default</code>, <code>estricto</code> — <code>strict_mode</code> enabled.</li>
-            <li><code>informe</code> — landscape + repeatable table header.</li>
-            <li><code>membrete</code>, <code>pie_solo</code>, <code>carta_us</code> — cabecera/pie PhpWord y tamaño LETTER.</li>
-            <li><a href="{{ path('demo_custom_config') }}"><code>/custom-config</code></a> — mismo esquema en JSON (ejemplo precargado con cabecera + pie).</li>
-            <li><code>tablas_avanzado</code> vs <code>tablas_sin_repeat</code> — <code>tables.repeat_header_row</code>.</li>
-            <li><code>imagen_ancha</code> — <code>images.max_width</code> / remote images.</li>
-            <li><code>densidad</code> — long text/tables + stress filename.</li>
-          </ul>
-        </div>
-      </div>
+  <details class="nowo-ui-card">
+    <summary class="nowo-ui-card__title">YAML profiles in this demo (different config, same builder)</summary>
+    <div class="nowo-ui-card__body">
+      <ul>
+        <li><code>default</code>, <code>estricto</code> — <code>strict_mode</code> enabled.</li>
+        <li><code>informe</code> — landscape + repeatable table header.</li>
+        <li><code>membrete</code>, <code>pie_solo</code>, <code>carta_us</code> — cabecera/pie PhpWord y tamaño LETTER.</li>
+        <li><a href="{{ path('demo_custom_config') }}"><code>/custom-config</code></a> — mismo esquema en JSON (ejemplo precargado con cabecera + pie).</li>
+        <li><code>tablas_avanzado</code> vs <code>tablas_sin_repeat</code> — <code>tables.repeat_header_row</code>.</li>
+        <li><code>imagen_ancha</code> — <code>images.max_width</code> / remote images.</li>
+        <li><code>densidad</code> — long text/tables + stress filename.</li>
+      </ul>
     </div>
-  </div>
+  </details>
 
   {{ form_start(form) }}
+    {{ form_errors(form) }}
     {{ form_row(form.api) }}
+    {{ form_row(form.profile) }}
+    {{ form_widget(form.preset) }}
 
-    <div class="row g-3 mb-3">
-      <div class="col-md-6">
-        {{ form_row(form.profile) }}
-      </div>
-      <div class="col-md-6 d-flex align-items-end">
-        {{ form_widget(form.preset) }}
-        <button type="submit" class="btn btn-primary">Download .docx</button>
-      </div>
-    </div>
-
-    <label class="form-label">Presets (fill the textarea)</label>
-    <div class="d-flex flex-wrap gap-2 mb-2">
+    <p class="nowo-ui-muted">Presets (fill the textarea)</p>
+    <p>
       {% for id, _html in presets %}
-        <button type="button" class="btn btn-outline-secondary btn-sm" data-load-preset="{{ id }}" title="{{ preset_meta[id].stack|default('') }}">{{ id }}</button>
+        <button type="button" class="nowo-ui-btn nowo-ui-btn--outline nowo-ui-btn--sm" data-load-preset="{{ id }}" title="{{ preset_meta[id].stack|default('') }}">{{ id }}</button>
       {% endfor %}
-    </div>
+    </p>
 
     {{ form_row(form.html) }}
 
-    <div class="table-responsive">
-      <table class="table table-sm table-bordered caption-top">
-        <caption class="text-dark">Preset → suggested profile + stack note</caption>
-        <thead class="table-light">
-          <tr><th>Preset</th><th>Suggested profile</th><th>Stack / libraries</th></tr>
-        </thead>
-        <tbody class="small">
-          {% for id, meta in preset_meta %}
-            <tr>
-              <td><code>{{ id }}</code></td>
-              <td><code>{{ meta.profile }}</code></td>
-              <td>{{ meta.stack }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <table class="nowo-ui-data-table nowo-ui-data-table--compact">
+      <caption>Preset → suggested profile + stack note</caption>
+      <thead>
+        <tr><th>Preset</th><th>Suggested profile</th><th>Stack / libraries</th></tr>
+      </thead>
+      <tbody>
+        {% for id, meta in preset_meta %}
+          <tr>
+            <td><code>{{ id }}</code></td>
+            <td><code>{{ meta.profile }}</code></td>
+            <td>{{ meta.stack }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-    {% for child in form %}
-      {% if not child.rendered %}
-        {{ form_row(child) }}
-      {% endif %}
-    {% endfor %}
-  {{ form_end(form) }}
+    {{ form_rest(form) }}
+  {{ form_end(form, {render_rest: false}) }}
 
   <script>
     const DEMO_PRESETS = {{ presets_json|raw }};
