@@ -167,8 +167,7 @@ HTML;
 
     private function createTempPng(): string
     {
-        $png = base64_decode(self::PNG_1X1, true);
-        self::assertNotFalse($png);
+        $png = (string) base64_decode(self::PNG_1X1, true);
         $tmp = tempnam(sys_get_temp_dir(), 'htw_inline_') . '.png';
         file_put_contents($tmp, $png);
 

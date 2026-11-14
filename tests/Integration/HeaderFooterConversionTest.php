@@ -32,8 +32,7 @@ final class HeaderFooterConversionTest extends KernelTestCase
         /** @var HtmlToWordConverter $converter */
         $converter = self::getContainer()->get(HtmlToWordConverter::class);
 
-        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', true);
-        self::assertNotFalse($png);
+        $png = (string) base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', true);
 
         $logo = sys_get_temp_dir() . '/htw_logo_' . uniqid() . '.png';
         file_put_contents($logo, $png);
