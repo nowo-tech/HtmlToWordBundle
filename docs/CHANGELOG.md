@@ -33,6 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Demo uses the UiKit base style and FormKit forms (REQ-DEMO-014/015).
+- Tests: drop the `assertNotFalse()` on constant `base64_decode()` fixtures, which phpstan 2.3.5 reports as always true (`staticMethod.alreadyNarrowedType`); no runtime change.
 
 ## [1.8.0] - 2026-11-12
 
