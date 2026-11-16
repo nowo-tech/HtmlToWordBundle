@@ -2,7 +2,7 @@
 
 **Baseline spec**: [`spec.md`](spec.md)  
 **Package**: `nowo-tech/html-to-word-bundle`  
-**Last audited**: 2026-10-20
+**Last audited**: 2026-11-16
 
 ## Symfony config
 
@@ -74,12 +74,15 @@
 | `Transformer/HrTransformer.php` | Horizontal rules | FR-XFORM-002 |
 | `Transformer/ImageBlockTransformer.php` | Block images | FR-XFORM-002 |
 
-## Export
+## Export & HTTP edge
 
 | Source file | Spec section | Requirement IDs |
 | --- | --- | --- |
 | `Export/DocxExporter.php` | DOCX export | FR-EXPORT-001 |
-| `Export/ExporterInterface.php` | Exporter contract | FR-EXPORT-001 |
+| `Export/ExporterInterface.php` | Exporter contract (deprecated since 1.8.0) | FR-EXPORT-001 |
+| `Export/DocumentWriterInterface.php` | Framework-free output port: bytes / stream / path / Flysystem (1.8.0) | FR-EXPORT-002 |
+| `Http/DocxResponseFactory.php` | HTTP edge: DOCX download / inline response from the writer port (1.8.0) | FR-EXPORT-003 |
+| `Http/DocxDownloadHeaders.php` | Shared download headers (safe filename, Content-Disposition, MIME) | FR-EXPORT-003 |
 
 ## Exceptions
 
@@ -104,8 +107,8 @@
 | Conversion pipeline | 7 | 7 |
 | Engine & document model | 14 | 14 |
 | Transformers | 12 | 12 |
-| Export | 2 | 2 |
+| Export & HTTP edge | 5 | 5 |
 | Exceptions | 8 | 8 |
-| **Total production sources** | **50** | **50** |
+| **Total production sources** | **53** | **53** |
 
-Audit command (production count): `git ls-files src | wc -l` → **50** (2026-10-20).
+Audit command (production count): `git ls-files src | wc -l` → **53** (2026-11-16).
