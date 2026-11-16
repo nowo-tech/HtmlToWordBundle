@@ -73,14 +73,16 @@ Converts **rich HTML** (WYSIWYG output) into downloadable **DOCX** via **PHPWord
 
 ### Export & errors
 
-- **FR-EXPORT-001**: `DocxExporter`, `ExporterInterface`.
+- **FR-EXPORT-001**: `DocxExporter`, `ExporterInterface` (deprecated since 1.8.0, removed in 2.0).
+- **FR-EXPORT-002**: `DocumentWriterInterface` — framework-free output port (bytes, stream, local path, Flysystem); no Symfony / HTTP types, so CLI, Messenger and DDD adapters depend on it (REQ-ARCH-001).
+- **FR-EXPORT-003**: `DocxResponseFactory` + `DocxDownloadHeaders` — HTTP edge that turns a document into a download / inline response through the writer port.
 - **FR-EXC-001**: Typed exceptions for parse, export, engine, profile, image, and unsupported elements.
 
 ---
 
 ## Success Criteria
 
-- **SC-001**: **50/50** production files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (audited 2026-10-20; `git ls-files src | wc -l`).
+- **SC-001**: **53/53** production files under `src/` mapped in [`code-inventory.md`](code-inventory.md) (audited 2026-11-16; `git ls-files src | wc -l`).
 - **SC-002**: Config keys match [`docs/CONFIGURATION.md`](../../docs/CONFIGURATION.md).
 - **SC-003**: `composer qa` / coverage-check (≥85%) green in CI.
 

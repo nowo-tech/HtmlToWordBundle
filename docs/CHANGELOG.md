@@ -35,6 +35,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Demo uses the UiKit base style and FormKit forms (REQ-DEMO-014/015).
 - Tests: drop the `assertNotFalse()` on constant `base64_decode()` fixtures, which phpstan 2.3.5 reports as always true (`staticMethod.alreadyNarrowedType`); no runtime change.
 
+### Documentation
+
+- REQ compliance sweep 2026-11-16: Spec Kit baseline maps the 1.8.0 output port and HTTP edge (`DocumentWriterInterface`, `DocxResponseFactory`, `DocxDownloadHeaders`; FR-EXPORT-002/003); inventory 53/53 (REQ-SPECKIT-001/003).
+
 ## [1.8.0] - 2026-11-12
 
 Target: **1.8.0** (minor). REQ-ARCH-001 rule 3: a framework-free output port. See [UPGRADING](UPGRADING.md#to-180).
