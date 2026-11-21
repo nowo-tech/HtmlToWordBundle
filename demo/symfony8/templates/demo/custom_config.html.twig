@@ -10,69 +10,63 @@
 {% endblock %}
 
 {% block body %}
-  <div class="nowo-ui-flash nowo-ui-flash--info" role="note">
-    <p><strong>Merge with YAML</strong> — <code>convertWithOptions($html, $options, $profile)</code>:
-      merge order = YAML <code>default</code> profile + selected named profile + your JSON (deepest wins).</p>
-    <p><strong>This config only</strong> — <code>convertWithInlineProfile($html, $options)</code>:
-      no YAML merge; use when the full profile lives in a database.</p>
-  </div>
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'Merge with YAML or this config only', kind: 'detail'} %}
+        {% block section_body %}
+            <p>
+                <strong>Merge with YAML</strong> — <code class="nowo-ui-code">convertWithOptions($html, $options, $profile)</code>:
+                merge order = YAML <code class="nowo-ui-code">default</code> profile + selected named profile + your JSON (deepest wins).
+            </p>
+            <p>
+                <strong>This config only</strong> — <code class="nowo-ui-code">convertWithInlineProfile($html, $options)</code>:
+                no YAML merge; use when the full profile lives in a database.
+            </p>
+        {% endblock %}
+    {% endembed %}
 
-  <section class="nowo-ui-card">
-    <div class="nowo-ui-card__body">
-      <h2 class="nowo-ui-card__title">Cabecera y pie en el Word</h2>
-      <p>Las claves son las mismas que en <code>nowo_html_to_word.profiles.*</code> del bundle:</p>
-      <ul>
-        <li><code>header</code>: <code>enabled</code>, <code>text</code>, <code>logo</code> (ruta absoluta a raster), <code>logo_width</code> (px CSS), <code>show_page_number</code>, <code>different_first_page</code>.</li>
-        <li><code>footer</code>: <code>enabled</code>, <code>text</code>, <code>show_page_number</code> (PhpWord inserta el campo de página con <code>{PAGE}</code>), <code>different_first_page</code>.</li>
-        <li>En JSON pegado en el navegador <strong>no</strong> se resuelve <code>%kernel.project_dir%</code>: el ejemplo precargado usa ya la ruta absoluta al logo del demo.</li>
-        <li>Perfil YAML <code>membrete</code> en la demo principal reproduce el mismo concepto sin pasar por este formulario.</li>
-      </ul>
-    </div>
-  </section>
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'Cabecera y pie en el Word', intro: 'Las claves son las mismas que en nowo_html_to_word.profiles.* del bundle.', kind: 'list'} %}
+        {% block section_body %}
+            <ul>
+                <li><code class="nowo-ui-code">header</code>: <code class="nowo-ui-code">enabled</code>, <code class="nowo-ui-code">text</code>, <code class="nowo-ui-code">logo</code> (ruta absoluta a raster), <code class="nowo-ui-code">logo_width</code> (px CSS), <code class="nowo-ui-code">show_page_number</code>, <code class="nowo-ui-code">different_first_page</code>.</li>
+                <li><code class="nowo-ui-code">footer</code>: <code class="nowo-ui-code">enabled</code>, <code class="nowo-ui-code">text</code>, <code class="nowo-ui-code">show_page_number</code> (PhpWord inserta el campo de página con <code class="nowo-ui-code">{PAGE}</code>), <code class="nowo-ui-code">different_first_page</code>.</li>
+                <li>En JSON pegado en el navegador <strong>no</strong> se resuelve <code class="nowo-ui-code">%kernel.project_dir%</code>: el ejemplo precargado usa ya la ruta absoluta al logo del demo.</li>
+                <li>Perfil YAML <code class="nowo-ui-code">membrete</code> en la demo principal reproduce el mismo concepto sin pasar por este formulario.</li>
+            </ul>
+        {% endblock %}
+    {% endembed %}
 
-  <section class="nowo-ui-card">
-    <div class="nowo-ui-card__body">
-      <h2 class="nowo-ui-card__title">Sample header logo (web + DOCX)</h2>
-      <p>
-        <img src="{{ asset('demo-assets/demo-logo.png') }}" alt="Sample logo used in DOCX header when configured" width="160" height="160">
-      </p>
-      <p class="nowo-ui-muted">
-        Static file <code>public/demo-assets/demo-logo.png</code>. Profiles such as <code>membrete</code> reference it via
-        <code>header.logo</code>; HtmlToWordBundle embeds it in the Word header when the path is readable and the bytes look like PNG/JPEG/GIF/WebP.
-        Body HTML below can still include <code>&lt;img&gt;</code> tags — those are independent from this logo.
-      </p>
-    </div>
-  </section>
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'Sample header logo (web + DOCX)', kind: 'detail'} %}
+        {% block section_body %}
+            <p><img src="{{ asset('demo-assets/demo-logo.png') }}" alt="Sample logo used in DOCX header when configured" width="160" height="160"></p>
+            <p class="nowo-ui-muted">
+                Static file <code class="nowo-ui-code">public/demo-assets/demo-logo.png</code>. Profiles such as <code class="nowo-ui-code">membrete</code> reference it via
+                <code class="nowo-ui-code">header.logo</code>; HtmlToWordBundle embeds it in the Word header when the path is readable and the bytes look like PNG/JPEG/GIF/WebP.
+                Body HTML below can still include <code class="nowo-ui-code">&lt;img&gt;</code> tags — those are independent from this logo.
+            </p>
+        {% endblock %}
+    {% endembed %}
 
-  {{ form_start(form) }}
-    {{ form_errors(form) }}
-    {{ form_row(form.mode) }}
-    <div id="profile-row">
-      {{ form_row(form.profile) }}
-    </div>
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'Convert', kind: 'form', testid: 'demo-custom-config', form: form} %}
+        {% block section_body %}
+            {{ form_start(form, {attr: {id: 'custom-config-form', class: 'nowo-ui-form'}}) }}
+                {{ form_errors(form) }}
+                {{ form_row(form.mode) }}
+                <div id="profile-row" data-demo-mode-field="{{ form.mode.vars.full_name }}" data-demo-profile-field="{{ form.profile.vars.id }}">
+                    {{ form_row(form.profile) }}
+                </div>
+                {{ form_row(form.html) }}
+                {{ form_row(form.config_json) }}
+                <p class="nowo-ui-muted">Referencia: JSON mínimo del perfil YAML «{{ default_profile }}» (solo lo que exporta la config)</p>
+                <pre class="nowo-ui-code-block" tabindex="0">{{ sample_config_json }}</pre>
+            {{ form_end(form) }}
+        {% endblock %}
+        {% block section_footer %}
+            <a href="{{ path('demo_home') }}" class="nowo-ui-btn nowo-ui-btn--outline">Back to main demo</a>
+            <button type="submit" form="custom-config-form" class="nowo-ui-btn nowo-ui-btn--primary">Download .docx</button>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}
 
-    {{ form_row(form.html) }}
-    {{ form_row(form.config_json) }}
-    <details class="nowo-ui-card">
-      <summary class="nowo-ui-card__title">Referencia: JSON mínimo del perfil YAML «{{ default_profile }}» (solo lo que exporta la config)</summary>
-      <pre class="nowo-ui-code-block">{{ sample_config_json }}</pre>
-    </details>
-
-    {{ form_row(form.submit) }}
-    <a href="{{ path('demo_home') }}" class="nowo-ui-btn nowo-ui-btn--outline">Back to main demo</a>
-  {{ form_end(form) }}
-
-  <script>
-    const modeInline = document.querySelector('input[name="{{ form.mode.vars.full_name }}"][value="inline"]');
-    function syncProfileRow() {
-      const inline = modeInline.checked;
-      document.getElementById('profile-row').style.display = inline ? 'none' : '';
-      const sel = document.getElementById('{{ form.profile.vars.id }}');
-      if (sel) { sel.disabled = inline; }
-    }
-    document.querySelectorAll('input[name="{{ form.mode.vars.full_name }}"]').forEach(function (radio) {
-      radio.addEventListener('change', syncProfileRow);
-    });
-    syncProfileRow();
-  </script>
+{% block nowo_ui_scripts %}
+    {{ parent() }}
+    <script src="{{ asset('demo-assets/custom-config.js') }}" defer></script>
 {% endblock %}

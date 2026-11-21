@@ -8,7 +8,6 @@ use Nowo\FormKitBundle\Attribute\FormKitConfig;
 use Nowo\FormKitBundle\Form\FormOptionsTrait;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -61,11 +60,6 @@ final class DemoExportType extends AbstractType
             'placeholder'        => false,
             'attr'               => ['rows' => 18, 'spellcheck' => 'false'],
             'help'               => 'When you load a preset, the suggested profile can be applied from the table below (button tooltip = relevant stack layer).',
-        ]);
-        $this->addWithDefaults($builder, 'submit', SubmitType::class, [
-            'label'              => 'Download .docx',
-            'translation_domain' => false,
-            'attr'               => ['class' => 'nowo-ui-btn nowo-ui-btn--primary'],
         ]);
     }
 
