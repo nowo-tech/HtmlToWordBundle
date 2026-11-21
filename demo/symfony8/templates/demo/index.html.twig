@@ -10,80 +10,76 @@
 {% endblock %}
 
 {% block body %}
-  <div class="nowo-ui-flash nowo-ui-flash--info" role="note">
-    <strong>Same API, three calls:</strong> depending on the mode, the controller uses one of these
-    <code>HtmlToWordConverterInterface</code> methods:
-    <code>convertWithProfile()</code>, <code>convert()</code> (YAML <code>default</code> profile) or
-    <code>convertWithOptions()</code> (merge options + profile). The internal pipeline is unchanged.
-    <a href="{{ path('demo_custom_config') }}">Formulario JSON</a>
-    — cabecera / pie de Word (<code>header</code> / <code>footer</code>), merge YAML o solo inline (<code>convertWithInlineProfile</code>).
-  </div>
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'Same API, three calls', kind: 'detail'} %}
+        {% block section_body %}
+            <p>
+                Depending on the mode, the controller uses one of these <code class="nowo-ui-code">HtmlToWordConverterInterface</code> methods:
+                <code class="nowo-ui-code">convertWithProfile()</code>, <code class="nowo-ui-code">convert()</code> (YAML <code class="nowo-ui-code">default</code> profile) or
+                <code class="nowo-ui-code">convertWithOptions()</code> (merge options + profile). The internal pipeline is unchanged.
+                The JSON form covers the Word header / footer, YAML merge or inline only (<code class="nowo-ui-code">convertWithInlineProfile</code>).
+            </p>
+            <p><a class="nowo-ui-btn nowo-ui-btn--outline nowo-ui-btn--sm" href="{{ path('demo_custom_config') }}">Open the JSON form</a></p>
+        {% endblock %}
+    {% endembed %}
 
-  <details class="nowo-ui-card">
-    <summary class="nowo-ui-card__title">YAML profiles in this demo (different config, same builder)</summary>
-    <div class="nowo-ui-card__body">
-      <ul>
-        <li><code>default</code>, <code>estricto</code> — <code>strict_mode</code> enabled.</li>
-        <li><code>informe</code> — landscape + repeatable table header.</li>
-        <li><code>membrete</code>, <code>pie_solo</code>, <code>carta_us</code> — cabecera/pie PhpWord y tamaño LETTER.</li>
-        <li><a href="{{ path('demo_custom_config') }}"><code>/custom-config</code></a> — mismo esquema en JSON (ejemplo precargado con cabecera + pie).</li>
-        <li><code>tablas_avanzado</code> vs <code>tablas_sin_repeat</code> — <code>tables.repeat_header_row</code>.</li>
-        <li><code>imagen_ancha</code> — <code>images.max_width</code> / remote images.</li>
-        <li><code>densidad</code> — long text/tables + stress filename.</li>
-      </ul>
-    </div>
-  </details>
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'YAML profiles in this demo', intro: 'Different config, same builder.', kind: 'list'} %}
+        {% block section_body %}
+            <ul>
+                <li><code class="nowo-ui-code">default</code>, <code class="nowo-ui-code">estricto</code> — <code class="nowo-ui-code">strict_mode</code> enabled.</li>
+                <li><code class="nowo-ui-code">informe</code> — landscape + repeatable table header.</li>
+                <li><code class="nowo-ui-code">membrete</code>, <code class="nowo-ui-code">pie_solo</code>, <code class="nowo-ui-code">carta_us</code> — PhpWord header / footer and LETTER size.</li>
+                <li><a class="nowo-ui-link" href="{{ path('demo_custom_config') }}"><code class="nowo-ui-code">/custom-config</code></a> — the same schema as JSON (preloaded example with header + footer).</li>
+                <li><code class="nowo-ui-code">tablas_avanzado</code> vs <code class="nowo-ui-code">tablas_sin_repeat</code> — <code class="nowo-ui-code">tables.repeat_header_row</code>.</li>
+                <li><code class="nowo-ui-code">imagen_ancha</code> — <code class="nowo-ui-code">images.max_width</code> / remote images.</li>
+                <li><code class="nowo-ui-code">densidad</code> — long text/tables + stress filename.</li>
+            </ul>
+        {% endblock %}
+    {% endembed %}
 
-  {{ form_start(form) }}
-    {{ form_errors(form) }}
-    {{ form_row(form.api) }}
-    {{ form_row(form.profile) }}
-    {{ form_widget(form.preset) }}
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'Export', kind: 'form', testid: 'demo-export', form: form, presets: presets, preset_meta: preset_meta} %}
+        {% block section_body %}
+            {{ form_start(form, {attr: {id: 'export-form', class: 'nowo-ui-form'}}) }}
+                {{ form_errors(form) }}
+                {{ form_row(form.api) }}
+                {{ form_row(form.profile) }}
+                {{ form_widget(form.preset) }}
 
-    <p class="nowo-ui-muted">Presets (fill the textarea)</p>
-    <p>
-      {% for id, _html in presets %}
-        <button type="button" class="nowo-ui-btn nowo-ui-btn--outline nowo-ui-btn--sm" data-load-preset="{{ id }}" title="{{ preset_meta[id].stack|default('') }}">{{ id }}</button>
-      {% endfor %}
-    </p>
+                <div role="group" aria-label="Presets (fill the textarea)" data-demo-presets="{{ presets_json|e('html_attr') }}" data-demo-preset-meta="{{ preset_meta_json|e('html_attr') }}" data-demo-html-field="{{ form.html.vars.id }}" data-demo-preset-field="{{ form.preset.vars.id }}" data-demo-profile-field="{{ form.profile.vars.id }}">
+                    {% for id, _html in presets %}
+                        <button type="button" class="nowo-ui-btn nowo-ui-btn--outline nowo-ui-btn--sm" data-load-preset="{{ id }}" title="{{ preset_meta[id].stack|default('') }}">{{ id }}</button>
+                    {% endfor %}
+                </div>
 
-    {{ form_row(form.html) }}
+                {{ form_row(form.html) }}
+                {{ form_rest(form) }}
+            {{ form_end(form, {render_rest: false}) }}
+        {% endblock %}
+        {% block section_footer %}
+            <button type="submit" form="export-form" class="nowo-ui-btn nowo-ui-btn--primary">Download .docx</button>
+        {% endblock %}
+    {% endembed %}
 
-    <table class="nowo-ui-data-table nowo-ui-data-table--compact">
-      <caption>Preset → suggested profile + stack note</caption>
-      <thead>
-        <tr><th>Preset</th><th>Suggested profile</th><th>Stack / libraries</th></tr>
-      </thead>
-      <tbody>
-        {% for id, meta in preset_meta %}
-          <tr>
-            <td><code>{{ id }}</code></td>
-            <td><code>{{ meta.profile }}</code></td>
-            <td>{{ meta.stack }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    {% embed '@NowoUiKit/demo_platform/_section.html.twig' with {title: 'Preset → suggested profile + stack note', kind: 'table', preset_meta: preset_meta} %}
+        {% block section_body %}
+            <table class="nowo-ui-data-table">
+                <thead>
+                    <tr><th scope="col">Preset</th><th scope="col">Suggested profile</th><th scope="col" class="nowo-ui-cell--wrap">Stack / libraries</th></tr>
+                </thead>
+                <tbody>
+                    {% for id, meta in preset_meta %}
+                        <tr>
+                            <td><code class="nowo-ui-code">{{ id }}</code></td>
+                            <td><code class="nowo-ui-code">{{ meta.profile }}</code></td>
+                            <td class="nowo-ui-cell--wrap">{{ meta.stack }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endblock %}
+    {% endembed %}
+{% endblock %}
 
-    {{ form_rest(form) }}
-  {{ form_end(form, {render_rest: false}) }}
-
-  <script>
-    const DEMO_PRESETS = {{ presets_json|raw }};
-    document.querySelectorAll('[data-load-preset]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const id = btn.getAttribute('data-load-preset');
-        const ta = document.getElementById('{{ form.html.vars.id }}');
-        const pf = document.getElementById('{{ form.preset.vars.id }}');
-        ta.value = DEMO_PRESETS[id] || '';
-        pf.value = '';
-        const sug = {{ preset_meta_json|raw }};
-        if (sug[id] && sug[id].profile) {
-          const sel = document.getElementById('{{ form.profile.vars.id }}');
-          const opt = Array.from(sel.options).find(function (o) { return o.value === sug[id].profile; });
-          if (opt) { sel.value = sug[id].profile; }
-        }
-      });
-    });
-  </script>
+{% block nowo_ui_scripts %}
+    {{ parent() }}
+    <script src="{{ asset('demo-assets/presets.js') }}" defer></script>
 {% endblock %}

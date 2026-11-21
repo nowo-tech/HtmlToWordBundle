@@ -7,7 +7,6 @@ namespace App\Form;
 use Nowo\FormKitBundle\Attribute\FormKitConfig;
 use Nowo\FormKitBundle\Form\FormOptionsTrait;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -62,11 +61,6 @@ final class DemoCustomConfigType extends AbstractType
             'translation_domain' => false,
             'placeholder'        => false,
             'attr'               => ['rows' => 22, 'spellcheck' => 'false'],
-        ]);
-        $this->addWithDefaults($builder, 'submit', SubmitType::class, [
-            'label'              => 'Download .docx',
-            'translation_domain' => false,
-            'attr'               => ['class' => 'nowo-ui-btn nowo-ui-btn--primary'],
         ]);
     }
 
