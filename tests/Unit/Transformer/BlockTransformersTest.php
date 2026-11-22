@@ -146,7 +146,7 @@ final class BlockTransformersTest extends TestCase
 
         $temp = tempnam(sys_get_temp_dir(), 'img');
         self::assertIsString($temp);
-        $png = (string) base64_decode(self::PNG_1X1, true);
+        $png = base64_decode(self::PNG_1X1, true);
         file_put_contents($temp, $png);
 
         $resolver = $this->createMock(ImageResolverInterface::class);
@@ -175,7 +175,7 @@ final class BlockTransformersTest extends TestCase
 
         $temp = tempnam(sys_get_temp_dir(), 'img');
         self::assertIsString($temp);
-        $png = (string) base64_decode(self::PNG_1X1, true);
+        $png = base64_decode(self::PNG_1X1, true);
         file_put_contents($temp, $png);
 
         $resolver = $this->createMock(ImageResolverInterface::class);
