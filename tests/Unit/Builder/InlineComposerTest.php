@@ -120,7 +120,7 @@ final class InlineComposerTest extends TestCase
     public function testInlineImageEmbedsWithDimensions(): void
     {
         $tmp = tempnam(sys_get_temp_dir(), 'htw_inline_img_') . '.png';
-        $png = (string) base64_decode(self::PNG_1X1, true);
+        $png = base64_decode(self::PNG_1X1, true);
         file_put_contents($tmp, $png);
 
         try {

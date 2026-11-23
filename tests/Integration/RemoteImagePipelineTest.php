@@ -41,9 +41,9 @@ final class RemoteImagePipelineTest extends KernelTestCase
     {
         $docRoot = sys_get_temp_dir() . '/htw_pipe_' . uniqid('', true);
         mkdir($docRoot);
-        file_put_contents($docRoot . '/pixel.png', (string) base64_decode(self::PNG_1X1, true));
+        file_put_contents($docRoot . '/pixel.png', base64_decode(self::PNG_1X1, true));
         $secret = sys_get_temp_dir() . '/htw_secret_' . uniqid('', true) . '.png';
-        file_put_contents($secret, (string) base64_decode(self::PNG_1X1, true));
+        file_put_contents($secret, base64_decode(self::PNG_1X1, true));
 
         $port   = random_int(29000, 29999);
         $server = new Process([PHP_BINARY, '-S', '127.0.0.1:' . $port, '-t', $docRoot]);

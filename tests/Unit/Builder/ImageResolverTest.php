@@ -93,7 +93,7 @@ final class ImageResolverTest extends TestCase
         $tmp = tempnam(sys_get_temp_dir(), 'htw_img_read_');
         self::assertNotFalse($tmp);
         try {
-            $png = (string) base64_decode(self::PNG_1X1, true);
+            $png = base64_decode(self::PNG_1X1, true);
             file_put_contents($tmp, $png);
             $path = (new ImageResolver())->resolveToTempPath($tmp, ResolvedConfig::fromArray(['images' => ['local_base_dir' => sys_get_temp_dir()]]));
             self::assertSame(realpath($tmp), $path);
@@ -423,7 +423,7 @@ final class ImageResolverTest extends TestCase
 
     private function writePng(string $path): string
     {
-        file_put_contents($path, (string) base64_decode(self::PNG_1X1, true));
+        file_put_contents($path, base64_decode(self::PNG_1X1, true));
 
         return $path;
     }
