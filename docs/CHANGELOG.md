@@ -36,6 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- PHP 8.6 and Symfony 8.2 support in CI (both stable, no allowed failures): `composer.json` allows PHP below 8.7 (was below 8.6) and `.github/workflows/forward-compat.yml` runs PHP 8.6 / Symfony 8.1 and PHP 8.5 / Symfony 8.2 cells.
 - Demo: runs in UiKit's demo platform shell (`nowo-tech/ui-kit-bundle` ^2.60); the demo's own header is gone and the pages use the shell page headers and section cards. Demo only, no bundle change.
 - Demo uses the UiKit base style and FormKit forms (REQ-DEMO-014/015).
 - Tests: drop the `assertNotFalse()` on constant `base64_decode()` fixtures, which phpstan 2.3.5 reports as always true (`staticMethod.alreadyNarrowedType`); no runtime change.
